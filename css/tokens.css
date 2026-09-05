@@ -1,0 +1,80 @@
+/* Design tokens. Single source for spacing, type, colour and motion.
+   Values follow the visual system defined in docs/about.md section 22.1. */
+
+:root {
+  /* Spacing scale: 4, 8, 12, 16, 24, 32 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Type */
+  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --text-sm: 12px;
+  --text-base: 14px;
+  --text-lg: 18px;
+  --text-xl: 24px;
+  --leading: 1.5;
+  --leading-tight: 1.35;
+
+  /* Geometry */
+  --radius: 4px;
+  --radius-lg: 6px;
+  --border-width: 1px;
+  --focus-width: 2px;
+
+  /* Control sizing: 32px desktop, 40px touch (section 22.1) */
+  --control-height: 32px;
+  --toolbar-height: 36px;
+  --header-height: 48px;
+  --statusbar-height: 24px;
+
+  /* Motion: 120-180ms (section 22.1) */
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --easing: ease-out;
+
+  /* Semantic colour roles. Hue meaning is fixed; only the values change
+     between themes. Green never stands alone for "safe". */
+  --violation: #e5484d;
+  --caution: #e2a336;
+  --activity: #4a8fe7;
+  --unknown: #8b949e;
+  --contract: #3fa66a;
+}
+
+/* Dark is the default surface, matching the density of an engineering tool. */
+:root,
+[data-theme="dark"] {
+  --bg: #0f1216;
+  --bg-panel: #161b22;
+  --bg-raised: #1c232c;
+  --bg-input: #0c0f13;
+  --border: #2a323d;
+  --border-strong: #3b4653;
+  --text: #e3e8ef;
+  --text-muted: #9aa4b2;
+  --text-faint: #6d7683;
+  --focus: #6ea8ff;
+}
+
+[data-theme="light"] {
+  --bg: #f2f4f7;
+  --bg-panel: #ffffff;
+  --bg-raised: #f7f9fb;
+  --bg-input: #ffffff;
+  --border: #d5dbe3;
+  --border-strong: #b9c2cd;
+  --text: #1b2129;
+  --text-muted: #5a6673;
+  --text-faint: #7d8896;
+  --focus: #1f6feb;
+  --violation: #c62a2f;
+  --caution: #96650d;
+  --activity: #1f6feb;
+  --unknown: #6d7683;
+  --contract: #1f7a4d;
+}
