@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pomset · workbench de concurrencia</title>
+<meta name="description" content="Ejecuta, observa y verifica programas concurrentes en runtimes reales, desde el navegador.">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Saltar al contenido</a>
+
+<header class="app-header">
+  <a class="brand" href="index.html">pomset</a>
+  <nav class="app-nav" aria-label="Principal">
+    <a href="index.html" aria-current="page">Inicio</a>
+    <a href="workbench.html">Workbench</a>
+    <a href="catalog.html">Catálogo</a>
+  </nav>
+  <div class="header-end">
+    <button class="button" type="button" data-theme-toggle>Tema claro</button>
+  </div>
+</header>
+
+<main class="app-main" id="main">
+  <div class="page">
+
+    <section class="hero" aria-labelledby="title">
+      <h1 id="title">Ejecuta, observa y verifica programas concurrentes en runtimes reales, desde el navegador.</h1>
+      <p>
+        La unidad de trabajo no es un fragmento pegado en un editor. Es un proyecto versionado,
+        un escenario de prueba y un conjunto de perfiles. Un programa Python con asyncio, un
+        workspace Rust con Tokio y un proyecto CMake con OpenMP usan el mismo sistema de
+        proyectos, trabajos y evidencia, aunque sus motores y garantías sean distintos.
+      </p>
+      <div class="hero__actions">
+        <a class="button button--primary" href="workbench.html">Abrir un ejemplo</a>
+        <a class="button" href="catalog.html">Ver catálogo</a>
+      </div>
+    </section>
+
+    <section aria-labelledby="modes">
+      <h2 class="section-title" id="modes">Los tres modos</h2>
+      <table class="data-table">
+        <caption class="budget-note">
+          Ningún modo sustituye a los otros. Una prueba formal sobre un modelo restringido no
+          cubre todas las extensiones nativas de un programa, y una ejecución sin errores no
+          demuestra corrección.
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Modo</th>
+            <th scope="col">Qué hace</th>
+            <th scope="col">Qué puede ofrecer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Observar</th>
+            <td>Ejecuta un escenario instrumentado en un runtime real.</td>
+            <td>Traza, diagnósticos dinámicos, recursos y comportamiento observado.</td>
+          </tr>
+          <tr>
+            <th scope="row">Explorar</th>
+            <td>Ejecuta bajo scheduling o entorno controlado.</td>
+            <td>Ejecuciones alternativas, fallos reproducibles y cobertura del dominio explorado.</td>
+          </tr>
+          <tr>
+            <th scope="row">Verificar</th>
+            <td>Consulta un motor formal o estático sobre una propiedad.</td>
+            <td>Propiedad establecida bajo contrato, contraejemplo, alerta o resultado no concluyente.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section aria-labelledby="examples">
+      <h2 class="section-title" id="examples">Ejemplos curados</h2>
+      <div class="example-grid">
+
+        <article class="example">
+          <h3>Cancelación perdida en asyncio</h3>
+          <p class="example__path">gateway/dispatch.py</p>
+          <p class="profile__note">
+            Una tarea queda esperando un resultado que nunca llega porque su cancelación se
+            consumió en un <code>except</code> demasiado amplio.
+          </p>
+          <p class="example__meta">
+            <span class="badge">Python 3.13</span>
+            <span class="badge">asyncio</span>
+            <span class="badge badge--activity">observar</span>
+          </p>
+        </article>
+
+        <article class="example">
+          <h3>Orden de locks entre dos tareas Tokio</h3>
+          <p class="example__path">crates/ledger/src/apply.rs</p>
+          <p class="profile__note">
+            Dos rutas toman los mismos dos mutex en orden opuesto. El runtime nativo casi nunca
+            lo muestra; el scheduling controlado sí.
+          </p>
+          <p class="example__meta">
+            <span class="badge">Rust 1.89</span>
+            <span class="badge">Shuttle</span>
+            <span class="badge badge--activity">explorar</span>
+          </p>
+        </article>
+
+        <article class="example">
+          <h3>Escritura sin sincronizar en un kernel CUDA</h3>
+          <p class="example__path">src/reduce.cu</p>
+          <p class="profile__note">
+            Dos hilos del mismo bloque escriben la misma posición de memoria compartida sin
+            barrera entre medias.
+          </p>
+          <p class="example__meta">
+            <span class="badge">CUDA 12.6</span>
+            <span class="badge">Faial</span>
+            <span class="badge badge--activity">verificar</span>
+          </p>
+        </article>
+
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="app-footer">
+  <span>pomset · especificación v3.0</span>
+  <span>Apache-2.0</span>
+  <span>Mock de interfaz, sin backend</span>
+</footer>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

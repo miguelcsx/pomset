@@ -332,6 +332,12 @@ label {
   font-size: var(--text-sm);
 }
 
+.data-table caption {
+  caption-side: bottom;
+  text-align: left;
+  padding-top: var(--space-3);
+}
+
 .data-table th,
 .data-table td {
   text-align: left;
