@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catálogo de perfiles · pomset</title>
+<meta name="description" content="Entornos ejecutables y capacidades de análisis, con su estado de soporte y su disponibilidad operativa.">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Saltar al contenido</a>
+
+<header class="app-header">
+  <a class="brand" href="index.html">pomset</a>
+  <nav class="app-nav" aria-label="Principal">
+    <a href="index.html">Inicio</a>
+    <a href="workbench.html">Workbench</a>
+    <a href="catalog.html" aria-current="page">Catálogo</a>
+  </nav>
+  <div class="header-end">
+    <button class="button" type="button" data-theme-toggle>Tema claro</button>
+  </div>
+</header>
+
+<main class="app-main" id="main">
+  <div class="page">
+
+    <section aria-labelledby="title">
+      <h1 id="title" class="hero">Catálogo de perfiles</h1>
+      <p class="budget-note">
+        Cada ficha separa dos ejes que suelen confundirse. El <strong>soporte</strong> dice si la
+        combinación está validada y con qué límites; la <strong>disponibilidad</strong> dice si hay
+        capacidad operativa ahora mismo. «Validado, sin worker libre» no es «no soportado».
+      </p>
+    </section>
+
+    <section aria-labelledby="filters-title">
+      <h2 class="section-title" id="filters-title">Filtrar</h2>
+
+      <div class="filters">
+        <div class="field">
+          <label for="filter-mode">Modo</label>
+          <select id="filter-mode" data-filter-mode>
+            <option value="all">Todos</option>
+            <option value="observe">observar</option>
+            <option value="explore">explorar</option>
+            <option value="verify">verificar</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="filter-language">Lenguaje</label>
+          <select id="filter-language" data-filter-language>
+            <option value="all">Todos</option>
+          </select>
+        </div>
+
+        <p class="filters__count" role="status" data-profile-count></p>
+      </div>
+
+      <ul class="profile-grid" data-profile-grid></ul>
+
+      <p class="empty-state" data-profile-empty hidden>
+        Ninguna combinación coincide con ese filtro. Prueba con otro modo o lenguaje.
+      </p>
+    </section>
+
+  </div>
+</main>
+
+<footer class="app-footer">
+  <span>pomset · especificación v3.0</span>
+  <span>Apache-2.0</span>
+  <span>Mock de interfaz, sin backend</span>
+</footer>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

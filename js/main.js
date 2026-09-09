@@ -2,5 +2,7 @@
 // page, so every page loads the same module and wires only what it contains.
 
 import { initTheme } from "./theme.js";
+import { initCatalog } from "./catalog.js";
 
 initTheme();
+initCatalog();
