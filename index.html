@@ -27,49 +27,41 @@
   <div class="page">
 
     <section class="hero" aria-labelledby="title">
-      <h1 id="title">Ejecuta, observa y verifica programas concurrentes en runtimes reales, desde el navegador.</h1>
-      <p>
-        La unidad de trabajo no es un fragmento pegado en un editor. Es un proyecto versionado,
-        un escenario de prueba y un conjunto de perfiles. Un programa Python con asyncio, un
-        workspace Rust con Tokio y un proyecto CMake con OpenMP usan el mismo sistema de
-        proyectos, trabajos y evidencia, aunque sus motores y garantías sean distintos.
-      </p>
+      <h1 id="title">Concurrencia, ejecutada y verificada desde el navegador.</h1>
+      <p>Un proyecto, un escenario, varios perfiles. La misma evidencia para Python, Rust y CUDA.</p>
       <div class="hero__actions">
         <a class="button button--primary" href="workbench.html">Abrir un ejemplo</a>
-        <a class="button" href="catalog.html">Ver catálogo</a>
+        <a class="button" href="#import">Importar</a>
+        <a class="button" href="catalog.html">Catálogo</a>
       </div>
     </section>
 
     <section aria-labelledby="modes">
       <h2 class="section-title" id="modes">Los tres modos</h2>
       <table class="data-table">
-        <caption class="budget-note">
-          Ningún modo sustituye a los otros. Una prueba formal sobre un modelo restringido no
-          cubre todas las extensiones nativas de un programa, y una ejecución sin errores no
-          demuestra corrección.
-        </caption>
+        <caption class="budget-note">Ningún modo sustituye a otro. Sin fallos observados no es prueba de corrección.</caption>
         <thead>
           <tr>
             <th scope="col">Modo</th>
-            <th scope="col">Qué hace</th>
-            <th scope="col">Qué puede ofrecer</th>
+            <th scope="col">Ejecuta</th>
+            <th scope="col">Entrega</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <th scope="row">Observar</th>
-            <td>Ejecuta un escenario instrumentado en un runtime real.</td>
-            <td>Traza, diagnósticos dinámicos, recursos y comportamiento observado.</td>
+            <td>Runtime real, instrumentado.</td>
+            <td>Traza y comportamiento observado.</td>
           </tr>
           <tr>
             <th scope="row">Explorar</th>
-            <td>Ejecuta bajo scheduling o entorno controlado.</td>
-            <td>Ejecuciones alternativas, fallos reproducibles y cobertura del dominio explorado.</td>
+            <td>Scheduling controlado.</td>
+            <td>Fallos reproducibles y cobertura.</td>
           </tr>
           <tr>
             <th scope="row">Verificar</th>
-            <td>Consulta un motor formal o estático sobre una propiedad.</td>
-            <td>Propiedad establecida bajo contrato, contraejemplo, alerta o resultado no concluyente.</td>
+            <td>Motor formal o estático.</td>
+            <td>Propiedad bajo contrato o contraejemplo.</td>
           </tr>
         </tbody>
       </table>
@@ -82,10 +74,7 @@
         <article class="example">
           <h3>Cancelación perdida en asyncio</h3>
           <p class="example__path">gateway/dispatch.py</p>
-          <p class="profile__note">
-            Una tarea queda esperando un resultado que nunca llega porque su cancelación se
-            consumió en un <code>except</code> demasiado amplio.
-          </p>
+          <p class="profile__note">Una cancelación se pierde en un <code>except</code> demasiado amplio.</p>
           <p class="example__meta">
             <span class="badge">Python 3.13</span>
             <span class="badge">asyncio</span>
@@ -96,10 +85,7 @@
         <article class="example">
           <h3>Orden de locks entre dos tareas Tokio</h3>
           <p class="example__path">crates/ledger/src/apply.rs</p>
-          <p class="profile__note">
-            Dos rutas toman los mismos dos mutex en orden opuesto. El runtime nativo casi nunca
-            lo muestra; el scheduling controlado sí.
-          </p>
+          <p class="profile__note">Dos mutex tomados en orden opuesto. El runtime nativo casi nunca lo muestra.</p>
           <p class="example__meta">
             <span class="badge">Rust 1.89</span>
             <span class="badge">Shuttle</span>
@@ -110,10 +96,7 @@
         <article class="example">
           <h3>Escritura sin sincronizar en un kernel CUDA</h3>
           <p class="example__path">src/reduce.cu</p>
-          <p class="profile__note">
-            Dos hilos del mismo bloque escriben la misma posición de memoria compartida sin
-            barrera entre medias.
-          </p>
+          <p class="profile__note">Dos hilos escriben la misma posición compartida sin barrera.</p>
           <p class="example__meta">
             <span class="badge">CUDA 12.6</span>
             <span class="badge">Faial</span>
@@ -122,6 +105,57 @@
         </article>
 
       </div>
+    </section>
+
+    <section id="import" aria-labelledby="import-title">
+      <h2 class="section-title" id="import-title">Importar</h2>
+      <form novalidate data-import-form>
+        <div class="form-grid">
+
+          <div class="field">
+            <label for="repo">Repositorio</label>
+            <input id="repo" name="repo" type="url" inputmode="url" autocomplete="off"
+                   placeholder="https://github.com/usuario/proyecto" aria-describedby="repo-error">
+            <p class="field__error" id="repo-error" data-error-for="repo" role="alert"></p>
+          </div>
+
+          <div class="field">
+            <label for="commit">Commit</label>
+            <input id="commit" name="commit" type="text" autocomplete="off" spellcheck="false"
+                   placeholder="dca1dc0" aria-describedby="commit-error">
+            <p class="field__error" id="commit-error" data-error-for="commit" role="alert"></p>
+          </div>
+
+          <div class="field">
+            <label for="root">Raíz</label>
+            <input id="root" name="root" type="text" autocomplete="off" spellcheck="false"
+                   placeholder="services/gateway" aria-describedby="root-error">
+            <p class="field__error" id="root-error" data-error-for="root" role="alert"></p>
+          </div>
+
+          <div class="field">
+            <label for="contact">Correo</label>
+            <input id="contact" name="contact" type="email" autocomplete="email"
+                   placeholder="tu@correo.com" aria-describedby="contact-error">
+            <p class="field__error" id="contact-error" data-error-for="contact" role="alert"></p>
+          </div>
+
+          <div class="field">
+            <label for="scenario">Escenario</label>
+            <input id="scenario" name="scenario" type="text" autocomplete="off" spellcheck="false"
+                   placeholder="tests/test_dispatch.py::test_cancel" aria-describedby="scenario-error">
+            <p class="field__error" id="scenario-error" data-error-for="scenario" role="alert"></p>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button class="button button--primary" type="submit">Preparar</button>
+          <p class="form-status" role="status" data-form-status></p>
+        </div>
+
+        <p class="budget-note">Sesión anónima: 20 archivos, 512 KiB, 20 s por análisis.</p>
+      </form>
     </section>
 
   </div>

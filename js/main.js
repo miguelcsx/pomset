@@ -3,6 +3,8 @@
 
 import { initTheme } from "./theme.js";
 import { initCatalog } from "./catalog.js";
+import { initImportForm } from "./import-form.js";
 
 initTheme();
 initCatalog();
+initImportForm();
