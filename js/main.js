@@ -4,7 +4,9 @@
 import { initTheme } from "./theme.js";
 import { initCatalog } from "./catalog.js";
 import { initImportForm } from "./import-form.js";
+import { initWorkbench } from "./workbench.js";
 
 initTheme();
 initCatalog();
 initImportForm();
+initWorkbench();
