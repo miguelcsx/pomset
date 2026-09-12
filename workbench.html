@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Workbench · pomset</title>
+<meta name="description" content="Fuente, carriles de análisis y evidencia vinculada al código.">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Saltar al contenido</a>
+
+<header class="app-header">
+  <a class="brand" href="index.html">pomset</a>
+  <nav class="app-nav" aria-label="Principal">
+    <a href="index.html">Inicio</a>
+    <a href="workbench.html" aria-current="page">Workbench</a>
+    <a href="catalog.html">Catálogo</a>
+  </nav>
+  <div class="header-end">
+    <button class="button button--icon" type="button" data-theme-toggle aria-label="Cambiar tema">
+      <svg class="icon icon--sun" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <circle cx="8" cy="8" r="3.25"/>
+        <path d="M8 1v1.75M8 13.25V15M15 8h-1.75M2.75 8H1M12.95 3.05l-1.24 1.24M4.29 11.71l-1.24 1.24M12.95 12.95l-1.24-1.24M4.29 4.29L3.05 3.05"/>
+      </svg>
+      <svg class="icon icon--moon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+        <path d="M13.5 9.6A5.8 5.8 0 0 1 6.4 2.5a5.8 5.8 0 1 0 7.1 7.1z"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<main class="app-main workbench" id="main">
+  <h1 class="sr-only">Workbench del escenario de ejemplo</h1>
+
+  <section class="panel workbench__tree" aria-labelledby="tree-title">
+    <div class="panel__bar">
+      <h2 class="panel__title" id="tree-title">Proyecto</h2>
+    </div>
+    <div class="panel__body panel__body--flush">
+      <p class="tree__group">Fuentes</p>
+      <ul class="tree">
+        <li><button class="tree__item" type="button" aria-current="true">gateway/dispatch.py</button></li>
+        <li><button class="tree__item" type="button">gateway/sink.py</button></li>
+        <li><button class="tree__item" type="button">pyproject.toml</button></li>
+      </ul>
+      <p class="tree__group">Escenarios</p>
+      <ul class="tree">
+        <li><button class="tree__item" type="button" aria-current="true">test_cancel_propagates</button></li>
+        <li><button class="tree__item" type="button">test_backpressure</button></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="panel workbench__source" aria-labelledby="source-title">
+    <div class="panel__bar">
+      <h2 class="panel__title" id="source-title">gateway/dispatch.py</h2>
+      <div class="panel__bar-end">
+        <span class="badge">snapshot dca1dc0</span>
+      </div>
+    </div>
+    <div class="panel__body panel__body--flush">
+      <div class="source" data-source></div>
+    </div>
+  </section>
+
+  <section class="panel workbench__lanes" aria-labelledby="lanes-title">
+    <div class="panel__bar">
+      <h2 class="panel__title" id="lanes-title">Carriles</h2>
+      <div class="panel__bar-end">
+        <span class="stage-label" data-lane-count></span>
+        <button class="button" type="button" data-add-lane>Añadir</button>
+      </div>
+    </div>
+    <div class="panel__body">
+      <ul class="lane-list" data-lane-list></ul>
+    </div>
+  </section>
+
+  <section class="panel workbench__evidence" aria-labelledby="evidence-title">
+    <div class="panel__bar">
+      <h2 class="panel__title" id="evidence-title">Evidencia</h2>
+      <div class="panel__bar-end">
+        <span class="stage-label">Selecciona un evento para ubicarlo en la fuente</span>
+      </div>
+    </div>
+    <div class="panel__body panel__body--flush" data-evidence></div>
+  </section>
+</main>
+
+<div class="statusbar">
+  <span>cola: 0</span>
+  <span>presupuesto: 12 / 480 CPU·s</span>
+  <span class="statusbar__end">catálogo rev. 2026-09-12</span>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
