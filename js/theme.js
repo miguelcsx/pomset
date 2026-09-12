@@ -22,12 +22,11 @@ const store = (theme) => {
 const systemTheme = () =>
   window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
 
+// The button shows the theme you would switch to, so its label is the opposite
+// of the current one. Which icon is visible is decided in CSS.
 const apply = (theme, button) => {
   document.documentElement.dataset.theme = theme;
-  if (!button) return;
-  const next = theme === "dark" ? "claro" : "oscuro";
-  button.textContent = theme === "dark" ? "Tema claro" : "Tema oscuro";
-  button.setAttribute("aria-label", `Cambiar a tema ${next}`);
+  button?.setAttribute("aria-label", theme === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro");
 };
 
 export const initTheme = () => {

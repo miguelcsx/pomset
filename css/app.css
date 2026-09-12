@@ -180,6 +180,32 @@ samp {
   color: var(--violation);
 }
 
+.button--icon {
+  padding: 0;
+  justify-content: center;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon--moon {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* Show the theme you would switch to, not the one you are in. */
+[data-theme="dark"] .icon--moon,
+[data-theme="light"] .icon--sun {
+  display: none;
+}
+
 select,
 input,
 textarea {

@@ -34,7 +34,7 @@ export const profiles = [
     mode: "observe",
     support: "validated",
     availability: "immediate",
-    note: "Tareas, esperas, cancelaciones y excepciones sin manejar. Una espera larga se reporta como observación, no como deadlock demostrado.",
+    note: "Tareas, esperas y cancelaciones. Una espera larga es observación, no deadlock.",
   },
   {
     id: "py313-threading-observe",
@@ -45,7 +45,7 @@ export const profiles = [
     mode: "observe",
     support: "limited",
     availability: "immediate",
-    note: "Registra el estado efectivo del GIL en cada ejecución: una extensión incompatible puede reactivarlo sin avisar.",
+    note: "Registra el estado efectivo del GIL: una extensión incompatible puede reactivarlo.",
   },
   {
     id: "py313-multiprocessing-observe",
@@ -56,7 +56,7 @@ export const profiles = [
     mode: "observe",
     support: "limited",
     availability: "queued",
-    note: "El método de inicio (spawn, fork, forkserver) se fija por perfil. Ejecutar spawn en Linux no prueba el comportamiento nativo de macOS.",
+    note: "El método de inicio se fija por perfil. spawn en Linux no prueba macOS.",
   },
   {
     id: "py313-asyncio-explore",
@@ -67,7 +67,7 @@ export const profiles = [
     mode: "explore",
     support: "untested",
     availability: "none",
-    note: "Tiempo virtual y entradas simuladas sobre un conjunto acotado de primitivas. Los event loops alternativos como uvloop necesitan su propio perfil.",
+    note: "Tiempo virtual sobre primitivas acotadas. uvloop necesita su propio perfil.",
   },
   {
     id: "rust189-tokio-observe",
@@ -78,7 +78,7 @@ export const profiles = [
     mode: "observe",
     support: "validated",
     availability: "immediate",
-    note: "Requiere tokio_unstable y soporte de tracing; la plataforma prepara el harness y muestra la diferencia antes de ejecutar.",
+    note: "Requiere tokio_unstable. La plataforma prepara el harness y muestra la diferencia.",
   },
   {
     id: "rust189-shuttle-explore",
@@ -89,7 +89,7 @@ export const profiles = [
     mode: "explore",
     support: "validated",
     availability: "queued",
-    note: "Scheduling controlado con reproducción de fallos. El resultado corresponde al perfil Shuttle, no a todas las ejecuciones del runtime nativo.",
+    note: "Scheduling controlado con replay. El resultado es del perfil Shuttle, no del nativo.",
   },
   {
     id: "rust189-loom-verify",
@@ -100,7 +100,7 @@ export const profiles = [
     mode: "verify",
     support: "limited",
     availability: "queued",
-    note: "Para componentes acotados por el usuario. No se aplica a un servidor Tokio completo suponiendo que su red y dependencias quedan modeladas.",
+    note: "Para componentes acotados. No modela la red ni las dependencias de un servidor.",
   },
   {
     id: "rust189-miri-verify",
@@ -111,7 +111,7 @@ export const profiles = [
     mode: "verify",
     support: "validated",
     availability: "immediate",
-    note: "Detecta cierto comportamiento indefinido y carreras, e interpreta targets distintos del host. Cada resultado declara que el destino fue interpretado.",
+    note: "Detecta UB y carreras, e interpreta otros targets. El destino va declarado.",
   },
   {
     id: "cpp20-genmc-verify",
@@ -122,7 +122,7 @@ export const profiles = [
     mode: "verify",
     support: "limited",
     availability: "queued",
-    note: "Opera sobre programas admitidos por su modelo a nivel LLVM. Aceptar LLVM IR no implica comprender cualquier runtime bajado a LLVM.",
+    note: "Programas admitidos por su modelo LLVM. Aceptar IR no es entender cualquier runtime.",
   },
   {
     id: "openmp5-archer-observe",
@@ -133,7 +133,7 @@ export const profiles = [
     mode: "observe",
     support: "limited",
     availability: "immediate",
-    note: "El perfil enumera las construcciones probadas. La instrumentación del host no cubre target offloading.",
+    note: "Enumera las construcciones probadas. No cubre target offloading.",
   },
   {
     id: "cuda126-faial-verify",
@@ -144,7 +144,7 @@ export const profiles = [
     mode: "verify",
     support: "validated",
     availability: "immediate",
-    note: "Análisis estático de accesos conflictivos, útil sin GPU en el servidor. El testigo estático no equivale a una ejecución física.",
+    note: "Accesos conflictivos sin GPU en el servidor. El testigo no es ejecución física.",
   },
   {
     id: "cuda126-native-observe",
@@ -155,7 +155,7 @@ export const profiles = [
     mode: "observe",
     support: "untested",
     availability: "none",
-    note: "Pendiente de admisión técnica y contractual. El pool GPU permanece cerrado hasta disponer de controles de aislamiento equivalentes.",
+    note: "Pendiente de admisión. El pool GPU sigue cerrado sin aislamiento equivalente.",
   },
 ];
 
