@@ -18,7 +18,17 @@ const state = {
   nextId: 1,
 };
 
-const runnable = profiles.filter((profile) => profile.availability !== "none");
+// Why a profile cannot run this scenario, or null when it can. The reason is
+// shown instead of hiding the option: the catalogue is meant to explain a
+// mismatch, never to fall back to something that merely looks close (6.2).
+const blockReason = (profile) => {
+  if (profile.language !== scenario.language) return `no aplica a ${scenario.language}`;
+  if (profile.availability === "none") return "sin worker";
+  return null;
+};
+
+const selectable = profiles.filter((profile) => blockReason(profile) === null);
+const blocked = profiles.filter((profile) => blockReason(profile) !== null);
 
 const findLane = (id) => state.lanes.find((lane) => lane.id === id);
 const activeLane = () => findLane(state.activeLane);
@@ -75,13 +85,24 @@ const renderOption = (profile, selectedId) => `
   </option>
 `;
 
+// A disabled optgroup disables its options natively, so the blocked profiles
+// stay visible with their cause without any extra scripting.
+const renderProfileOptions = (selectedId) => `
+  <optgroup label="Compatibles">
+    ${selectable.map((profile) => renderOption(profile, selectedId)).join("")}
+  </optgroup>
+  <optgroup label="No aplican a este escenario" disabled>
+    ${blocked.map((profile) => `<option>${describe(profile)} — ${blockReason(profile)}</option>`).join("")}
+  </optgroup>
+`;
+
 const renderLane = (lane) => {
   const profile = findProfile(lane);
   return `
     <li class="lane" data-lane="${lane.id}" aria-current="${lane.id === state.activeLane}">
       <div class="lane__head">
         <select class="lane__select" data-lane-profile="${lane.id}" aria-label="Perfil del carril ${lane.id}">
-          ${runnable.map((option) => renderOption(option, lane.profileId)).join("")}
+          ${renderProfileOptions(lane.profileId)}
         </select>
         <button class="button button--danger" type="button" data-lane-remove="${lane.id}" aria-label="Quitar carril ${lane.id}">×</button>
       </div>
@@ -174,7 +195,7 @@ const cancel = (lane) => {
 
 const addLane = () => {
   if (state.lanes.length >= MAX_LANES) return;
-  const lane = createLane(runnable[state.lanes.length % runnable.length].id);
+  const lane = createLane(selectable[state.lanes.length % selectable.length].id);
   state.lanes.push(lane);
   state.activeLane = lane.id;
   render();
