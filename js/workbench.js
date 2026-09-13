@@ -8,7 +8,7 @@
 import { profiles, MODES, describe } from "./profiles.js";
 import { scenario, evidenceByMode, STAGES } from "./scenario.js";
 
-const MAX_LANES = 4; // Section 6.3: up to four lanes over the same scenario.
+const MAX_LANES = 4; // Four lanes over the same scenario is the documented cap.
 const STAGE_MS = 420;
 
 const state = {

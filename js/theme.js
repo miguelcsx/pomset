@@ -1,5 +1,5 @@
 // Theme follows the system until the visitor chooses otherwise; the choice
-// then persists across visits (docs/about.md section 22.1).
+// then persists across visits.
 
 const STORAGE_KEY = "pomset.theme";
 

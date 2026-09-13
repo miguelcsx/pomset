@@ -1,10 +1,9 @@
-// Single definition of the profile catalogue (docs/about.md section 11.2).
-// In the API milestone this array is replaced by the catalogue endpoint and
-// nothing that renders it needs to change.
+// Single definition of the profile catalogue. In the API milestone this array
+// is replaced by the catalogue endpoint and nothing that renders it changes.
 //
 // `support` and `availability` are deliberately separate axes: a profile can
-// be validated and still have no free worker, which is not the same as being
-// unsupported (section 6.2).
+// be validated and still have no free worker, which is a different situation
+// from being unsupported.
 
 export const MODES = {
   observe: "observar",

@@ -62,6 +62,6 @@ export const evidenceByMode = {
   },
 };
 
-// Operational states from section 16.2. "Terminado" says nothing about whether
-// the program is correct; that verdict lives in the conclusion.
+// Operational states. "Terminado" says nothing about whether the program is
+// correct; that verdict lives in the conclusion.
 export const STAGES = ["en cola", "preparando", "construyendo", "ejecutando", "evidencia", "terminado"];

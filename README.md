@@ -4,13 +4,13 @@ Maqueta navegable de pomset, un workbench web para correr y revisar programas
 concurrentes sin instalar nada. HTML, CSS y JavaScript sin frameworks.
 
 **Sitio:** https://pomset.vercel.app
-**Producto y especificación:** rama [`main`](https://github.com/miguelcsx/pomset/tree/main)
+**Producto:** rama [`main`](https://github.com/miguelcsx/pomset/tree/main)
 
 ## Por qué existe
 
-La especificación de pomset son mil líneas en `main`: arquitectura, aislamiento,
-presupuestos de cómputo, catálogo de motores. Esta rama toma la parte visible y la
-vuelve clicable, para resolver cómo se ve antes de escribir el producto.
+pomset está diseñado pero no construido. Esta rama toma la parte visible y la
+vuelve clicable, para resolver cómo se ve y cómo se comporta antes de escribir el
+producto.
 
 El problema que ataca pomset: revisar concurrencia hoy implica un toolchain por
 lenguaje. VizTracer si usas asyncio. Shuttle si usas Tokio. Faial para CUDA. Cada
@@ -32,9 +32,10 @@ exploración, mismo código, encuentra "Cancelación absorbida en 3 de 128
 schedules". Haces clic en cualquier evento de la tabla de abajo y se marca la
 línea correspondiente en la fuente.
 
-Que esos dos veredictos se vean distintos importa. La especificación es
-explícita en que la ausencia de fallos observados nunca se presenta como prueba,
-y por eso el verde no aparece solo para decir "seguro".
+Que esos dos veredictos se vean distintos importa. Una corrida sin fallos no
+prueba que el programa esté bien, solo que en esa corrida no pasó nada, y la
+interfaz no puede presentar las dos cosas igual. Por eso el verde nunca aparece
+solo para decir "seguro".
 
 ## Decisiones
 
@@ -72,8 +73,9 @@ lo dibuja.
 
 ### La validación
 
-El formulario tiene `novalidate` porque la burbuja nativa del navegador aparece
-donde el navegador quiere, y la especificación pide el mensaje pegado al campo.
+El formulario tiene `novalidate`. La burbuja nativa del navegador aparece donde
+el navegador quiere y se va sola, y yo necesitaba el mensaje pegado al campo y
+persistente.
 
 Cada campo arranca con un `required` y después vienen las comprobaciones de
 formato. Esas segundas ignoran el campo vacío a propósito: si no, al enviar
@@ -87,7 +89,7 @@ pantalla reciba lo mismo que se ve.
 ### Por qué el mock está en otra rama
 
 `main` es el repositorio del producto y el frontend real va a ser React con
-Monaco y Dockview, ya está decidido en un ADR. Este mock es plano y va a morir
+Monaco. Este mock es plano y va a morir
 cuando exista el de verdad. Mezclarlo con `main` habría dejado archivos
 condenados en el repo del producto, así que vive en `web/mock` y Vercel publica
 esa rama.
@@ -100,13 +102,13 @@ la rúbrica. Doce líneas duplicadas salen más baratas.
 ## Uso de IA
 
 Usé Claude Code para escribir la mayor parte del código. La dirección la puse yo:
-el dominio, la especificación de donde sale todo el contenido, y qué se muestra.
+el dominio, de dónde sale el contenido, y qué se muestra en pantalla.
 
 Rechacé varias versiones antes de esta. La peor: el selector de perfiles del
-workbench ofrecía Rust y CUDA sobre un archivo Python. Eso no tiene sentido y
-encima contradice la especificación, que prohíbe explícitamente sustituir un
-perfil por otro parecido. Lo mandé a arreglar y ahora el selector solo muestra
-lo que el lenguaje del escenario admite.
+workbench ofrecía Rust y CUDA sobre un archivo Python. Además de no tener
+sentido, es justo lo que el producto no debe hacer: ofrecerte algo parecido
+cuando lo que pediste no aplica. Ahora el selector solo muestra lo que el
+lenguaje del escenario admite.
 
 También boté la primera versión del workbench completa. Abría vacía, con dos
 dropdowns y un botón de ejecutar, y no se entendía qué estabas viendo ni para qué
@@ -147,7 +149,7 @@ transiciones respetan `prefers-reduced-motion`.
 
 ![Workbench en móvil](docs/screenshots/workbench-mobile.png)
 
-Los cortes salen de la especificación. Arriba de 1280px se ven los tres paneles.
+Arriba de 1280px se ven los tres paneles.
 Entre 900 y 1280 se colapsa el árbol de archivos, que es lo primero de lo que
 puedes prescindir. Abajo de 900 los paneles se apilan.
 

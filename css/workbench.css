@@ -225,8 +225,8 @@
 }
 
 
-/* Section 22.3: above 1280 several panels, 900-1279 the tree collapses,
-   below 900 the panels stack. */
+/* Above 1280 several panels, 900-1279 the tree collapses, below 900 they
+   stack. */
 @media (max-width: 1279px) {
   .workbench {
     grid-template-columns: minmax(360px, 1fr) minmax(320px, 1fr);

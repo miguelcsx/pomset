@@ -1,5 +1,4 @@
-/* Design tokens. Single source for spacing, type, colour and motion.
-   Values follow the visual system defined in docs/about.md section 22.1. */
+/* Design tokens. Single source for spacing, type, colour and motion. */
 
 :root {
   /* Spacing scale: 4, 8, 12, 16, 24, 32 */
@@ -26,13 +25,13 @@
   --border-width: 1px;
   --focus-width: 2px;
 
-  /* Control sizing: 32px desktop, 40px touch (section 22.1) */
+  /* 32px on pointer devices, 40px when the target has to be tapped. */
   --control-height: 32px;
   --toolbar-height: 36px;
   --header-height: 48px;
   --statusbar-height: 24px;
 
-  /* Motion: 120-180ms (section 22.1) */
+  /* Short enough that it never delays reading the result. */
   --motion-fast: 120ms;
   --motion-base: 180ms;
   --easing: ease-out;
