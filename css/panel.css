@@ -48,3 +48,17 @@
 .panel__body--flush {
   padding: 0;
 }
+
+.panel__hint {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* The hint explains a pointer affordance that is obvious on touch, and on a
+   narrow bar it would push the panel title out of view. */
+@media (max-width: 899px) {
+  .panel__hint {
+    display: none;
+  }
+}
