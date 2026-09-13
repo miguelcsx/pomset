@@ -1,3 +1,3 @@
 # Claude Code
 
-Las instrucciones de este repositorio están en [AGENTS.md](AGENTS.md).
+This repository's instructions live in [AGENTS.md](AGENTS.md).

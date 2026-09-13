@@ -1,47 +1,47 @@
-# Instrucciones para agentes
+# Agent instructions
 
-## Qué es esto
+## What this is
 
-`pomset` es un workbench web de concurrencia multilenguaje. La especificación
-técnica está en `docs/about.md` y es normativa: arquitectura, contratos,
-aislamiento, presupuestos, catálogo y UI. No hay backend todavía.
+`pomset` is a multi-language concurrency workbench for the web. The technical
+specification in `docs/about.md` is normative: architecture, contracts,
+isolation, budgets, catalogue and UI. There is no backend yet.
 
-Antes de proponer cualquier cosa, lee la sección que aplique. Si algo contradice
-la spec, la spec gana o se abre un ADR; no se decide en el código.
+Read the relevant section before proposing anything. When something contradicts
+the spec, the spec wins or an ADR is opened; it is not settled in the code.
 
-## Ramas
+## Branches
 
-| Rama | Contenido |
+| Branch | Holds |
 |---|---|
-| `main` | Producto: documentos, licencia, utilidades. |
-| `web/mock` | Mock navegable de la interfaz en HTML, CSS y JS sin frameworks. |
+| `main` | The product: documents, licence, utilities. |
+| `web/mock` | A navigable interface mock in plain HTML, CSS and JS. |
 
-El mock no se mezcla con `main`. Es una maqueta para validar lenguaje visual y
-estados de interacción, no el frontend definitivo (que será React + Monaco +
-Dockview, ADR-006).
+The mock is never merged into `main`. It is a maquette for validating the visual
+language and the interaction states, not the eventual frontend, which is React,
+Monaco and Dockview (ADR-006).
 
-## Convenciones
+## Conventions
 
-- **Código en inglés**: nombres de archivo, identificadores, clases CSS, commits.
-- **Textos visibles en español**. Los identificadores técnicos del dominio no se
-  traducen: `runtime`, `Tokio`, `asyncio`, `deadlock`, `snapshot` (§22.3).
-- Archivos de máximo 500 líneas, idealmente menos de 400. Una responsabilidad
-  por archivo.
-- Commits convencionales y firmados.
+- **Code and repository documents in English**: file names, identifiers, CSS
+  classes, commit messages, everything under `main`.
+- **The mock's visible copy is Spanish.** Domain identifiers are never
+  translated: `runtime`, `Tokio`, `asyncio`, `deadlock`, `snapshot` (§22.3).
+- Files stay under 500 lines, ideally under 400, with one responsibility each.
+- Conventional commits, signed.
 
-## Reglas que no se negocian
+## Rules that do not bend
 
-Vienen de los invariantes de producto (§23) y aplican también al mock:
+These come from the product invariants (§23) and apply to the mock as well:
 
-- Ejecutar no es publicar. Terminar un trabajo no es demostrar corrección.
-- «Sin fallos observados» nunca se presenta como prueba. El verde no significa
-  seguro por sí solo.
-- Una combinación incompatible se explica; nunca se sustituye en silencio por
-  otra parecida.
-- Un resultado pertenece al snapshot que se analizó, aunque la fuente cambie
-  después.
+- Running is not publishing. Finishing a job is not proving correctness.
+- "No failures observed" is never presented as proof. Green alone does not mean
+  safe.
+- An unsupported combination is explained, never silently swapped for something
+  that looks close.
+- A result belongs to the snapshot that was analysed, even after the source
+  changes.
 
-## Antes de dar algo por terminado
+## Before calling something done
 
-Verifícalo en el navegador, no solo por lectura del código. Para el mock:
-`python3 -m http.server` desde la raíz de la rama.
+Check it in a browser, not by reading the code. For the mock, serve the branch
+root with `python3 -m http.server`.

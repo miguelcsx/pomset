@@ -1,29 +1,29 @@
 # pomset
 
-Ejecuta, observa y verifica programas concurrentes en runtimes reales, desde el navegador y sin instalar nada.
+Run, observe and verify concurrent programs on real runtimes, from the browser, with nothing to install.
 
-La unidad de trabajo no es un snippet pegado en un editor: es un **proyecto versionado, un escenario de prueba y un conjunto de perfiles**. Un programa Python con asyncio, un workspace Rust con Tokio y un proyecto CMake con OpenMP usan el mismo sistema de proyectos, trabajos, resultados y publicación, aunque sus motores y garantías sean distintos.
+The unit of work is not a snippet pasted into an editor. It is a **versioned project, a test scenario and a set of profiles**. A Python program using asyncio, a Rust workspace on Tokio and a CMake project with OpenMP go through the same system of projects, jobs, results and publication, even though their engines and guarantees differ.
 
-## Los tres modos
+## Three modes
 
-| Modo | Qué hace | Qué puede ofrecer |
+| Mode | What it runs | What it can return |
 |---|---|---|
-| Observar | Ejecuta un escenario instrumentado en un runtime real. | Traza, diagnósticos dinámicos, recursos y comportamiento observado. |
-| Explorar | Ejecuta bajo scheduling o entorno controlado. | Ejecuciones alternativas, fallos reproducibles y cobertura del dominio explorado. |
-| Verificar | Consulta un motor formal o estático sobre una propiedad. | Propiedad establecida bajo contrato, contraejemplo, alerta o resultado no concluyente. |
+| Observe | An instrumented scenario on a real runtime. | Trace, dynamic diagnostics, resources, observed behaviour. |
+| Explore | The scenario under controlled scheduling. | Alternative executions, reproducible failures, coverage of the explored domain. |
+| Verify | A formal or static engine, asked about a property. | A property established under contract, a counterexample, a warning, or no conclusion. |
 
-Ningún modo sustituye a los otros. Una prueba formal sobre un modelo restringido no cubre todas las extensiones nativas de un programa, y una ejecución sin errores no demuestra corrección.
+No mode replaces the others. A proof over a restricted model does not cover every native extension of a program, and a run without errors does not demonstrate correctness.
 
-## Estado
+## Status
 
-Pre-implementación. La especificación técnica vive en `docs/` y define arquitectura, contratos, aislamiento, presupuestos, catálogo y UI. No hay backend todavía.
+Pre-implementation. The technical specification lives in `docs/` and covers architecture, contracts, isolation, budgets, catalogue and UI. There is no backend yet.
 
-La rama `web/mock` contiene un mock navegable de la interfaz en HTML, CSS y JavaScript sin frameworks: catálogo de perfiles, workbench con carriles y panel de evidencia. Sirve para validar el lenguaje visual y los estados de interacción antes de escribir el producto.
+Branch `web/mock` holds a navigable interface mock in plain HTML, CSS and JavaScript: profile catalogue, workbench with lanes, and an evidence panel. It exists to settle the visual language and the interaction states before the product is written.
 
-## Invariantes
+## Invariants
 
-Ejecutar no significa publicar. Compilar para un target no significa ejecutarlo físicamente. Terminar un trabajo no significa demostrar corrección. Reabrir evidencia no significa obtener una muestra nueva. Editar fuente no cambia resultados históricos.
+Running is not publishing. Compiling for a target is not executing on it. Finishing a job is not proving correctness. Reopening evidence is not taking a fresh sample. Editing source does not change historical results.
 
-## Licencia
+## Licence
 
-Apache-2.0. La reutilización selectiva de Compiler Explorer conserva sus avisos BSD-2-Clause.
+Apache-2.0. Selective reuse of Compiler Explorer keeps its BSD-2-Clause notices.
