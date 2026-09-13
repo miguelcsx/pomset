@@ -6,6 +6,7 @@ export const scenario = {
   path: "gateway/dispatch.py",
   entry: "tests/test_dispatch.py::test_cancel_propagates",
   language: "Python",
+  question: "¿Se propaga la cancelación?",
   source: [
     "async def dispatch(queue, sink):",
     "    pending = set()",

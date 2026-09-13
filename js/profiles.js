@@ -66,7 +66,7 @@ export const profiles = [
     engine: "scheduler controlado de mundo cerrado",
     mode: "explore",
     support: "untested",
-    availability: "none",
+    availability: "queued",
     note: "Tiempo virtual sobre primitivas acotadas. uvloop necesita su propio perfil.",
   },
   {

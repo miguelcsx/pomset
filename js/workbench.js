@@ -18,17 +18,11 @@ const state = {
   nextId: 1,
 };
 
-// Why a profile cannot run this scenario, or null when it can. The reason is
-// shown instead of hiding the option: the catalogue is meant to explain a
-// mismatch, never to fall back to something that merely looks close (6.2).
-const blockReason = (profile) => {
-  if (profile.language !== scenario.language) return `no aplica a ${scenario.language}`;
-  if (profile.availability === "none") return "sin worker";
-  return null;
-};
-
-const selectable = profiles.filter((profile) => blockReason(profile) === null);
-const blocked = profiles.filter((profile) => blockReason(profile) !== null);
+// Only profiles this scenario admits reach the selector. Explaining why the
+// rest do not apply belongs to the catalogue page, not to a lane dropdown.
+const selectable = profiles.filter(
+  (profile) => profile.language === scenario.language && profile.availability !== "none",
+);
 
 const findLane = (id) => state.lanes.find((lane) => lane.id === id);
 const activeLane = () => findLane(state.activeLane);
@@ -66,13 +60,14 @@ const renderStages = (lane) => `
   <p class="stage-label">${lane.stage < 0 ? "sin ejecutar" : STAGES[lane.stage]}</p>
 `;
 
-const renderConclusion = (lane) => {
-  if (!isDone(lane)) return "";
+// A finished lane leads with its verdict: that answer is why the lane exists,
+// and the machinery that produced it stays underneath it.
+const renderVerdict = (lane) => {
+  if (!isDone(lane)) return renderStages(lane);
+
   const evidence = evidenceByMode[findProfile(lane).mode];
   return `
-    <p class="lane__conclusion">
-      <span class="badge badge--${evidence.tone}">${evidence.conclusion}</span>
-    </p>
+    <p class="lane__verdict lane__verdict--${evidence.tone}">${evidence.conclusion}</p>
     <p class="lane__meta">${evidence.detail}</p>
   `;
 };
@@ -85,16 +80,8 @@ const renderOption = (profile, selectedId) => `
   </option>
 `;
 
-// A disabled optgroup disables its options natively, so the blocked profiles
-// stay visible with their cause without any extra scripting.
-const renderProfileOptions = (selectedId) => `
-  <optgroup label="Compatibles">
-    ${selectable.map((profile) => renderOption(profile, selectedId)).join("")}
-  </optgroup>
-  <optgroup label="No aplican a este escenario" disabled>
-    ${blocked.map((profile) => `<option>${describe(profile)} — ${blockReason(profile)}</option>`).join("")}
-  </optgroup>
-`;
+const renderProfileOptions = (selectedId) =>
+  selectable.map((profile) => renderOption(profile, selectedId)).join("");
 
 const renderLane = (lane) => {
   const profile = findProfile(lane);
@@ -107,11 +94,10 @@ const renderLane = (lane) => {
         <button class="button button--danger" type="button" data-lane-remove="${lane.id}" aria-label="Quitar carril ${lane.id}">×</button>
       </div>
       <div class="lane__body">
-        <p class="lane__meta">${profile.engine} · ${MODES[profile.mode]}</p>
-        ${renderStages(lane)}
-        ${renderConclusion(lane)}
+        ${renderVerdict(lane)}
+        <p class="lane__meta">${profile.engine}</p>
         <button class="button" type="button" data-lane-run="${lane.id}">
-          ${isRunning(lane) ? "Cancelar" : "Ejecutar"}
+          ${isRunning(lane) ? "Cancelar" : isDone(lane) ? "Repetir" : "Ejecutar"}
         </button>
       </div>
     </li>
@@ -193,11 +179,28 @@ const cancel = (lane) => {
   render();
 };
 
-const addLane = () => {
-  if (state.lanes.length >= MAX_LANES) return;
-  const lane = createLane(selectable[state.lanes.length % selectable.length].id);
+const addLane = (profileId = selectable[state.lanes.length % selectable.length].id) => {
+  if (state.lanes.length >= MAX_LANES) return null;
+  const lane = createLane(profileId);
   state.lanes.push(lane);
   state.activeLane = lane.id;
+  render();
+  return lane;
+};
+
+// The page opens on the comparison it exists to show: the same file observed
+// once and explored once, with two different answers. Landing on an empty
+// shell would hide the point behind a button.
+const seedComparison = () => {
+  const finished = (profileId) => {
+    const lane = addLane(profileId);
+    lane.stage = STAGES.length - 1;
+  };
+
+  finished("py313-asyncio-observe");
+  finished("py313-asyncio-explore");
+  state.activeLane = state.lanes[1].id;
+  state.selectedRow = evidenceByMode.explore.rows.find((row) => row.op === "swallow") ?? null;
   render();
 };
 
@@ -269,8 +272,7 @@ export const initWorkbench = () => {
   dom.lanes.addEventListener("change", onLanesChange);
   dom.evidence.addEventListener("click", onEvidenceActivate);
   dom.evidence.addEventListener("keydown", onEvidenceActivate);
-  dom.addLane.addEventListener("click", addLane);
+  dom.addLane.addEventListener("click", () => addLane());
 
-  addLane();
-  addLane();
+  seedComparison();
 };
