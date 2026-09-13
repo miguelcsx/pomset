@@ -1,155 +1,160 @@
-# pomset — mock de interfaz
+# pomset · mock de interfaz
 
-Maqueta navegable de la interfaz de **pomset**, un workbench web donde ejecutas,
-observas y verificas programas concurrentes sin instalar nada. Hecha en HTML, CSS
-y JavaScript puro, sin frameworks.
+Maqueta navegable de pomset, un workbench web para correr y revisar programas
+concurrentes sin instalar nada. HTML, CSS y JavaScript sin frameworks.
 
 **Sitio:** https://pomset.vercel.app
 **Producto y especificación:** rama [`main`](https://github.com/miguelcsx/pomset/tree/main)
 
-## De qué va
+## Por qué existe
 
-La especificación completa de pomset son mil líneas: arquitectura, aislamiento,
-presupuestos, catálogo de motores. Esta rama toma solo la capa visible y la
-vuelve navegable, para decidir el lenguaje visual y los estados de interacción
-antes de escribir el producto de verdad.
+La especificación de pomset son mil líneas en `main`: arquitectura, aislamiento,
+presupuestos de cómputo, catálogo de motores. Esta rama toma la parte visible y la
+vuelve clicable, para resolver cómo se ve antes de escribir el producto.
 
-El problema que resuelve pomset es concreto. Hoy verificar concurrencia obliga a
-instalar un toolchain distinto por lenguaje —VizTracer para asyncio, Shuttle
-para Tokio, Faial para CUDA— y cada uno reporta a su manera. pomset los pone
-detrás del mismo sistema de proyectos, escenarios y evidencia.
+El problema que ataca pomset: revisar concurrencia hoy implica un toolchain por
+lenguaje. VizTracer si usas asyncio. Shuttle si usas Tokio. Faial para CUDA. Cada
+uno reporta a su manera y comparar resultados entre ellos es trabajo manual.
+pomset los pone detrás del mismo modelo de proyectos y evidencia.
 
 ![Workbench en escritorio](docs/screenshots/workbench.png)
 
-### Las tres pantallas
+## Qué hay
 
-- **Inicio** — los tres modos (observar, explorar, verificar), ejemplos y el
-  formulario de importación.
-- **Workbench** — fuente, carriles de análisis y evidencia. Es el core.
-- **Catálogo** — los perfiles disponibles, filtrables.
+Tres páginas. `index.html` con los modos de análisis, ejemplos y el formulario de
+importación. `catalog.html` con los perfiles disponibles y sus filtros.
+`workbench.html`, que es donde está lo interesante.
 
-### Lo que muestra el workbench
+El workbench abre ya ejecutado. Un archivo Python, dos perfiles corriendo sobre
+él, dos respuestas distintas. El de observación reporta "No se observaron fallos
+en estas ejecuciones" y al lado te dice que la cobertura no está medida. El de
+exploración, mismo código, encuentra "Cancelación absorbida en 3 de 128
+schedules". Haces clic en cualquier evento de la tabla de abajo y se marca la
+línea correspondiente en la fuente.
 
-Abre directamente sobre la comparación que justifica el producto: el mismo
-archivo, analizado con dos perfiles, con dos respuestas distintas.
+Que esos dos veredictos se vean distintos importa. La especificación es
+explícita en que la ausencia de fallos observados nunca se presenta como prueba,
+y por eso el verde no aparece solo para decir "seguro".
 
-El perfil de observación dice *«No se observaron fallos en estas ejecuciones»*
-con su cobertura al lado. El de exploración, sobre el mismo código, encuentra
-*«Cancelación absorbida en 3 de 128 schedules»*. Al hacer clic en un evento de
-la evidencia, la línea correspondiente se marca en la fuente.
+## Decisiones
 
-Esa distinción es deliberada y viene de la especificación: ausencia de fallos
-observados no es prueba de corrección, y la interfaz no puede presentarlas
-igual. Por eso el verde nunca aparece solo para decir «seguro».
+### Flexbox y Grid
 
-## Decisiones técnicas
+Usé Grid en dos lugares. El workbench, que tiene tres zonas más un panel que
+cruza todo el ancho abajo, está declarado con `grid-template-areas` en
+`css/workbench.css`. La ventaja es que adaptar el layout en cada breakpoint
+significa reescribir el mapa de áreas y ya, sin mover el orden del HTML. El
+catálogo también va con Grid, `repeat(auto-fill, minmax(300px, 1fr))`, que
+reacomoda columnas según el ancho disponible y me ahorró dos media queries.
 
-### Dónde usé Flexbox y dónde Grid
+Flexbox quedó para las filas donde los elementos se reparten el espacio entre
+ellos: la barra de cada panel, el header, la barra de estado, el encabezado de
+los carriles. Ahí el patrón siempre es el mismo, título a la izquierda y
+controles empujados a la derecha con `margin-left: auto`.
 
-Grid donde hay una cuadrícula real y bidimensional. El workbench es lo más
-claro: tres zonas más un panel inferior que cruza el ancho completo, declarado
-con `grid-template-areas` en `css/workbench.css`. Cambiar el layout en cada
-breakpoint es reescribir el mapa de áreas, sin tocar el orden del HTML. El
-catálogo también es Grid, con `repeat(auto-fill, minmax(300px, 1fr))`, que
-reacomoda las columnas según el ancho sin media queries.
+### El JavaScript
 
-Flexbox donde hay una fila de cosas que negocian espacio entre ellas: la barra
-de cada panel (título a un lado, controles al otro con `margin-left: auto`), el
-header, la barra de estado, el encabezado de cada carril. En todos esos casos no
-hay cuadrícula, hay una línea.
+Cuatro módulos.
 
-### Qué hace el JavaScript
+`js/profiles.js` guarda el catálogo completo. Es un arreglo de objetos y es el
+único sitio donde están esos datos, así que cuando exista la API de la Entrega 2
+se reemplaza por la respuesta del servidor sin tocar el código que dibuja.
 
-Cuatro módulos, cada uno con una responsabilidad.
+`js/catalog.js` filtra y pinta las fichas. La función que filtra recibe la lista
+y los criterios y devuelve otra lista; no conoce el DOM.
 
-`js/profiles.js` es la única definición del catálogo. Cuando exista la API
-—Entrega 2— ese arreglo se reemplaza por la respuesta del servidor y nada de lo
-que dibuja cambia.
+`js/import-form.js` valida el formulario. Cada campo tiene una lista de
+comprobaciones asociada en un objeto `rules`, así que agregar un campo nuevo es
+agregar una entrada ahí, sin escribir un `if`.
 
-`js/catalog.js` filtra y dibuja. La función de filtrado es pura: recibe la lista
-y los criterios, devuelve otra lista, no toca el DOM. Se puede leer sin pensar
-en HTML.
+`js/workbench.js` es el más largo, 278 líneas. Lleva el estado de los carriles y
+lo dibuja.
 
-`js/import-form.js` valida. Las reglas son datos, no condicionales: cada campo
-tiene una lista de comprobaciones y el mensaje que aparece cuando falla. Agregar
-un campo es agregar una entrada al objeto `rules`.
+### La validación
 
-`js/workbench.js` maneja los carriles. Todo el estado vive en un objeto, unas
-funciones puras construyen el HTML a partir de él, y un único `render()` lo
-escribe. Los manejadores solo cambian el estado y vuelven a llamar a `render()`.
+El formulario tiene `novalidate` porque la burbuja nativa del navegador aparece
+donde el navegador quiere, y la especificación pide el mensaje pegado al campo.
 
-### Cómo funciona la validación
+Cada campo arranca con un `required` y después vienen las comprobaciones de
+formato. Esas segundas ignoran el campo vacío a propósito: si no, al enviar
+vacío te salen dos errores por el mismo campo y queda ruidoso.
 
-El formulario lleva `novalidate`: la burbuja nativa del navegador no sirve aquí
-porque el mensaje debe quedar junto al campo. Cada campo tiene primero un
-`required` y después comprobaciones de formato, y esas de formato ignoran el
-campo vacío para que no aparezcan dos errores por lo mismo.
+Cuando envías se juntan los valores, se validan todos, se pintan los errores de
+golpe y el foco salta al primero que falló. Si empiezas a escribir en un campo su
+error desaparece. Todo eso va acompañado de `aria-invalid` para que un lector de
+pantalla reciba lo mismo que se ve.
 
-Al enviar, se recogen los valores, se validan, se pintan todos los errores de
-una vez y el foco salta al primer campo que falló. Mientras escribes, el error
-de ese campo se borra. `aria-invalid` acompaña cada estado, así que un lector de
-pantalla recibe lo mismo que se ve.
+### Por qué el mock está en otra rama
 
-### Por qué el mock vive en una rama aparte
+`main` es el repositorio del producto y el frontend real va a ser React con
+Monaco y Dockview, ya está decidido en un ADR. Este mock es plano y va a morir
+cuando exista el de verdad. Mezclarlo con `main` habría dejado archivos
+condenados en el repo del producto, así que vive en `web/mock` y Vercel publica
+esa rama.
 
-`main` es el repositorio del producto: especificación, licencia, instrucciones.
-El frontend real será React con Monaco y Dockview, ya decidido en un ADR. Este
-mock es plano y desechable por diseño, así que mezclarlo con `main` ensuciaría
-el repositorio con archivos que van a morir. Vive en `web/mock`, y Vercel
-publica esa rama.
+Eso trae un costo: el header está repetido en los tres HTML. Sin build no hay
+includes. La opción era inyectarlo con JavaScript, pero entonces el navegador
+recibe un documento sin estructura en el primer render, y eso pesa 15 puntos de
+la rúbrica. Doce líneas duplicadas salen más baratas.
 
-Una consecuencia: el header se repite en los tres HTML. Sin build no hay
-includes, y la alternativa —inyectarlo con JavaScript— rompería la estructura
-semántica que el navegador necesita desde el primer render. Doce líneas
-repetidas salen más baratas que eso.
+## Uso de IA
 
-### Uso de IA
+Usé Claude Code para escribir la mayor parte del código. La dirección la puse yo:
+el dominio, la especificación de donde sale todo el contenido, y qué se muestra.
 
-La dirección fue mía: el dominio, la especificación de la que sale todo el
-contenido y las decisiones de producto. La IA escribió código bajo esa
-dirección, y rechacé varias versiones antes de llegar a esta.
+Rechacé varias versiones antes de esta. La peor: el selector de perfiles del
+workbench ofrecía Rust y CUDA sobre un archivo Python. Eso no tiene sentido y
+encima contradice la especificación, que prohíbe explícitamente sustituir un
+perfil por otro parecido. Lo mandé a arreglar y ahora el selector solo muestra
+lo que el lenguaje del escenario admite.
 
-Tres rechazos concretos. El selector de perfiles ofrecía Rust y CUDA sobre un
-archivo Python, lo cual no tiene sentido y además contradice la especificación,
-que prohíbe exactamente ese tipo de sustitución silenciosa. La primera versión
-del workbench abría vacía, mostrando dropdowns y barras de progreso: maquinaria,
-no producto; ahora abre sobre la comparación. Y el texto sobraba por todos lados
-—párrafos explicando lo que la propia interfaz ya decía—, así que lo recorté y
-cambié etiquetas por iconos donde el icono bastaba.
+También boté la primera versión del workbench completa. Abría vacía, con dos
+dropdowns y un botón de ejecutar, y no se entendía qué estabas viendo ni para qué
+servía. De ahí salió la idea de abrir con la comparación ya hecha.
 
-### Lo más difícil
+Lo tercero fue el texto. Sobraba en todas las pantallas, con párrafos que
+explicaban cosas que la interfaz ya estaba diciendo. Recorté casi todo y cambié
+etiquetas por iconos donde el icono alcanzaba.
 
-Mantener el estado de los carriles coherente en JavaScript plano. Hay cuatro
-cosas que cambian a la vez y dependen entre sí: qué carriles existen, en qué
-etapa va cada uno, cuál está activo y qué fila de evidencia está seleccionada.
-Mi primer intento actualizaba el DOM por partes —cambiar la etiqueta de la
-etapa aquí, la clase del carril allá— y se desincronizaba en cuanto dos cosas
-pasaban juntas, por ejemplo cancelar un carril mientras otro terminaba.
+## Lo más difícil
 
-Lo resolví al revés: un solo objeto de estado y un único `render()` que redibuja
-todo desde él. Es menos eficiente, y con listas grandes no serviría, pero con
-cuatro carriles no se nota y elimina toda una clase de errores. El costo fue que
-los manejadores de eventos morían en cada redibujado, así que pasé a delegación:
-un listener por panel que mira qué elemento recibió el clic.
+Mantener el estado de los carriles coherente sin framework.
+
+Hay cuatro cosas cambiando al mismo tiempo: qué carriles existen, en qué etapa va
+cada uno, cuál está activo, y qué fila de evidencia está seleccionada. Mi primera
+versión iba actualizando el DOM por pedazos. Cambiaba el texto de la etapa por un
+lado, la clase del carril activo por otro. Funcionaba hasta que dos cosas pasaban
+juntas. Cancelar un carril mientras otro terminaba dejaba la barra de etapas de
+uno pintada con el estado del otro y me tomó un rato entender por qué.
+
+Terminé haciéndolo al contrario: un objeto con todo el estado, y una sola función
+`render()` que redibuja los tres paneles desde ahí. Cualquier handler cambia el
+estado y llama a `render()`. Es menos eficiente porque redibuja de más, y con
+listas largas no serviría, pero con cuatro carriles ni se nota.
+
+El efecto secundario fue que los listeners se morían en cada redibujado, porque
+el `innerHTML` bota los nodos viejos. Lo resolví con delegación: un listener por
+panel, que mira qué elemento recibió el clic.
 
 ## Accesibilidad
 
-Criterio WCAG 2.2 AA. Navegación completa por teclado, incluidas las filas de
-evidencia, que responden a Enter y espacio. Foco visible de 2px que no depende
-del color de diagnóstico. Landmarks y jerarquía de encabezados correctos en las
-tres páginas. Las transiciones respetan `prefers-reduced-motion`.
+Objetivo WCAG 2.2 AA. Todo se puede recorrer con teclado, incluidas las filas de
+evidencia, que responden a Enter y espacio. El foco se ve siempre, con un borde
+de 2px que no usa el color de diagnóstico para no confundirse con un error. Las
+transiciones respetan `prefers-reduced-motion`.
 
 ## Responsive
 
 ![Workbench en móvil](docs/screenshots/workbench-mobile.png)
 
-Los cortes vienen de la especificación. Por encima de 1280px se ven los tres
-paneles; entre 900 y 1280 el árbol de archivos se colapsa porque es lo primero
-prescindible; por debajo de 900 los paneles se apilan. A 320px nada se desborda:
-lo que no cabe —la tabla de evidencia, el código— desplaza dentro de su propio
-panel, no arrastra la página.
+Los cortes salen de la especificación. Arriba de 1280px se ven los tres paneles.
+Entre 900 y 1280 se colapsa el árbol de archivos, que es lo primero de lo que
+puedes prescindir. Abajo de 900 los paneles se apilan.
 
-## Correr el proyecto
+A 320px nada se desborda. Lo que no cabe, como la tabla de evidencia o el código,
+desplaza dentro de su propio panel sin arrastrar la página.
+
+## Correrlo
 
 ```bash
 git clone -b web/mock https://github.com/miguelcsx/pomset.git
@@ -157,7 +162,7 @@ cd pomset
 python3 -m http.server 4174
 ```
 
-No hay build ni dependencias.
+Sin build ni dependencias.
 
 ## Licencia
 
