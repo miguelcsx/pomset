@@ -16,7 +16,7 @@ No mode replaces the others. A proof over a restricted model leaves every native
 
 ## Status
 
-Pre-implementation. The technical specification lives in `docs/` and covers architecture, contracts, isolation, budgets, catalogue and UI. There is no backend yet.
+Pre-implementation. The design is settled; the system is not built. There is no backend yet.
 
 Branch `web/mock` holds a navigable interface mock in plain HTML, CSS and JavaScript: profile catalogue, workbench with lanes, and an evidence panel. It exists to settle the visual language and the interaction states before the product is written.
 

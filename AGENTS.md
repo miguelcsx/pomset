@@ -2,12 +2,9 @@
 
 ## What this is
 
-`pomset` is a multi-language concurrency workbench for the web. The technical
-specification in `docs/about.md` is normative: architecture, contracts,
-isolation, budgets, catalogue and UI. There is no backend yet.
-
-Read the relevant section before proposing anything. When something contradicts
-the spec, the spec wins or an ADR is opened; it is not settled in the code.
+`pomset` is a multi-language concurrency workbench for the web. You open a
+project, pick a scenario, run it under one or more profiles, and read the
+evidence each one produces. There is no backend yet.
 
 ## Branches
 
@@ -16,30 +13,31 @@ the spec, the spec wins or an ADR is opened; it is not settled in the code.
 | `main` | The product: documents, licence, utilities. |
 | `web/mock` | A navigable interface mock in plain HTML, CSS and JS. |
 
-The mock is never merged into `main`. It is a maquette for validating the visual
-language and the interaction states, not the eventual frontend, which is React,
-Monaco and Dockview (ADR-006).
+The mock is never merged into `main`. It is a maquette for settling the visual
+language and the interaction states, and it gets thrown away once the real
+frontend exists. That one will be React with Monaco.
 
 ## Conventions
 
 - **Code and repository documents in English**: file names, identifiers, CSS
   classes, commit messages, everything under `main`.
 - **The mock's visible copy is Spanish.** Domain identifiers are never
-  translated: `runtime`, `Tokio`, `asyncio`, `deadlock`, `snapshot` (§22.3).
+  translated: `runtime`, `Tokio`, `asyncio`, `deadlock`, `snapshot`.
 - Files stay under 500 lines, ideally under 400, with one responsibility each.
 - Conventional commits, signed.
 
 ## Rules that do not bend
 
-These come from the product invariants (§23) and apply to the mock as well:
-
-- Running is not publishing. Finishing a job is not proving correctness.
+- Running a job leaves the project unpublished, and finishing one proves nothing
+  about correctness.
 - "No failures observed" is never presented as proof. Green alone does not mean
   safe.
-- An unsupported combination is explained, never silently swapped for something
-  that looks close.
+- An unsupported combination gets explained. Never swap it for something that
+  merely looks close.
 - A result belongs to the snapshot that was analysed, even after the source
   changes.
+- Every number carries what qualifies it: coverage, assumptions, and the profile
+  that produced it.
 
 ## Before calling something done
 
