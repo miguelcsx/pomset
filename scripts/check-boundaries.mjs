@@ -187,21 +187,57 @@ for (const dir of packages) {
 }
 
 // Frontend feature leaves cannot import the composition root or one another
-// except for the explicit pure working-copy dependency.
-const webRoot = join(root, "apps/web/src/app");
+// except for the explicit pure working-copy dependency. The composition root is
+// the workbench itself, which sits at the top of `features/` and may use every
+// leaf; `app/` is Next.js's own entry and is not a feature.
+const webRoot = join(root, "apps/web/src/features");
 const featureImports = {
-  editor: [], scenario: [], workspace: [],
-  analysis: ["workspace"], evidence: ["workspace"],
+  editor: [],
+  scenario: [],
+  workspace: [],
+  styles: [],
+  analysis: ["workspace"],
+  evidence: ["workspace"],
 };
 for (const file of sourceFiles(webRoot)) {
   if (/\.test\.tsx?$/.test(file)) continue;
-  const feature = relative(webRoot, file).split("/")[0];
+  const segments = relative(webRoot, file).split("/");
+  if (segments.length < 2) continue;
+  const feature = segments[0];
   if (!(feature in featureImports)) continue;
   for (const spec of specifiersIn(readFileSync(file, "utf8"))) {
     if (!spec.startsWith(".")) continue;
     const target = relative(webRoot, resolve(dirname(file), spec)).split("/")[0];
     if (target !== feature && !featureImports[feature].includes(target)) {
       violations.push(`${relative(root, file)}: ${feature} cannot import ${spec}`);
+    }
+  }
+}
+
+// `apps/api` is layered the same way the packages are, one level down:
+// `interface` may reach `application`, `application` may reach `domain`, and
+// `infrastructure` implements the ports `application` declares. Nothing may
+// import `interface`, and only the composition root — `app.ts`, `main.ts`,
+// `index.ts`, `bin/` — may choose a concrete adapter.
+const apiRoot = join(root, "apps/api/src");
+const apiLayers = {
+  domain: [],
+  application: ["domain"],
+  infrastructure: ["domain", "application"],
+  interface: ["domain", "application"],
+};
+for (const file of sourceFiles(apiRoot)) {
+  if (/\.test\.tsx?$/.test(file)) continue;
+  const segments = relative(apiRoot, file).split("/");
+  if (segments.length < 2) continue;
+  const layer = segments[0];
+  if (!(layer in apiLayers)) continue;
+  for (const spec of specifiersIn(readFileSync(file, "utf8"))) {
+    if (!spec.startsWith(".")) continue;
+    const target = relative(apiRoot, resolve(dirname(file), spec)).split("/")[0];
+    if (target === layer || !(target in apiLayers)) continue;
+    if (!apiLayers[layer].includes(target)) {
+      violations.push(`${relative(root, file)}: ${layer} cannot import ${target}`);
     }
   }
 }
