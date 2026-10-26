@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "capabilityId": "cap_invalid_noreason",
+  "profileRevisionId": "prf_triton_cpu_z3_1",
+  "backend": "triton",
+  "feature": "outputCoverage",
+  "support": "untested",
+  "availability": "unavailable",
+  "evidenceArtifactIds": [
+    "art_rep_1"
+  ]
+}

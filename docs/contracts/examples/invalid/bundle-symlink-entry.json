@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "bundleId": "bnd_invalid_symlink",
+  "createdAt": "2026-10-12T10:12:00Z",
+  "sourceOrigin": "local",
+  "snapshotId": "snp_01HN3",
+  "scenarioId": "scn_91Bx",
+  "profileRevisionIds": [
+    "prf_triton_cpu_z3_1"
+  ],
+  "entries": [
+    {
+      "path": "docs/scenario.json",
+      "contentHash": "sha256:c72986041df00fc60c988cd351f681990e873950dbd8d45d31f51f3389229943",
+      "bytes": 1200,
+      "kind": "document",
+      "symlink": false
+    },
+    {
+      "path": "artifacts/report.json",
+      "contentHash": "sha256:f65fdb506bcae90353f4a4e1c68a80964ae26a26169e09318d17f8ad1bd4f294",
+      "bytes": 18422,
+      "kind": "report",
+      "symlink": true
+    },
+    {
+      "path": "measurements/msr_1.json",
+      "contentHash": "sha256:294eb623fb7ceae335f4c520786d932d1c36c2df6e6cd5c86dea3c89aad912a1",
+      "bytes": 900,
+      "kind": "measurement",
+      "symlink": false
+    }
+  ],
+  "documents": {
+    "scenarios": [
+      "docs/scenario.json"
+    ],
+    "snapshotManifests": [
+      "docs/snapshot.json"
+    ],
+    "results": [
+      "docs/result.json"
+    ],
+    "measurements": [
+      "measurements/msr_1.json"
+    ]
+  },
+  "requiredTools": [
+    {
+      "name": "python",
+      "version": "3.12.6",
+      "backend": "host"
+    },
+    {
+      "name": "z3",
+      "version": "4.13.0",
+      "backend": "solver"
+    },
+    {
+      "name": "ncu",
+      "version": "2024.2.1",
+      "backend": "cuda",
+      "optional": true
+    }
+  ],
+  "requiredHardware": {
+    "device": "NVIDIA A100-SXM4-80GB",
+    "arch": "sm_80",
+    "cohortId": "hw_a100_80g",
+    "note": "Replay of a measurement needs the same cohort."
+  },
+  "producer": {
+    "tool": "pomset",
+    "toolVersion": "0.1.0"
+  },
+  "executable": false,
+  "published": false,
+  "manifestHash": "sha256:5d2475af8b9ca9066115181a8923c8f65cc08a8824924d8657be31fe01be5900"
+}

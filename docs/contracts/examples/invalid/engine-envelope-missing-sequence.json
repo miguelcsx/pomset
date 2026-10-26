@@ -1,0 +1,30 @@
+{
+  "protocolVersion": 1,
+  "jobId": "job_7Kd",
+  "attemptId": "att_7Kd_1",
+  "type": "hello",
+  "payload": {
+    "engineName": "pomset-triton-engine",
+    "engineVersion": "0.1.0",
+    "capabilities": [
+      {
+        "feature": "outputCoverage",
+        "support": "validated"
+      },
+      {
+        "feature": "writeWriteConflict",
+        "support": "limited",
+        "reason": "Non-atomic write/write conflicts only; atomics are unsupported."
+      },
+      {
+        "feature": "atomics",
+        "support": "untested",
+        "reason": "Not modelled in the supported subset."
+      }
+    ],
+    "limits": {
+      "maxMessageBytes": 1048576,
+      "maxOutputBytes": 16777216
+    }
+  }
+}
