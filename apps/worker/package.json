@@ -1,0 +1,32 @@
+{
+  "name": "@pomset/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The engine supervisor and hosted job consumer. It owns process cancellation, resource limits and the leased-row lifecycle; it holds no identity-provider or billing credentials.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pomset/contracts": "workspace:*",
+    "@pomset/engine-client": "workspace:*",
+    "@pomset/storage": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
