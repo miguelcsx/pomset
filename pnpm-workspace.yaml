@@ -5,6 +5,12 @@ packages:
 allowBuilds:
   # esbuild's install script links its platform binary; Vite and Vitest need it.
   esbuild: true
+  # Prisma's install scripts fetch its query and schema engines. The hosted store
+  # uses the `pg` driver adapter, so no query engine is ever loaded, and
+  # migrations are reviewed SQL rather than `prisma migrate`. Generation alone
+  # needs neither, so installs stay offline and need no binary.
+  '@prisma/engines': false
+  prisma: false
 
 # One version per shared development dependency, declared here rather than
 # repeated in nine manifests. A member references these with `catalog:`.
