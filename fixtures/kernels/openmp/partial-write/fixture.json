@@ -1,0 +1,16 @@
+{
+  "fixtureId": "fx_openmp_partial_write",
+  "class": "defect",
+  "backend": "openmp",
+  "entrypoint": "kernel.c",
+  "symbol": "transform",
+  "origin": "original",
+  "licence": "Apache-2.0",
+  "revision": "pomset@0.0.0",
+  "expectedOutcome": {
+    "property": "initialization",
+    "outcome": "violated",
+    "qualifier": "half the declared output elements are never stored to, at every thread count and independently of scheduling"
+  },
+  "notes": "A host-parallel kernel that guards its store with a parity test, so every odd element keeps whatever the harness poisoned it with. The defect is deterministic, which is what makes it a usable fixture: a check that fires here and stays silent on its control has been judged against something other than itself. The engine reports it as initialization violated with the element count, not as a numerical disagreement — an element no store reached is a different failure from one written with a wrong value."
+}

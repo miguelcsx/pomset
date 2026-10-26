@@ -92,6 +92,26 @@ models, separately from CUDA and Triton. Cross-backend comparison is a compariso
 of **evidence**, not of semantics; results from different backends appear side by
 side with their own qualifiers and are never merged into one verdict.
 
+### Current implementation
+
+`engines/openmp` exists and runs from the CLI behind `--trust-local-code`
+([ADR-0016](../adr/0016-openmp-host-execution.md)). It compiles one C entrypoint
+with Clang and OpenMP, runs it at a sweep of thread counts against buffers it
+poisons first, and compares every output element with the scenario's declared
+reference. What it decides is `numericalAgreement` and `initialization`; a run
+that agreed is `unknown`, because `established` is not reachable from an
+observation.
+
+The two capabilities that need instrumentation — `instrumentedExecution` and the
+synchronization and deadlock diagnostics that depend on it — are **unavailable on
+this platform**, measured rather than assumed: a ThreadSanitizer binary dies
+before `main` with signal 11, with or without OpenMP. They are reported
+`unsupported` with that reason, and never approximated by a clean run.
+
+The workbench does not run any of this. It renders an OpenMP report a CLI
+invocation produced; compiling and executing a kernel from a browser page is a
+different act with its own trust boundary.
+
 ## Conformance corpus
 
 Each backend ships fixtures under `fixtures/kernels` with declared outcomes:

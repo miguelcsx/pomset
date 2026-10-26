@@ -12,6 +12,14 @@ repository. `apps/api/src` is `domain`, `application`, `infrastructure` and
 the worker and the Python engine reuse. The client is served from the API's own
 origin, so a browser reaches one host and one capability.
 
+Analysis runs in `engines/`, as a child process speaking JSON Lines over a
+read-only request file. Two engines exist: `engines/triton`, which reads a kernel
+and reasons about it symbolically and executes nothing, and `engines/openmp`,
+which compiles a host-parallel kernel and runs it. Only the second one runs
+anything the user wrote, so only the second one needs `--trust-local-code`, and
+the workbench never runs it at all. Which engine a scenario belongs to is its
+`launch` form.
+
 ## Branches
 
 | Branch | Holds |

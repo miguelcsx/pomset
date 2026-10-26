@@ -1,0 +1,16 @@
+{
+  "fixtureId": "fx_openmp_missing_reduction",
+  "class": "defect",
+  "backend": "openmp",
+  "entrypoint": "kernel.c",
+  "symbol": "transform",
+  "origin": "original",
+  "licence": "Apache-2.0",
+  "revision": "pomset@0.0.0",
+  "expectedOutcome": {
+    "property": "numericalAgreement",
+    "outcome": "violated",
+    "qualifier": "when the unsynchronised update is observed; a run may agree, and this fixture may miss"
+  },
+  "notes": "A reduction written without its reduction clause, so the team updates one accumulator without synchronisation. The defect is a race and therefore intermittent: observed at one thread count and not at others on the same machine, in the same build. It is kept because the corpus exists to make such misses visible rather than to hide them, and because a check that fires on the control would be worse than one that occasionally stays silent on the defect."
+}

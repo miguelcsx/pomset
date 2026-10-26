@@ -163,3 +163,18 @@ SQLite and the filesystem, and `PrismaAnalysisRepository` over PostgreSQL. The
 run workspace and the content-addressed bytes are separate ports the local
 backend satisfies and a hosted deployment would answer differently — an object
 store for bytes, and no run directory at all.
+
+## Engines
+
+Two engines exist, and both are child processes behind the same protocol, which
+they share rather than restate:
+
+| Engine | Decides | Executes |
+|---|---|---|
+| `engines/triton` | `outputCoverage`, `memoryBounds`, `writeWriteConflict`, symbolically over a restricted subset | Nothing: it reads the module with `ast` and never imports it |
+| `engines/openmp` | `numericalAgreement`, `initialization`, by running the kernel against its declared reference | The kernel, under Clang and OpenMP, on the machine the analysis runs on |
+
+Only the second needs consent, and `apps/cli` refuses it without
+`--trust-local-code` before any process exists. Which engine a scenario belongs
+to is its `launch` form, not a flag
+([ADR-0016](../adr/0016-openmp-host-execution.md)).

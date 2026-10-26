@@ -1,0 +1,16 @@
+{
+  "fixtureId": "fx_openmp_missing_reduction_control",
+  "class": "control",
+  "backend": "openmp",
+  "entrypoint": "kernel.c",
+  "symbol": "transform",
+  "origin": "original",
+  "licence": "Apache-2.0",
+  "revision": "pomset@0.0.0",
+  "expectedOutcome": {
+    "property": "numericalAgreement",
+    "outcome": "unknown",
+    "qualifier": "the reduction is synchronised, so every executed run agrees and none of them proves anything"
+  },
+  "notes": "The same kernel with reduction(+ : total) restored. Agreement here is coverage of the thread counts that ran. It is never a proof of race freedom, and no instrumented path was available to say anything further."
+}

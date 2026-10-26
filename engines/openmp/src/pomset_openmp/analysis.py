@@ -489,6 +489,23 @@ def _property(
                 "semanticRole": "violation",
             }, detail
 
+        unwritten = [v for v in verdicts if v["verdict"] == "unwritten"]
+        if unwritten:
+            # Claiming agreement would be false: the comparison never reached
+            # those elements. They are a different failure, reported as
+            # initialization, and saying so is not the same as saying the values
+            # that were written were right about the whole output.
+            return {
+                **base,
+                "outcome": "unknown",
+                "unknownReason": (
+                    f"every element that was written agreed with the declared reference at "
+                    f"thread counts {threads}, but {unwritten[0]['count']} element(s) were never "
+                    "written at all. That is reported as initialization, and it leaves this "
+                    "property undecided over the whole output."
+                ),
+            }, ""
+
     unfinished = [verdict for verdict in verdicts if verdict["verdict"] == "unfinished"]
     if unfinished:
         return {

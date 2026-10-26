@@ -1,0 +1,16 @@
+{
+  "fixtureId": "fx_openmp_partial_write_control",
+  "class": "control",
+  "backend": "openmp",
+  "entrypoint": "kernel.c",
+  "symbol": "transform",
+  "origin": "original",
+  "licence": "Apache-2.0",
+  "revision": "pomset@0.0.0",
+  "expectedOutcome": {
+    "property": "initialization",
+    "outcome": "unknown",
+    "qualifier": "every declared element was written, so the property is coverage of the runs performed and never established"
+  },
+  "notes": "The same kernel with the parity guard removed. The engine must stay silent here, and it must stay silent as unknown rather than as established: a run that wrote everything is an observation, and established is reachable only through reasoning over a stated model."
+}

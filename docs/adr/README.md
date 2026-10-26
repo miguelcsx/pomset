@@ -37,6 +37,7 @@ requirement and an ADR conflict, the requirement wins.
 | [0013](0013-local-symbolic-workstation.md) | A separately launched single-owner loopback workbench that takes source as data and executes nothing. | accepted |
 | [0014](0014-web-client-and-api-layers.md) | Next.js static export served from the workbench's own origin; a layered Express API; the shared packages kept as the shared layers. | accepted |
 | [0015](0015-hosted-record-store.md) | Three ports instead of one; the job lifecycle and record rules shared; PostgreSQL through Prisma as the second record store. | accepted |
+| [0016](0016-openmp-host-execution.md) | A second engine that compiles and runs a host-parallel kernel locally, behind per-invocation CLI consent; instrumentation unavailable here and named. | accepted |
 
 ## Template
 

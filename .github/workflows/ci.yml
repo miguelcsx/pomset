@@ -106,6 +106,17 @@ jobs:
           nix develop -c node apps/cli/dist/bin/pomset.js analyze --scenario examples/transform-floor-grid/scenario.json --report /tmp/report.json; test $? -eq 1
           nix develop -c node apps/cli/dist/bin/pomset.js analyze --scenario examples/transform-floor-grid/scenario-ceil.json --report /tmp/report.json; test $? -eq 0
 
+      - name: an OpenMP kernel is refused until the invocation is authorized
+        run: |
+          ! nix develop -c node apps/cli/dist/bin/pomset.js analyze --scenario examples/openmp-partial-write/scenario.json
+
+      - name: the OpenMP kernel that writes half its output is caught, and its control is not
+        run: |
+          nix develop -c node apps/cli/dist/bin/pomset.js analyze --scenario examples/openmp-partial-write/scenario.json --trust-local-code; test $? -eq 1
+          # The control is not silent-and-passing: it is inconclusive, because a run
+          # that wrote everything is an observation and never a proof.
+          nix develop -c node apps/cli/dist/bin/pomset.js analyze --scenario examples/openmp-partial-write-control/scenario.json --trust-local-code; test $? -eq 2
+
   hosted:
     name: the hosted record store
     runs-on: ubuntu-latest

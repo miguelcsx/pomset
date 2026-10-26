@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "scn_openmp_partial_write",
+  "snapshotId": "snp_openmp_partial_write",
+  "name": "Half the declared output elements are never stored to, at every thread count.",
+  "entrypoint": {
+    "path": "kernels/kernel.c",
+    "symbol": "transform"
+  },
+  "allocations": [
+    {
+      "allocationId": "al_x",
+      "name": "X",
+      "role": "input",
+      "dtype": "fp32",
+      "shape": [
+        {
+          "op": "parameter",
+          "parameter": "N"
+        }
+      ]
+    },
+    {
+      "allocationId": "al_y",
+      "name": "Y",
+      "role": "output",
+      "dtype": "fp32",
+      "shape": [
+        {
+          "op": "parameter",
+          "parameter": "N"
+        }
+      ],
+      "poisoned": true
+    }
+  ],
+  "launch": {
+    "schedule": "dynamic",
+    "displayHints": [
+      "omp parallel for"
+    ]
+  },
+  "domain": {
+    "domainId": "dom_openmp_partial_write",
+    "enumerable": true,
+    "variables": [
+      {
+        "name": "N",
+        "kind": "shape",
+        "type": "int",
+        "width": "i32",
+        "min": 512,
+        "max": 512,
+        "step": 1
+      }
+    ],
+    "constraints": [],
+    "hardwareCohortIds": [
+      "hw_local"
+    ]
+  },
+  "reference": {
+    "kind": "host-python",
+    "path": "kernels/reference.py",
+    "symbol": "reference",
+    "tolerances": {
+      "atol": 0.001,
+      "rtol": 1e-05,
+      "dtype": "fp32",
+      "nanPolicy": "reject-nan",
+      "infPolicy": "reject-inf"
+    }
+  },
+  "requiredProperties": [
+    "numericalAgreement",
+    "initialization"
+  ],
+  "notes": "Half the declared output elements are never stored to, at every thread count.",
+  "createdAt": "2026-10-18T00:00:00Z"
+}

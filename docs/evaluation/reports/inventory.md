@@ -98,9 +98,9 @@ Existing targets are candidates for review, not acceptance evidence. No requirem
 | TASK-CUDA-007 | missing | 0 / 2 |
 | TASK-CUDA-008 | missing | 0 / 2 |
 | TASK-CUDA-009 | missing | 0 / 3 |
-| TASK-OMP-001 | missing | 0 / 3 |
-| TASK-OMP-002 | missing | 0 / 3 |
-| TASK-OMP-003 | missing | 0 / 2 |
+| TASK-OMP-001 | partial/unverified | 1 / 3 |
+| TASK-OMP-002 | partial/unverified | 3 / 3 |
+| TASK-OMP-003 | partial/unverified | 1 / 2 |
 | TASK-OMP-004 | missing | 0 / 3 |
 | TASK-OMP-005 | missing | 0 / 4 |
 | TASK-OMP-006 | missing | 0 / 3 |
