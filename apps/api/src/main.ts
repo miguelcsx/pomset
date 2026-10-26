@@ -16,7 +16,8 @@ import { REPO_ROOT } from "@pomset/worker";
 import { createWorkbenchApp } from "./app.js";
 import { createWorkbench } from "./application/Workbench.js";
 import { LocalEngineRunner } from "./infrastructure/engine/LocalEngineRunner.js";
-import { SqliteAnalysisRepository } from "./infrastructure/repository/SqliteAnalysis.repository.js";
+import { LocalAnalysisStore } from "./infrastructure/repository/LocalAnalysisStore.js";
+import { openWorkbenchStore } from "./infrastructure/storage/openWorkbenchStore.js";
 
 export interface WorkbenchOptions {
   readonly directory: string;
@@ -33,9 +34,16 @@ export interface RunningWorkbench {
 export async function startWorkbench(
   options: WorkbenchOptions,
 ): Promise<RunningWorkbench> {
-  const repository = new SqliteAnalysisRepository(options.directory);
-  const engine = new LocalEngineRunner(repository.store, options.directory);
-  const workbench = createWorkbench(repository, engine);
+  const opened = openWorkbenchStore(options.directory);
+  const local = new LocalAnalysisStore(opened.store, options.directory);
+  const engine = new LocalEngineRunner(opened.store, options.directory);
+  const workbench = createWorkbench({
+    repository: local,
+    workspace: local,
+    blobs: local,
+    engine,
+    closeStore: () => opened.close(),
+  });
 
   const token = randomBytes(32).toString("hex");
   let port = options.port ?? 0;

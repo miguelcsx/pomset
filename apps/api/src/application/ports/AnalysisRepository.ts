@@ -1,10 +1,11 @@
 /**
- * The port the use cases persist through.
+ * The record store: the durable objects a job is made of and the job itself.
  *
- * The local implementation is SQLite plus a filesystem content-addressed store;
- * the planned hosted implementation is PostgreSQL plus an object store. Neither
- * is visible above this interface, and `SqliteAnalysisRepository` is the only
- * module that knows which backend is in use.
+ * This is the port a hosted backend can satisfy. It knows nothing about where a
+ * run's files are written, how an engine is launched, or where bytes are kept —
+ * a local workbench answers with SQLite and a filesystem content-addressed
+ * store, and a hosted deployment answers with PostgreSQL and an object store.
+ * The run workspace, which is local by nature, is a separate port.
  */
 
 import type {
@@ -15,43 +16,17 @@ import type {
   SnapshotManifest,
 } from "@pomset/contracts";
 
-/** One piece of source or declaration captured for a run. */
-export interface CapturedFile {
-  readonly path: string;
-  readonly source: string;
-}
-
 export interface AnalysisRepository {
+  /** The most recent jobs this store holds, newest first. */
   history(): Job[];
   job(id: string): Job;
+
   snapshot(id: string): SnapshotManifest;
   scenario(id: string): Scenario;
   revision(id: string): ProfileRevision;
   result(id: string): AnalysisResult | undefined;
 
-  /** Reads back the bytes captured for a content hash. */
-  bytes(hash: string): Buffer;
-
-  /** Where one run's captured inputs live. */
-  runDirectory(jobId: string): string;
-
-  /**
-   * Writes the captured files, content-addresses their bytes and creates the
-   * run's scratch and artifact directories. Reads nothing outside `directory`.
-   * `runScenario` is the declaration the engine is launched against; it is
-   * written beside the run rather than into the manifest, exactly as the source
-   * files are not rewritten.
-   */
-  captureRun(
-    directory: string,
-    files: readonly CapturedFile[],
-    runScenario: Scenario,
-  ): void;
-
-  /** Discards a run whose capture failed, so no half-written run is left behind. */
-  removeRun(directory: string): void;
-
-  /** Persists one submission's snapshot, scenario and profile in one transaction. */
+  /** Captures one submission's snapshot, scenario and profile, atomically. */
   record(
     snapshot: SnapshotManifest,
     scenario: Scenario,
@@ -60,5 +35,4 @@ export interface AnalysisRepository {
 
   enqueue(job: Job): void;
   cancel(id: string): void;
-  close(): void;
 }

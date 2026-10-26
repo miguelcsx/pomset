@@ -16,6 +16,7 @@ import type {
 
 import { evaluateEligibility } from "../../domain/index.js";
 import type { AnalysisRepository } from "../ports/AnalysisRepository.js";
+import type { BlobStore } from "../ports/BlobStore.js";
 
 export interface AnalysisReport {
   readonly schemaVersion: 1;
@@ -29,7 +30,10 @@ export interface AnalysisReport {
 }
 
 export class GetAnalysis {
-  constructor(private readonly repository: AnalysisRepository) {}
+  constructor(
+    private readonly repository: AnalysisRepository,
+    private readonly blobs: BlobStore,
+  ) {}
 
   execute(id: string): AnalysisReport {
     const job = this.repository.job(id);
@@ -53,7 +57,7 @@ export class GetAnalysis {
           file.path,
           {
             encoding: "base64" as const,
-            data: this.repository.bytes(file.sha256).toString("base64"),
+            data: this.blobs.bytes(file.sha256).toString("base64"),
           },
         ]),
       ),

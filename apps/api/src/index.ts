@@ -10,11 +10,10 @@
  */
 
 export { createWorkbenchApp, type WorkbenchAppOptions } from "./app.js";
-export { createWorkbench, type Workbench } from "./application/Workbench.js";
-export type {
-  AnalysisRepository,
-  CapturedFile,
-} from "./application/ports/AnalysisRepository.js";
+export { createWorkbench, type Workbench, type WorkbenchDependencies } from "./application/Workbench.js";
+export type { AnalysisRepository } from "./application/ports/AnalysisRepository.js";
+export type { BlobStore } from "./application/ports/BlobStore.js";
 export type { EngineRunner } from "./application/ports/EngineRunner.js";
+export type { CapturedFile, RunWorkspace } from "./application/ports/RunWorkspace.js";
 export { ApplicationError, type ErrorKind } from "./domain/errors/ApplicationError.js";
 export { startWorkbench, type RunningWorkbench, type WorkbenchOptions } from "./main.js";

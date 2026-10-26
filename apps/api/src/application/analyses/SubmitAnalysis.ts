@@ -26,8 +26,9 @@ import {
   sha256Of,
   validateScenario,
 } from "../../domain/index.js";
-import type { AnalysisRepository, CapturedFile } from "../ports/AnalysisRepository.js";
+import type { AnalysisRepository } from "../ports/AnalysisRepository.js";
 import type { EngineRunner } from "../ports/EngineRunner.js";
+import type { CapturedFile, RunWorkspace } from "../ports/RunWorkspace.js";
 import type { AnalysisRunner } from "./AnalysisRunner.js";
 
 const uid = (prefix: string): string => `${prefix}_${randomUUID()}`;
@@ -35,6 +36,7 @@ const uid = (prefix: string): string => `${prefix}_${randomUUID()}`;
 export class SubmitAnalysis {
   constructor(
     private readonly repository: AnalysisRepository,
+    private readonly workspace: RunWorkspace,
     private readonly runner: AnalysisRunner,
     private readonly engine: EngineRunner,
   ) {}
@@ -146,13 +148,13 @@ export class SubmitAnalysis {
       createdAt: now,
     };
 
-    const directory = this.repository.runDirectory(job.jobId);
+    const directory = this.workspace.runDirectory(job.jobId);
     try {
-      this.repository.captureRun(directory, files, scenario);
+      this.workspace.captureRun(directory, files, scenario);
       this.repository.record(manifest.value as SnapshotManifest, scenario, profile);
       this.repository.enqueue(job);
     } catch (error) {
-      this.repository.removeRun(directory);
+      this.workspace.removeRun(directory);
       throw error;
     }
 
