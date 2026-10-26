@@ -45,6 +45,10 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: nix develop -c pnpm install --frozen-lockfile
+      # The workbench test starts the real Python engines, so its leg needs the
+      # pinned environment; the other legs never load it.
+      - if: matrix.package == '@pomset/api'
+        run: nix develop -c uv sync --frozen
       # `pkg...` selects the package and its workspace dependencies. A member
       # consumes the others through their built `dist`, so a leg that installed
       # only would otherwise fail on a clean checkout.
