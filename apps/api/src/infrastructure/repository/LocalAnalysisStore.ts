@@ -3,10 +3,14 @@
  * metadata in a single file beside a filesystem content-addressed store and the
  * run directories the supervisor mounts.
  *
- * It satisfies three ports that a hosted deployment would satisfy separately —
+ * It satisfies three ports that a hosted deployment satisfies separately —
  * records in PostgreSQL, bytes in an object store, and no run directory at all.
  * Keeping the ports apart is what makes that deployment possible; this class is
  * only able to merge them because here they share a directory.
+ *
+ * The record and blob ports are asynchronous because a remote store must be.
+ * These methods answer in the same turn; the promise is the interface, not a
+ * pretence that the work is slow.
  */
 
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
@@ -35,44 +39,44 @@ export class LocalAnalysisStore
     private readonly directory: string,
   ) {}
 
-  history(): Job[] {
+  async history(): Promise<Job[]> {
     return this.store.db
       .prepare("SELECT document FROM jobs ORDER BY rowid DESC LIMIT 100")
       .all()
       .map((row) => JSON.parse(String(row["document"])) as Job);
   }
 
-  job(id: string): Job {
+  async job(id: string): Promise<Job> {
     return translate(() => this.store.job(id));
   }
 
-  snapshot(id: string): SnapshotManifest {
+  async snapshot(id: string): Promise<SnapshotManifest> {
     const value = this.store.get<SnapshotManifest>("snapshot", id);
     if (!value) throw notFound(`No snapshot ${id} in this workbench store`);
     return value;
   }
 
-  scenario(id: string): Scenario {
+  async scenario(id: string): Promise<Scenario> {
     const value = this.store.get<Scenario>("scenario", id);
     if (!value) throw notFound(`No scenario ${id} in this workbench store`);
     return value;
   }
 
-  revision(id: string): ProfileRevision {
+  async revision(id: string): Promise<ProfileRevision> {
     const value = this.store.get<ProfileRevision>("profile", id);
     if (!value) throw notFound(`No profile revision ${id} in this workbench store`);
     return value;
   }
 
-  result(id: string): AnalysisResult | undefined {
+  async result(id: string): Promise<AnalysisResult | undefined> {
     return this.store.get<AnalysisResult>("result", id);
   }
 
-  record(
+  async record(
     snapshot: SnapshotManifest,
     scenario: Scenario,
     profile: ProfileRevision,
-  ): void {
+  ): Promise<void> {
     translate(() =>
       this.store.transaction(() => {
         this.store.put("snapshot", snapshot.snapshotId, snapshot);
@@ -82,11 +86,11 @@ export class LocalAnalysisStore
     );
   }
 
-  enqueue(job: Job): void {
+  async enqueue(job: Job): Promise<void> {
     translate(() => this.store.enqueue(job));
   }
 
-  cancel(id: string): void {
+  async cancel(id: string): Promise<void> {
     translate(() => this.store.cancel(id));
   }
 
@@ -103,7 +107,7 @@ export class LocalAnalysisStore
       const path = join(directory, "files", file.path);
       mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
       writeFileSync(path, file.source, { flag: "wx", mode: 0o444 });
-      this.putBytes(Buffer.from(file.source));
+      translate(() => this.store.putBytes(Buffer.from(file.source)));
     }
     for (const name of ["scratch", "artifacts"]) mkdirSync(join(directory, name));
     writeFileSync(join(directory, "scenario.json"), JSON.stringify(runScenario), {
@@ -116,11 +120,11 @@ export class LocalAnalysisStore
     rmSync(directory, { recursive: true, force: true });
   }
 
-  bytes(hash: string): Buffer {
+  async bytes(hash: string): Promise<Buffer> {
     return translate(() => this.store.bytes(hash));
   }
 
-  putBytes(bytes: Uint8Array): string {
+  async putBytes(bytes: Uint8Array): Promise<string> {
     return translate(() => this.store.putBytes(bytes));
   }
 }

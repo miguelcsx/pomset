@@ -27,14 +27,14 @@ const UNAVAILABLE = [
 
 export function workbenchController(workbench: Workbench) {
   return {
-    get(_request: Request, response: Response, next: NextFunction): void {
+    async get(_request: Request, response: Response, next: NextFunction): Promise<void> {
       try {
         response.json({
           data: {
             mode: "local-symbolic",
             profile: workbench.profile.execute(),
             maxSolverTimeMs: MAX_SOLVER_TIME_MS,
-            jobs: workbench.history.execute(),
+            jobs: await workbench.history.execute(),
             unavailable: UNAVAILABLE,
           },
         });

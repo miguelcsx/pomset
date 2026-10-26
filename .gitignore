@@ -12,6 +12,10 @@ out/
 # of the two it produced last. Both targets are inside `.next/` and ignored.
 next-env.d.ts
 
+# The Prisma client is generated from `apps/api/prisma/schema.prisma`, which is
+# the reviewed source. Unlike the contract bindings, nothing else consumes it.
+apps/api/src/generated/
+
 # Rust
 target/
 

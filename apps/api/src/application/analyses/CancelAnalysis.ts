@@ -18,8 +18,8 @@ export class CancelAnalysis {
     private readonly runner: AnalysisRunner,
   ) {}
 
-  execute(id: string): Job {
-    this.repository.cancel(id);
+  async execute(id: string): Promise<Job> {
+    await this.repository.cancel(id);
     this.runner.abort(id);
     return this.repository.job(id);
   }

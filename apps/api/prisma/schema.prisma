@@ -1,0 +1,46 @@
+// The hosted record store.
+//
+// The documents are the ones the contracts already define, so the tables hold
+// them as `jsonb` rather than restating their fields: `packages/contracts` is
+// the one schema authority (ADR-0004), and a second model of a job beside it
+// would be a second answer to what a job is. Prisma is used for the typed
+// queries and the connection, not for a competing schema.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// One immutable object a job is made of, addressed by kind and identity.
+/// Ownership is separate from content identity, so a hash is never a credential.
+model Record {
+  kind     String
+  id       String
+  document Json
+
+  @@id([kind, id])
+  @@map("records")
+}
+
+/// The job itself, including the state the lifecycle policy decides.
+model Job {
+  id       String @id
+  document Json
+
+  @@map("jobs")
+}
+
+/// The durable, append-only per-job event stream, ordered from 1.
+/// Progress and accepted evidence are never modified or retracted.
+model JobEvent {
+  jobId    String
+  sequence Int
+  document Json
+
+  @@id([jobId, sequence])
+  @@map("events")
+}

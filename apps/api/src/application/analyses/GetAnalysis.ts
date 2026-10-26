@@ -35,14 +35,26 @@ export class GetAnalysis {
     private readonly blobs: BlobStore,
   ) {}
 
-  execute(id: string): AnalysisReport {
-    const job = this.repository.job(id);
-    const snapshot = this.repository.snapshot(job.snapshotId);
-    const scenario = this.repository.scenario(job.scenarioId);
-    const profile = this.repository.revision(job.profileRevisionId);
-    const analysis = job.resultIds?.[0]
-      ? this.repository.result(job.resultIds[0])
+  async execute(id: string): Promise<AnalysisReport> {
+    const job = await this.repository.job(id);
+    const [snapshot, scenario, profile] = await Promise.all([
+      this.repository.snapshot(job.snapshotId),
+      this.repository.scenario(job.scenarioId),
+      this.repository.revision(job.profileRevisionId),
+    ]);
+    const resultId = job.resultIds?.[0];
+    const analysis = resultId
+      ? await this.repository.result(resultId)
       : undefined;
+    const sourceFiles = await Promise.all(
+      snapshot.files.map(async (file) => [
+        file.path,
+        {
+          encoding: "base64" as const,
+          data: (await this.blobs.bytes(file.sha256)).toString("base64"),
+        },
+      ] as const),
+    );
     return {
       schemaVersion: 1,
       job,
@@ -52,15 +64,7 @@ export class GetAnalysis {
       ...(analysis
         ? { analysis, eligibility: evaluateEligibility(analysis, scenario) }
         : {}),
-      sourceFiles: Object.fromEntries(
-        snapshot.files.map((file) => [
-          file.path,
-          {
-            encoding: "base64" as const,
-            data: this.blobs.bytes(file.sha256).toString("base64"),
-          },
-        ]),
-      ),
+      sourceFiles: Object.fromEntries(sourceFiles),
     };
   }
 }

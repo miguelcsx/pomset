@@ -156,3 +156,10 @@ express. `scripts/check-boundaries.mjs` enforces the directions:
 Nothing imports `interface`. Only the composition root — `app.ts`, `main.ts`,
 `bin/` — names a concrete adapter, which is what makes the SQLite backend and
 the child-process supervisor replaceable without touching a use case.
+
+The record store has two implementations behind one port
+([ADR-0015](../adr/0015-hosted-record-store.md)): `LocalAnalysisStore` over
+SQLite and the filesystem, and `PrismaAnalysisRepository` over PostgreSQL. The
+run workspace and the content-addressed bytes are separate ports the local
+backend satisfies and a hosted deployment would answer differently — an object
+store for bytes, and no run directory at all.

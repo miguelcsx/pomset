@@ -12,7 +12,7 @@ import type { AnalysisRepository } from "../ports/AnalysisRepository.js";
 export class ListAnalyses {
   constructor(private readonly repository: AnalysisRepository) {}
 
-  execute(): Job[] {
+  execute(): Promise<Job[]> {
     return this.repository.history();
   }
 }

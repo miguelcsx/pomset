@@ -6,6 +6,9 @@
  * forwards any failure to the error handler; a status code is chosen here only
  * where the HTTP contract itself decides it, such as the 202 that says the work
  * has been accepted rather than finished.
+ *
+ * The store answers asynchronously, so the handlers are asynchronous too and
+ * catch their own rejections: Express 4 does not await a handler for you.
  */
 
 import type { NextFunction, Request, Response } from "express";
@@ -14,25 +17,25 @@ import type { Workbench } from "../../application/Workbench.js";
 
 export function analysesController(workbench: Workbench) {
   return {
-    submit(request: Request, response: Response, next: NextFunction): void {
+    async submit(request: Request, response: Response, next: NextFunction): Promise<void> {
       try {
-        response.status(202).json({ data: workbench.submit.execute(request.body) });
+        response.status(202).json({ data: await workbench.submit.execute(request.body) });
       } catch (error) {
         next(error);
       }
     },
 
-    get(request: Request, response: Response, next: NextFunction): void {
+    async get(request: Request, response: Response, next: NextFunction): Promise<void> {
       try {
-        response.json({ data: workbench.report.execute(request.params["id"]!) });
+        response.json({ data: await workbench.report.execute(request.params["id"]!) });
       } catch (error) {
         next(error);
       }
     },
 
-    cancel(request: Request, response: Response, next: NextFunction): void {
+    async cancel(request: Request, response: Response, next: NextFunction): Promise<void> {
       try {
-        response.json({ data: workbench.cancel.execute(request.params["id"]!) });
+        response.json({ data: await workbench.cancel.execute(request.params["id"]!) });
       } catch (error) {
         next(error);
       }

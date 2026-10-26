@@ -5,7 +5,11 @@
  * run's files are written, how an engine is launched, or where bytes are kept —
  * a local workbench answers with SQLite and a filesystem content-addressed
  * store, and a hosted deployment answers with PostgreSQL and an object store.
- * The run workspace, which is local by nature, is a separate port.
+ *
+ * It is asynchronous, and that is not incidental: a store reached over a socket
+ * cannot answer in the same turn, and a port that pretends otherwise could only
+ * ever have one implementation. The local backend is free to be synchronous
+ * underneath.
  */
 
 import type {
@@ -18,21 +22,21 @@ import type {
 
 export interface AnalysisRepository {
   /** The most recent jobs this store holds, newest first. */
-  history(): Job[];
-  job(id: string): Job;
+  history(): Promise<Job[]>;
+  job(id: string): Promise<Job>;
 
-  snapshot(id: string): SnapshotManifest;
-  scenario(id: string): Scenario;
-  revision(id: string): ProfileRevision;
-  result(id: string): AnalysisResult | undefined;
+  snapshot(id: string): Promise<SnapshotManifest>;
+  scenario(id: string): Promise<Scenario>;
+  revision(id: string): Promise<ProfileRevision>;
+  result(id: string): Promise<AnalysisResult | undefined>;
 
   /** Captures one submission's snapshot, scenario and profile, atomically. */
   record(
     snapshot: SnapshotManifest,
     scenario: Scenario,
     profile: ProfileRevision,
-  ): void;
+  ): Promise<void>;
 
-  enqueue(job: Job): void;
-  cancel(id: string): void;
+  enqueue(job: Job): Promise<void>;
+  cancel(id: string): Promise<void>;
 }

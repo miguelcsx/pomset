@@ -41,7 +41,7 @@ export class SubmitAnalysis {
     private readonly engine: EngineRunner,
   ) {}
 
-  execute(raw: unknown): Job {
+  async execute(raw: unknown): Promise<Job> {
     if (this.runner.activeId !== undefined)
       throw badRequest(
         "An analysis is already running. Cancel it or wait before starting another.",
@@ -83,7 +83,7 @@ export class SubmitAnalysis {
       throw badRequest("Entry point or reference is missing from working files");
 
     const parent = input.parentSnapshotId
-      ? this.repository.snapshot(input.parentSnapshotId)
+      ? await this.repository.snapshot(input.parentSnapshotId)
       : undefined;
     if (input.parentSnapshotId && !parent)
       throw badRequest("Parent snapshot is not in this workbench store");
@@ -151,8 +151,8 @@ export class SubmitAnalysis {
     const directory = this.workspace.runDirectory(job.jobId);
     try {
       this.workspace.captureRun(directory, files, scenario);
-      this.repository.record(manifest.value as SnapshotManifest, scenario, profile);
-      this.repository.enqueue(job);
+      await this.repository.record(manifest.value as SnapshotManifest, scenario, profile);
+      await this.repository.enqueue(job);
     } catch (error) {
       this.workspace.removeRun(directory);
       throw error;

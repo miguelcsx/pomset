@@ -56,7 +56,7 @@ export function createWorkbench(dependencies: WorkbenchDependencies): Workbench 
     async close(): Promise<void> {
       const activeId = runner.activeId;
       if (activeId !== undefined) {
-        dependencies.repository.cancel(activeId);
+        await dependencies.repository.cancel(activeId);
         runner.abort(activeId);
         await runner.drain();
       }

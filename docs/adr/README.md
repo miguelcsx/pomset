@@ -36,6 +36,7 @@ requirement and an ADR conflict, the requirement wins.
 | [0012](0012-research-gates-and-compatibility.md) | Feasibility before the full web product; feature-by-feature tool probes; later-phase documentation stays specified even if a gate fails. | accepted |
 | [0013](0013-local-symbolic-workstation.md) | A separately launched single-owner loopback workbench that takes source as data and executes nothing. | accepted |
 | [0014](0014-web-client-and-api-layers.md) | Next.js static export served from the workbench's own origin; a layered Express API; the shared packages kept as the shared layers. | accepted |
+| [0015](0015-hosted-record-store.md) | Three ports instead of one; the job lifecycle and record rules shared; PostgreSQL through Prisma as the second record store. | accepted |
 
 ## Template
 
