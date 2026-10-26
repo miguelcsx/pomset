@@ -34,3 +34,15 @@ export function launchExpressions(launch: LaunchConfig): readonly IntExpr[] {
     ...(launch.chunk ? [launch.chunk] : []),
   ];
 }
+
+/**
+ * Which backend a scenario's launch form belongs to.
+ *
+ * The form is the declaration of how the kernel is placed, and only one backend
+ * places kernels that way. Deciding the backend from anything else — a flag, a
+ * remembered preference — would let a scenario be handed to an engine that
+ * cannot run it.
+ */
+export function backendForLaunch(launch: LaunchConfig): "triton" | "openmp" {
+  return isProgramInstanceLaunch(launch) ? "triton" : "openmp";
+}

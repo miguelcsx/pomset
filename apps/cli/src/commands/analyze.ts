@@ -2,10 +2,10 @@
 import { randomUUID } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { type AnalysisResult } from "@pomset/contracts";
+import { backendForLaunch, type AnalysisResult, type Scenario } from "@pomset/contracts";
 import { DEFAULT_POLICY } from "@pomset/domain";
 import { LocalStore, recoverAbandoned, recordEngineProcess } from "@pomset/storage";
-import { DEFAULT_BUDGET, applyBudget, supervise } from "@pomset/engine-client";
+import { DEFAULT_BUDGET, applyBudget, consentField, consentScopeFor, requireConsentFor, supervise } from "@pomset/engine-client";
 import { capture, validated } from "../capture.js";
 import { startEngine } from "../engine.js";
 import { exitStatusFor, EXIT_ERROR, type Report, type ReportProperty } from "../report.js";
@@ -16,12 +16,21 @@ export interface AnalyzeOptions {
   readonly jobId?: string;
   readonly profileRevisionId?: string;
   readonly solverTimeMs?: number;
+  /** Consent for this invocation only; it is never read from anywhere else. */
+  readonly trustLocalCode?: boolean;
   readonly signal?: AbortSignal;
 }
 
 export async function analyze(options: AnalyzeOptions): Promise<number> {
   const budget = applyBudget(options.solverTimeMs === undefined ? {} : { solverTimeMs: options.solverTimeMs });
   if (budget instanceof Error) throw budget;
+  // Consent is settled before anything is created or started. The scenario's own
+  // launch form says which engine would run it, and an engine that compiles and
+  // executes the kernel needs the flag on this invocation to do either.
+  const declared = validated<Scenario>(JSON.parse(readFileSync(resolve(options.scenarioPath), "utf8")), "domain.schema.yaml#/$defs/scenario");
+  const backend = backendForLaunch(declared.launch);
+  const granted = options.trustLocalCode === true;
+  requireConsentFor(backend, "full", granted);
   const jobId = options.jobId ?? `job_${randomUUID()}`;
   const attemptId = `att_${randomUUID()}`;
   const root = dirname(resolve(options.scenarioPath));
@@ -50,7 +59,8 @@ export async function analyze(options: AnalyzeOptions): Promise<number> {
     scenarioId: scenario.scenarioId, profileRevisionId: profile.profileRevisionId, domainRef: scenario.domain.domainId,
     policyId: DEFAULT_POLICY.policyId, policyRevision: DEFAULT_POLICY.policyRevision,
     inputs: [{ kind: "scenario", path: "scenario.json" }, { kind: "files", path: "files" }],
-    scratchDir: "scratch", artifactDir: "artifacts", requestPath: join(directory, "request.json"), cwd: directory, budget });
+    scratchDir: "scratch", artifactDir: "artifacts", requestPath: join(directory, "request.json"), cwd: directory, budget,
+    backend, consent: consentField(granted, consentScopeFor(backend)) });
   if (child.pid) recordEngineProcess(store, jobId, child.pid);
   const run = await supervise({ child, jobId, attemptId, limits: budget, signal: controller.signal, artifactDir: join(directory, "artifacts"), onChunk: (chunk) => store.appendChunk(jobId, chunk) });
   store.putDiagnostics(jobId, { redactionRevision: run.redactionRevision, messages: run.diagnostics, termination: run.termination });

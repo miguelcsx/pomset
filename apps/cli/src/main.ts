@@ -38,12 +38,14 @@ function output(document: unknown, path: string | boolean | undefined, stdout: (
   else stdout(text);
 }
 async function analysisCommand({ argv }: CommandContext) {
-  const values = args(argv, ["scenario", "manifest", "report", "solver-time-ms", "profile"]);
+  const values = args(argv, ["scenario", "manifest", "report", "solver-time-ms", "profile"], ["trust-local-code"]);
   if (values["scenario"] && values["manifest"]) throw new Error("INPUT_INVALID: select either --scenario or --manifest");
   return analyze({ scenarioPath: required(values["scenario"] ?? values["manifest"], "--scenario or --manifest"),
     ...(typeof values["report"] === "string" ? { reportPath: values["report"] } : {}),
     ...(typeof values["profile"] === "string" ? { profileRevisionId: values["profile"] } : {}),
-    ...(typeof values["solver-time-ms"] === "string" ? { solverTimeMs: Number(values["solver-time-ms"]) } : {}) });
+    ...(typeof values["solver-time-ms"] === "string" ? { solverTimeMs: Number(values["solver-time-ms"]) } : {}),
+    // Consent is per invocation. It is passed through, never remembered.
+    trustLocalCode: values["trust-local-code"] === true });
 }
 
 export const COMMANDS: readonly Command[] = [

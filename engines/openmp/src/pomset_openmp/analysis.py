@@ -559,7 +559,15 @@ def _assumptions(domain_id: str) -> dict:
                 "assumptionId": "instrumentation-changes-timing",
                 "statement": (
                     "Instrumentation changes timing and therefore which interleavings were "
-                    "explored; the thread counts executed are recorded in the sampled check."
+                    "explored; the thread counts requested are recorded in the sampled check."
+                ),
+            },
+            {
+                "assumptionId": "thread-count-is-a-request",
+                "statement": (
+                    "The harness sets OMP_NUM_THREADS before each run. The runtime may ignore it, "
+                    "and a kernel carrying a num_threads clause does ignore it, so five runs are "
+                    "not five team sizes merely because five sizes were asked for."
                 ),
             },
         ],
@@ -622,12 +630,14 @@ def _coverage_notes(points, observations, details) -> str:
         {run["threads"] for item in observations for run in item["runs"]}
     )
     header = (
-        f"Executed {len(observations)} of {len(points)} declared domain points at thread counts "
-        f"{', '.join(str(item) for item in thread_counts)}. A defect that needs another division "
-        "of the work was not exercised. No source map is available, so a disagreement names the "
-        "element that differed rather than a line."
+        f"Executed {len(observations)} of {len(points)} declared domain points, with "
+        f"OMP_NUM_THREADS set to {', '.join(str(item) for item in thread_counts)}. "
+        "That is what the harness asked for: a kernel that pins its own team size with a "
+        "num_threads clause ignores it, and this harness cannot see that from outside. "
+        "A defect that needs another division of the work was not exercised. No source map is "
+        "available, so a disagreement names the element that differed rather than a line."
     )
-    return f"{header} {' '.join(details)}"
+    return f"{header} {' '.join(details)}"[:2000]
 
 
 def _completeness(points, observations) -> dict:

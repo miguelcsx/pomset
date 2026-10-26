@@ -1,5 +1,5 @@
 import { request } from "node:http";
-import { existsSync, mkdtempSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -121,4 +121,53 @@ describe.skipIf(!engineReady)("analyzing the flagship fixture end to end", () =>
     const status = await analyze({ scenarioPath: join(examples, "scenario-ceil.json") });
     expect(status).toBe(0);
   });
+});
+
+describe("the OpenMP backend", () => {
+  /** A host-threads scenario, which is what makes the launch form an OpenMP one. */
+  function openmpScenario(directory: string): string {
+    const path = join(directory, "scenario.json");
+    writeFileSync(path, JSON.stringify({
+      schemaVersion: 1, scenarioId: "scn_openmp", snapshotId: "snp_openmp", name: "partial writes",
+      entrypoint: { path: "kernel.c", symbol: "transform" },
+      allocations: [
+        { allocationId: "al_x", name: "X", role: "input", dtype: "fp32", shape: [{ op: "parameter", parameter: "N" }] },
+        { allocationId: "al_y", name: "Y", role: "output", dtype: "fp32", shape: [{ op: "parameter", parameter: "N" }] },
+      ],
+      launch: { schedule: "dynamic" },
+      domain: { domainId: "dom_openmp", enumerable: true, variables: [
+        { name: "N", kind: "shape", type: "int", width: "i32", min: 64, max: 64, step: 1 }], constraints: [] },
+      reference: { kind: "host-python", path: "reference.py", symbol: "reference",
+        tolerances: { atol: 0.001, rtol: 0.00001, dtype: "fp32", nanPolicy: "reject-nan", infPolicy: "reject-inf" } },
+      requiredProperties: ["initialization"], notes: "", createdAt: "2026-10-18T00:00:00Z",
+    }), { flag: "wx" });
+    writeFileSync(join(directory, "kernel.c"),
+      "#include <omp.h>\nvoid transform(float *X, float *Y, int N) {\n  #pragma omp parallel for\n  for (int i = 0; i < N; ++i) if (i % 2 == 0) Y[i] = X[i] * 2.0f;\n}\n",
+      { flag: "wx" });
+    writeFileSync(join(directory, "reference.py"),
+      "def reference(x):\n    return [value * 2.0 for value in x]\n", { flag: "wx" });
+    return path;
+  }
+
+  it.skipIf(!engineReady)("refuses a scenario whose launch means compiling and running code", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "pomset-openmp-cli-"));
+    const scenarioPath = openmpScenario(directory);
+    // The launch form is what decides the backend, so a flag cannot name one the
+    // scenario cannot use, and the flag is what authorizes running it.
+    await expect(analyze({ scenarioPath })).rejects.toThrow("--trust-local-code");
+  }, 60_000);
+
+  it.skipIf(!engineReady)("reports an element no store reached as violated", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "pomset-openmp-cli-"));
+    const scenarioPath = openmpScenario(directory);
+    const status = await analyze({ scenarioPath, trustLocalCode: true, reportPath: join(directory, "report.json") });
+    // A violation is the CLI's documented exit status for "not established".
+    expect(status).toBe(1);
+    const report = JSON.parse(readFileSync(join(directory, "report.json"), "utf8")) as {
+      profile: { backend: string };
+      analysis: { coverage: { notes: string } };
+    };
+    expect(report.profile.backend).toBe("openmp");
+    expect(report.analysis.coverage.notes).toContain("poison");
+  }, 120_000);
 });

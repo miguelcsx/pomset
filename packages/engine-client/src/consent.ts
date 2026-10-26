@@ -36,6 +36,24 @@ export function consentField(
   return { granted, scope };
 }
 
+/**
+ * The backends whose local work is execution rather than reading.
+ *
+ * The operation vocabulary is the contract's and is shared by every engine, so
+ * it cannot say that `full` means "reason about the source" for one backend and
+ * "compile and run the kernel" for another. That distinction lives here.
+ */
+const EXECUTING_BACKENDS: ReadonlySet<string> = new Set(["openmp"]);
+
+export function backendNeedsConsent(backend: string): boolean {
+  return EXECUTING_BACKENDS.has(backend);
+}
+
+/** The scope a backend's consent covers, so the grant says what it was for. */
+export function consentScopeFor(backend: string): ConsentScope {
+  return backendNeedsConsent(backend) ? "numerical-replay" : "analysis-only";
+}
+
 export class ConsentRequiredError extends Error {
   readonly record: ErrorRecord;
   constructor(operation: string) {
@@ -56,4 +74,20 @@ export class ConsentRequiredError extends Error {
  */
 export function requireConsent(operation: string, granted: boolean): void {
   if (requestNeedsConsent(operation) && !granted) throw new ConsentRequiredError(operation);
+}
+
+/**
+ * Refuses an operation that executes user code on this backend without consent.
+ *
+ * `full` is not an executing operation for a symbolic engine, which reads the
+ * source and runs nothing. It is one for an engine that compiles and runs the
+ * kernel, and the flag is what says the user meant that.
+ */
+export function requireConsentFor(
+  backend: string,
+  operation: string,
+  granted: boolean,
+): void {
+  if (backendNeedsConsent(backend) && !granted) throw new ConsentRequiredError(operation);
+  requireConsent(operation, granted);
 }

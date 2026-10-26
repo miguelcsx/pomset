@@ -2,9 +2,9 @@
 import { randomUUID } from "node:crypto";
 import { chmodSync, existsSync, lstatSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
-import { schemaSet, type ProfileRevision, type Scenario, type SnapshotManifest } from "@pomset/contracts";
+import { backendForLaunch, schemaSet, type ProfileRevision, type Scenario, type SnapshotManifest } from "@pomset/contracts";
 import { buildManifest, sha256Of } from "@pomset/domain";
-import { probeProfile } from "@pomset/engine-client";
+import { probeProfile, type Backend } from "@pomset/engine-client";
 
 export function validated<T>(raw: unknown, target: string): T {
   const check = schemaSet().validatorFor(target);
@@ -16,6 +16,8 @@ export interface CapturedRun {
   readonly scenario: Scenario;
   readonly snapshot: SnapshotManifest;
   readonly profile: ProfileRevision;
+  /** Which engine this scenario's launch form belongs to. */
+  readonly backend: Backend;
   readonly directory: string;
 }
 
@@ -24,7 +26,10 @@ export function capture(scenarioPath: string, jobId: string, profileId?: string,
   const original = validated<Scenario>(JSON.parse(scenarioBytes.toString("utf8")), "domain.schema.yaml#/$defs/scenario");
   const root = realpathSync(dirname(scenarioPath));
   const directory = join(root, ".pomset", jobId);
-  const profile = probeProfile(join(root, ".pomset", "profiles"), profileId);
+  // The launch form decides which engine can run this, so it decides which
+  // profile is measured. A flag could name a backend the scenario cannot use.
+  const backend = backendForLaunch(original.launch);
+  const profile = probeProfile(join(root, ".pomset", "profiles"), profileId, backend);
   mkdirSync(directory, { recursive: true, mode: 0o700 });
   chmodSync(join(root, ".pomset"), 0o700);
   const configPath = basename(scenarioPath);
@@ -54,6 +59,6 @@ export function capture(scenarioPath: string, jobId: string, profileId?: string,
   writeFileSync(join(directory, "profile.json"), JSON.stringify(profile, null, 2) + "\n", { flag: "wx", mode: 0o444 });
   mkdirSync(join(directory, "scratch"));
   mkdirSync(join(directory, "artifacts"));
-  return { scenario, snapshot, profile, directory };
+  return { scenario, snapshot, profile, backend, directory };
 }
 
