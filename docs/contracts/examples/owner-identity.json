@@ -1,0 +1,7 @@
+{
+  "ownerId": "own_7Qd2",
+  "issuer": "https://idp.example.invalid",
+  "subjectHash": "sha256:a9491f4c1bf7b0cffbadcba2db8f028e4b3f2867cb59e1f3a0bc1968f3c51242",
+  "displayName": "kernel author",
+  "createdAt": "2026-09-01T00:00:00Z"
+}

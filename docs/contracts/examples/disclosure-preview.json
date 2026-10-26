@@ -1,0 +1,43 @@
+{
+  "previewId": "prv_1",
+  "snapshotId": "snp_01HN3",
+  "totalBytes": 20480,
+  "items": [
+    {
+      "category": "source-text",
+      "itemId": "di_1",
+      "description": "Source of kernels/transform.py and kernels/reference.py",
+      "count": 2,
+      "bytes": 700
+    },
+    {
+      "category": "file-paths",
+      "itemId": "di_2",
+      "description": "Repository-relative paths of every snapshotted file",
+      "count": 3
+    },
+    {
+      "category": "logs",
+      "itemId": "di_3",
+      "description": "Bounded stderr diagnostics from the engine process",
+      "count": 1,
+      "bytes": 1240
+    },
+    {
+      "category": "witness-details",
+      "itemId": "di_4",
+      "description": "Witness assignments including N and BLOCK",
+      "count": 1
+    },
+    {
+      "category": "profile-revisions",
+      "itemId": "di_5",
+      "description": "Engine, tool and platform revisions used",
+      "count": 1
+    }
+  ],
+  "warnings": [
+    "Findings include the exact shape values from the analysed domain."
+  ],
+  "generatedAt": "2026-10-12T10:10:00Z"
+}

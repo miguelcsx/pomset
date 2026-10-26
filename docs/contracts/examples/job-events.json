@@ -1,0 +1,54 @@
+[
+  {
+    "schemaVersion": 1,
+    "eventId": "evt_1",
+    "jobId": "job_7Kd",
+    "attemptId": "att_7Kd_1",
+    "sequence": 1,
+    "type": "job.created",
+    "createdAt": "2026-10-12T09:20:00Z"
+  },
+  {
+    "schemaVersion": 1,
+    "eventId": "evt_2",
+    "jobId": "job_7Kd",
+    "attemptId": "att_7Kd_1",
+    "sequence": 2,
+    "type": "job.started",
+    "createdAt": "2026-10-12T09:20:01Z"
+  },
+  {
+    "schemaVersion": 1,
+    "eventId": "evt_3",
+    "jobId": "job_7Kd",
+    "attemptId": "att_7Kd_1",
+    "sequence": 3,
+    "type": "job.progress",
+    "createdAt": "2026-10-12T09:20:04Z",
+    "progress": {
+      "phase": "solve",
+      "completed": 1,
+      "total": 3
+    }
+  },
+  {
+    "schemaVersion": 1,
+    "eventId": "evt_4",
+    "jobId": "job_7Kd",
+    "attemptId": "att_7Kd_1",
+    "sequence": 4,
+    "type": "result.committed",
+    "resultId": "res_1",
+    "createdAt": "2026-10-12T09:22:10Z"
+  },
+  {
+    "schemaVersion": 1,
+    "eventId": "evt_5",
+    "jobId": "job_7Kd",
+    "attemptId": "att_7Kd_1",
+    "sequence": 5,
+    "type": "job.succeeded",
+    "resultId": "res_1",
+    "createdAt": "2026-10-12T09:22:10Z"
+  }
+]

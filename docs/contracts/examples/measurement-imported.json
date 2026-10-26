@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "measurementId": "msr_2",
+  "resultId": "res_1",
+  "snapshotId": "snp_01HN3",
+  "scenarioId": "scn_91Bx",
+  "profileRevisionId": "prf_triton_cpu_z3_1",
+  "evidenceClass": "measured",
+  "origin": "imported",
+  "metric": {
+    "name": "throughput",
+    "unit": "flops-per-second",
+    "statistic": "mean"
+  },
+  "value": 12000000000000.0,
+  "cohortId": "hw_h100_80g",
+  "hardware": {
+    "device": "NVIDIA H100 80GB HBM3",
+    "arch": "sm_90",
+    "driver": "550.54.15",
+    "runtime": "cuda 12.4",
+    "clockMethod": "unknown"
+  },
+  "tool": {
+    "name": "ncu",
+    "version": "2024.2.1"
+  },
+  "instrumentation": {
+    "kind": "profiler-counters",
+    "serializes": true,
+    "overheadNote": "Counter collection serialises dispatches; the run does not preserve normal concurrent stream behaviour."
+  },
+  "samples": {
+    "warmupCount": 0,
+    "sampleCount": 1,
+    "statistics": {
+      "min": 12000000000000.0,
+      "median": 12000000000000.0,
+      "max": 12000000000000.0
+    }
+  },
+  "synchronization": {
+    "method": "profiler-serialized",
+    "compileTimeSeparated": false,
+    "jitCacheState": "unknown"
+  },
+  "referenceOutcome": {
+    "checked": false,
+    "outcome": "not-applicable"
+  },
+  "eligibility": {
+    "state": "ineligible",
+    "reasonCodes": [
+      "MISSING_PROVENANCE",
+      "NO_WARMUP",
+      "INSUFFICIENT_SAMPLES",
+      "ORIGIN_IMPORTED",
+      "ESTIMATED_NOT_MEASURED"
+    ],
+    "policyId": "pol_default",
+    "policyRevision": 3
+  },
+  "notes": "Imported from a profiler export. Inspectable, not recommendable.",
+  "createdAt": "2026-10-12T10:05:00Z"
+}

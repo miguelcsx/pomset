@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "profileRevisionId": "prf_triton_cpu_z3_1",
+  "backend": "triton",
+  "revisionHash": "sha256:edb2a655abaef0869aa8f15824c65e549a47bd5c33e0304f6fa44a765e8ae36c",
+  "createdAt": "2026-10-12T08:00:00Z",
+  "components": [
+    {
+      "name": "python",
+      "version": "3.12.6"
+    },
+    {
+      "name": "triton",
+      "version": "3.0.0"
+    },
+    {
+      "name": "z3",
+      "version": "4.13.0"
+    }
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x86_64"
+  },
+  "imageDigest": "sha256:bfc0e5be886770cc430ba503f43e9b466d31ee741fdde6cd4b7cc434c0a3269e",
+  "capabilityIds": [
+    "cap_bounds",
+    "cap_coverage",
+    "cap_ww"
+  ],
+  "notes": "CPU-only symbolic profile. No GPU and no sandboxed compilation path."
+}

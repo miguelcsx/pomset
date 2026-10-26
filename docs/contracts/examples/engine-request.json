@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "protocolVersion": 1,
+  "jobId": "job_7Kd",
+  "attemptId": "att_7Kd_1",
+  "operation": "coverage",
+  "snapshotId": "snp_01HN3",
+  "scenarioId": "scn_91Bx",
+  "profileRevisionId": "prf_triton_cpu_z3_1",
+  "policyId": "pol_default",
+  "policyRevision": 3,
+  "domainRef": "dom_f8K2",
+  "budget": {
+    "solverTimeMs": 30000,
+    "engineWallTimeMs": 120000,
+    "memoryBytes": 2147483648,
+    "maxMessageBytes": 1048576,
+    "maxOutputBytes": 16777216,
+    "maxArtifactBytes": 268435456
+  },
+  "inputs": [
+    {
+      "kind": "files",
+      "path": "files",
+      "sha256": "sha256:f85b1d5a3b0a36b55fee9818a9b40675fce10b3e730c891bc0ebf36ea03208b9"
+    },
+    {
+      "kind": "scenario",
+      "path": "request/scenario.json",
+      "sha256": "sha256:c72986041df00fc60c988cd351f681990e873950dbd8d45d31f51f3389229943"
+    }
+  ],
+  "scratchDir": "scratch",
+  "artifactDir": "artifacts"
+}

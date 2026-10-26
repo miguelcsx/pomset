@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "policyId": "pol_default",
+  "policyRevision": 3,
+  "requiredProperties": [
+    {
+      "propertyId": "outputCoverage",
+      "acceptedMethods": [
+        "symbolic"
+      ],
+      "acceptSampled": false,
+      "acceptUnknown": false
+    },
+    {
+      "propertyId": "memoryBounds",
+      "acceptedMethods": [
+        "symbolic"
+      ],
+      "acceptSampled": false,
+      "acceptUnknown": false
+    },
+    {
+      "propertyId": "writeWriteConflict",
+      "acceptedMethods": [
+        "symbolic"
+      ],
+      "acceptSampled": false,
+      "acceptUnknown": false
+    }
+  ],
+  "benchmark": {
+    "requireEligibleValidation": true,
+    "requireMeasuredMetric": true,
+    "cohortMatch": "exact-hardware",
+    "minSamples": 30,
+    "requireWarmup": true
+  }
+}

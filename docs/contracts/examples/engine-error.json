@@ -1,0 +1,15 @@
+{
+  "protocolVersion": 1,
+  "jobId": "job_9Np",
+  "attemptId": "att_9Np_1",
+  "sequence": 4,
+  "type": "error",
+  "payload": {
+    "code": "ENGINE_FAILED",
+    "message": "Exceeded the solver memory budget while encoding coverage constraints.",
+    "details": {
+      "limit": "memoryBytes",
+      "limitValue": 2147483648
+    }
+  }
+}

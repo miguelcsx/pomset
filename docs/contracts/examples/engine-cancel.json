@@ -1,0 +1,11 @@
+{
+  "protocolVersion": 1,
+  "jobId": "job_7Kd",
+  "attemptId": "att_7Kd_1",
+  "sequence": 1,
+  "type": "cancel",
+  "payload": {
+    "reason": "user-requested",
+    "gracePeriodMs": 2000
+  }
+}

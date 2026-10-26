@@ -1,0 +1,163 @@
+{
+  "note": "Valid fixtures must validate; invalid fixtures must be rejected. Each entry names the schema definition it is checked against and, for invalid ones, why it must be rejected.",
+  "valid": [
+    {
+      "file": "project.json",
+      "schema": "domain.schema.yaml#/$defs/project"
+    },
+    {
+      "file": "snapshot-manifest.json",
+      "schema": "domain.schema.yaml#/$defs/snapshotManifest"
+    },
+    {
+      "file": "workload-domain.json",
+      "schema": "domain.schema.yaml#/$defs/workloadDomain"
+    },
+    {
+      "file": "scenario.json",
+      "schema": "domain.schema.yaml#/$defs/scenario"
+    },
+    {
+      "file": "profile-revision.json",
+      "schema": "domain.schema.yaml#/$defs/profileRevision"
+    },
+    {
+      "file": "capability.json",
+      "schema": "domain.schema.yaml#/$defs/capability"
+    },
+    {
+      "file": "eligibility-policy.json",
+      "schema": "domain.schema.yaml#/$defs/eligibilityPolicy"
+    },
+    {
+      "file": "analysis-result.json",
+      "schema": "evidence.schema.yaml#/$defs/analysisResult"
+    },
+    {
+      "file": "artifact-manifest.json",
+      "schema": "evidence.schema.yaml#/$defs/artifactManifest"
+    },
+    {
+      "file": "measurement-measured.json",
+      "schema": "measurement.schema.yaml#/$defs/measurement"
+    },
+    {
+      "file": "measurement-imported.json",
+      "schema": "measurement.schema.yaml#/$defs/measurement"
+    },
+    {
+      "file": "owner-identity.json",
+      "schema": "publication.schema.yaml#/$defs/ownerIdentity"
+    },
+    {
+      "file": "disclosure-preview.json",
+      "schema": "publication.schema.yaml#/$defs/disclosurePreview"
+    },
+    {
+      "file": "publication.json",
+      "schema": "publication.schema.yaml#/$defs/publication"
+    },
+    {
+      "file": "experiment-bundle.json",
+      "schema": "bundle.schema.yaml#/$defs/experimentBundle"
+    },
+    {
+      "file": "job-succeeded.json",
+      "schema": "engine.schema.yaml#/$defs/job"
+    },
+    {
+      "file": "job-cancelled.json",
+      "schema": "engine.schema.yaml#/$defs/job"
+    },
+    {
+      "file": "job-failed.json",
+      "schema": "engine.schema.yaml#/$defs/job"
+    },
+    {
+      "file": "engine-request.json",
+      "schema": "engine.schema.yaml#/$defs/engineRequest"
+    },
+    {
+      "file": "engine-hello.json",
+      "schema": "engine.schema.yaml#/$defs/engineEnvelope"
+    },
+    {
+      "file": "engine-error.json",
+      "schema": "engine.schema.yaml#/$defs/engineEnvelope"
+    },
+    {
+      "file": "engine-cancel.json",
+      "schema": "engine.schema.yaml#/$defs/cancelEnvelope"
+    }
+  ],
+  "invalid": [
+    {
+      "file": "invalid/job-unknown-state.json",
+      "schema": "engine.schema.yaml#/$defs/job",
+      "why": "state outside the job state enum"
+    },
+    {
+      "file": "invalid/measurement-with-correctness-class.json",
+      "schema": "measurement.schema.yaml#/$defs/measurement",
+      "why": "a measurement carrying a correctness evidence class"
+    },
+    {
+      "file": "invalid/engine-envelope-missing-sequence.json",
+      "schema": "engine.schema.yaml#/$defs/engineEnvelope",
+      "why": "envelope without a sequence number"
+    },
+    {
+      "file": "invalid/capability-unavailable-without-reason.json",
+      "schema": "domain.schema.yaml#/$defs/capability",
+      "why": "untested, unavailable capability with no reason"
+    },
+    {
+      "file": "invalid/scenario-zero-divisor.json",
+      "schema": "domain.schema.yaml#/$defs/scenario",
+      "why": "launch expression with a zero divisor; rejected by the launch evaluator"
+    },
+    {
+      "file": "invalid/result-established-by-instrumentation.json",
+      "schema": "evidence.schema.yaml#/$defs/propertyResult",
+      "why": "established outcome paired with instrumented observation"
+    },
+    {
+      "file": "invalid/result-nested-established-by-instrumentation.json",
+      "schema": "evidence.schema.yaml#/$defs/analysisResult",
+      "why": "established outcome paired with instrumented observation, in a full result"
+    },
+    {
+      "file": "invalid/finding-without-source-range.json",
+      "schema": "evidence.schema.yaml#/$defs/finding",
+      "why": "finding with no source range"
+    },
+    {
+      "file": "invalid/coverage-percentage-unenumerated.json",
+      "schema": "evidence.schema.yaml#/$defs/coverage",
+      "why": "percentage-shaped denominator over an unenumerated domain"
+    },
+    {
+      "file": "invalid/bundle-path-traversal.json",
+      "schema": "bundle.schema.yaml#/$defs/experimentBundle",
+      "why": "bundle entry path escaping the root"
+    },
+    {
+      "file": "invalid/bundle-symlink-entry.json",
+      "schema": "bundle.schema.yaml#/$defs/experimentBundle",
+      "why": "bundle entry declaring a symlink"
+    },
+    {
+      "file": "invalid/witness-undeclared-and-unassigned.json",
+      "schema": "evidence.schema.yaml#/$defs/analysisResult",
+      "why": "witness that does not fix every domain variable it depends on",
+      "contextScenario": "scenario.json"
+    }
+  ],
+  "invalid_expected": [
+    {
+      "file": "invalid/measurement-zero-for-absent-metric.json",
+      "schema": "measurement.schema.yaml#/$defs/measurement",
+      "why": "a metric the tool cannot supply reported as a numeric zero; enforced by the capability rule, not by the schema shape"
+    }
+  ]
+}

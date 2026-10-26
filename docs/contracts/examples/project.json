@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "projectId": "prj_01HN2",
+  "ownerId": "own_7Qd2",
+  "title": "vLLM fused transform kernels",
+  "description": "Triton kernels used by a serving stack, with their supported input envelope.",
+  "createdAt": "2026-10-12T09:14:05Z",
+  "updatedAt": "2026-10-12T09:31:44Z"
+}

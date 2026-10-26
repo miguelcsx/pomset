@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "publicationId": "pub_1",
+  "ownerId": "own_7Qd2",
+  "projectId": "prj_01HN2",
+  "snapshotId": "snp_01HN3",
+  "scenarioId": "scn_91Bx",
+  "resultIds": [
+    "res_1"
+  ],
+  "artifactIds": [
+    "art_rep_1"
+  ],
+  "visibility": "unlisted",
+  "disclosurePreviewId": "prv_1",
+  "createdAt": "2026-10-12T10:11:00Z",
+  "portableBundleArtifactId": "art_bndl_1"
+}
