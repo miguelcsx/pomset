@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
 import { schemaSet } from "@pomset/contracts";
-import type { AnalysisSubmission, Job, Scenario, AnalysisResult } from "@pomset/contracts";
+import type { AnalysisSubmission, Job, ProgramInstanceLaunch, Scenario, AnalysisResult } from "@pomset/contracts";
 import { startWorkbench } from "./main.js";
 const directory = mkdtempSync(join(tmpdir(), "pomset-workbench-test-"));
 let server: Awaited<ReturnType<typeof startWorkbench>>;
@@ -55,7 +55,7 @@ it("analyzes changed declarations and preserves the previous captured evidence",
   const first = await call("/api/analyses", input); expect(first.status).toBe(202);
   const before = await finish(await first.json()); expect(before.job.state).toBe("succeeded");
   expect(before.analysis?.propertyResults.find((item) => item.propertyId === "outputCoverage")?.outcome).toBe("violated");
-  const scenario = structuredClone(input.scenario); const corrected = { ...scenario, launch: { ...scenario.launch, grid: [{ ...scenario.launch.grid[0]!, op: "ceilDivide" as const }] } };
+  const scenario = structuredClone(input.scenario); const launch = scenario.launch as ProgramInstanceLaunch; const corrected = { ...scenario, launch: { ...launch, grid: [{ ...launch.grid[0]!, op: "ceilDivide" as const }] } };
   const second = await call("/api/analyses", { ...input, scenario: corrected, parentSnapshotId: before.job.snapshotId }); expect(second.status).toBe(202);
   const after = await finish(await second.json()); expect(after.job.state).toBe("succeeded");
   expect(after.analysis?.propertyResults.find((item) => item.propertyId === "outputCoverage")?.outcome).toBe("established");

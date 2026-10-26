@@ -16,19 +16,11 @@ from .primitives import (  # noqa: F401
     Sha256,
 )
 
-DomainPath = str
-
-SupportLevel = Literal["validated", "limited", "untested"]
-
-Availability = Literal["immediate", "queued", "unavailable"]
-
 class IntExpr(TypedDict):
     op: Literal["literal", "parameter", "add", "subtract", "multiply", "floorDivide", "ceilDivide", "modulo"]
     value: NotRequired[float]
     parameter: NotRequired[Identifier]
     operands: NotRequired[list[IntExpr]]
-
-Identifier = str
 
 class IntConstraint(TypedDict):
     constraintId: Id
@@ -60,11 +52,17 @@ class AliasGroup(TypedDict):
     aliasGroupId: Id
     allocationIds: list[Id]
 
-class LaunchConfig(TypedDict):
+class ProgramInstanceLaunch(TypedDict):
     grid: list[IntExpr]
     block: list[IntExpr]
     numWarps: NotRequired[IntExpr]
     numStages: NotRequired[IntExpr]
+    displayHints: NotRequired[list[str]]
+
+class HostThreadsLaunch(TypedDict):
+    threads: NotRequired[IntExpr]
+    schedule: NotRequired[Literal["static", "dynamic", "guided", "auto", "runtime"]]
+    chunk: NotRequired[IntExpr]
     displayHints: NotRequired[list[str]]
 
 class ReferenceComputation(TypedDict):
@@ -184,3 +182,13 @@ class EligibilityPolicyBenchmark(TypedDict):
     cohortMatch: Literal["exact-hardware", "same-arch", "any"]
     minSamples: NotRequired[float]
     requireWarmup: NotRequired[bool]
+
+DomainPath = str
+
+SupportLevel = Literal["validated", "limited", "untested"]
+
+Availability = Literal["immediate", "queued", "unavailable"]
+
+Identifier = str
+
+LaunchConfig = ProgramInstanceLaunch | HostThreadsLaunch

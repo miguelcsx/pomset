@@ -1,6 +1,28 @@
 """Additional contextual rules over shape-validated portable records."""
 
 
+def launch_expressions(launch: dict) -> list[dict]:
+    """Every expression a launch declares, whichever form it takes.
+
+    A launch is either a program-instance launch, which places instances on a
+    device, or a host-threads launch, which declares how the runtime
+    parallelises work. They are one union in the contract, so a reader that
+    needs the expressions must ask the launch which form it is rather than
+    reaching for `grid` and hoping.
+    """
+    if "grid" in launch:
+        return [
+            *launch["grid"],
+            *launch.get("block", []),
+            *([launch["numWarps"]] if "numWarps" in launch else []),
+            *([launch["numStages"]] if "numStages" in launch else []),
+        ]
+    return [
+        *([launch["threads"]] if "threads" in launch else []),
+        *([launch["chunk"]] if "chunk" in launch else []),
+    ]
+
+
 def semantic_problems(value: object, scenario: dict | None = None) -> list[str]:
     problems: list[str] = []
 
@@ -28,7 +50,7 @@ def semantic_problems(value: object, scenario: dict | None = None) -> list[str]:
         for operand in expr.get("operands", []):
             parameters(operand)
 
-    for expr in scenario["launch"]["grid"] + scenario["launch"].get("block", []):
+    for expr in launch_expressions(scenario["launch"]):
         parameters(expr)
     for allocation in scenario["allocations"]:
         for expr in allocation["shape"] + allocation.get("strides", []):

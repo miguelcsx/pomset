@@ -1,5 +1,6 @@
 /** Contextual integrity checks; call after canonical shape validation. */
 import type { AnalysisResult, Scenario, IntExpr } from "./generated/index.js";
+import { launchExpressions } from "./launch.js";
 import { isAllowedTuple } from "./tuples.js";
 
 export function evidenceLinkProblems(result: AnalysisResult, scenario?: Scenario): string[] {
@@ -39,7 +40,7 @@ export function evidenceLinkProblems(result: AnalysisResult, scenario?: Scenario
     if (expr.op === "parameter" && expr.parameter) required.add(expr.parameter);
     for (const operand of expr.operands ?? []) parameters(operand);
   };
-  for (const expr of [...scenario.launch.grid, ...(scenario.launch.block ?? []), ...scenario.allocations.flatMap((item) => [...item.shape, ...(item.strides ?? [])])]) parameters(expr);
+  for (const expr of [...launchExpressions(scenario.launch), ...scenario.allocations.flatMap((item) => [...item.shape, ...(item.strides ?? [])])]) parameters(expr);
   for (const constraint of scenario.domain.constraints ?? []) { parameters(constraint.lhs); parameters(constraint.rhs); }
   for (const witness of result.witnesses ?? []) {
     const assigned = unique(witness.assignments.map((item) => item.name), "witness assignments");

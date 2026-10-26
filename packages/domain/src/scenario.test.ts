@@ -2,7 +2,12 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-import type { Scenario as ScenarioRecord } from "@pomset/contracts";
+import type {
+  IntExpr,
+  LaunchConfig,
+  ProgramInstanceLaunch,
+  Scenario as ScenarioRecord,
+} from "@pomset/contracts";
 
 import { aliasingAllocations, createScenario, launchParameters } from "./scenario.js";
 import { validateScenario } from "./validate.js";
@@ -15,10 +20,20 @@ function example(): ScenarioRecord {
   return JSON.parse(readFileSync(examplePath, "utf8")) as ScenarioRecord;
 }
 
+/** The canonical example is launched as program instances, so its grid is there. */
+function exampleLaunch(): ProgramInstanceLaunch {
+  return example().launch as ProgramInstanceLaunch;
+}
+
 /** A shallow copy with one launch dimension replaced. */
-function withLaunchGrid(grid: ScenarioRecord["launch"]["grid"]): unknown {
+function withLaunchGrid(grid: readonly IntExpr[]): unknown {
   const scenario = example();
-  return { ...scenario, launch: { ...scenario.launch, grid } };
+  return { ...scenario, launch: { ...exampleLaunch(), grid } };
+}
+
+/** The same kernel declared as a host thread team instead. */
+function withLaunch(launch: LaunchConfig): ScenarioRecord {
+  return { ...example(), launch };
 }
 
 describe("scenario validation", () => {
@@ -91,6 +106,50 @@ describe("scenario validation", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect([...launchParameters(result.value)].sort()).toEqual(["BLOCK", "N"]);
+  });
+
+  it("accepts the same kernel launched as a host thread team", () => {
+    // No grid and no block: the runtime owns the threads, and the kernel only
+    // declares how many it wants.
+    const scenario = withLaunch({
+      threads: { op: "parameter", parameter: "BLOCK" },
+      schedule: "dynamic",
+      chunk: { op: "literal", value: 64 },
+    });
+    const result = createScenario(scenario);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect([...launchParameters(result.value)].sort()).toEqual(["BLOCK"]);
+  });
+
+  it("rejects a host thread count that no domain variable declares", () => {
+    const scenario = withLaunch({
+      threads: { op: "parameter", parameter: "M" },
+    });
+    const result = validateScenario(scenario);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.rejections.some((r) => r.record.message.includes("M"))).toBe(true);
+  });
+
+  it("rejects a host thread count that is not provably positive", () => {
+    // A team of zero threads is not a launch, so nonnegative is not enough.
+    for (const threads of [
+      { op: "literal", value: 0 },
+      { op: "subtract", operands: [{ op: "parameter", parameter: "N" }, { op: "parameter", parameter: "N" }] },
+    ] as const) {
+      const result = validateScenario(withLaunch({ threads }));
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.rejections.some((r) => r.record.message === "thread count is not provably positive")).toBe(true);
+    }
+  });
+
+  it("rejects a launch that is neither form", () => {
+    // `grid` without `block` is neither a program instance launch nor a host
+    // one, so the union has no branch for it and the schema says so.
+    const result = validateScenario(withLaunch({ grid: [{ op: "literal", value: 1 }] } as unknown as LaunchConfig));
+    expect(result.ok).toBe(false);
   });
 
   it("never infers aliasing: an allocation outside a group stands alone", () => {

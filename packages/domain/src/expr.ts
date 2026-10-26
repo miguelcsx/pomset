@@ -13,7 +13,7 @@
  * extractor, so the two cannot drift.
  */
 
-import type { IntExpr, LaunchConfig } from "@pomset/contracts";
+import { isProgramInstanceLaunch, type IntExpr, type LaunchConfig } from "@pomset/contracts";
 
 import {
   UNKNOWN_SIGN,
@@ -260,14 +260,23 @@ export function validateLaunch(
     }
   };
 
-  const checkDimensions = (dimensions: readonly IntExpr[], path: string): SignSet[] => {
+  const checkDimensions = (
+    dimensions: readonly IntExpr[],
+    path: string,
+    message: string,
+    allowZero: boolean,
+  ): SignSet[] => {
     const signs: SignSet[] = [];
     dimensions.forEach((dimension, index) => {
       checkTree(dimension, `${path}/${index}`);
       const sign = signOfExpression(dimension, model);
-      if (sign.length === 0 || sign.includes("negative")) {
+      const unusable =
+        sign.length === 0 ||
+        sign.includes("negative") ||
+        (!allowZero && sign.includes("zero"));
+      if (unusable) {
         rejections.push(
-          inputInvalid(`${path}/${index}`, "grid dimension is not provably nonnegative", {
+          inputInvalid(`${path}/${index}`, message, {
             expression: describe(dimension),
           }),
         );
@@ -277,12 +286,37 @@ export function validateLaunch(
     return signs;
   };
 
-  const gridSigns = checkDimensions(launch.grid, `${at}/grid`);
-  for (const [index, dimension] of launch.block.entries()) {
-    checkTree(dimension, `${at}/block/${index}`);
+  let gridSigns: SignSet[] = [];
+  if (isProgramInstanceLaunch(launch)) {
+    gridSigns = checkDimensions(
+      launch.grid,
+      `${at}/grid`,
+      "grid dimension is not provably nonnegative",
+      true,
+    );
+    for (const [index, dimension] of launch.block.entries()) {
+      checkTree(dimension, `${at}/block/${index}`);
+    }
+    if (launch.numWarps) checkTree(launch.numWarps, `${at}/numWarps`);
+    if (launch.numStages) checkTree(launch.numStages, `${at}/numStages`);
+  } else {
+    // A thread team of zero is not a launch and a chunk of zero is not a chunk,
+    // so each must be provably positive rather than merely nonnegative.
+    if (launch.threads)
+      checkDimensions(
+        [launch.threads],
+        `${at}/threads`,
+        "thread count is not provably positive",
+        false,
+      );
+    if (launch.chunk)
+      checkDimensions(
+        [launch.chunk],
+        `${at}/chunk`,
+        "chunk size is not provably positive",
+        false,
+      );
   }
-  if (launch.numWarps) checkTree(launch.numWarps, `${at}/numWarps`);
-  if (launch.numStages) checkTree(launch.numStages, `${at}/numStages`);
 
   if (rejections.length > 0) return rejected(...rejections);
   return accepted({ gridSigns, divisorsProvablyPositive: true });

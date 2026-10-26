@@ -16,16 +16,6 @@ from .primitives import (  # noqa: F401
     Sha256,
 )
 
-EvidencePath = str
-
-EvidenceClass = Literal["observed", "counterexample", "potential", "verified-under-assumptions", "measured", "estimated"]
-
-Outcome = Literal["established", "violated", "unknown", "unsupported"]
-
-BackendId = Literal["triton", "cuda", "openmp"]
-
-SemanticRole = Literal["violation", "caution", "activity", "unknown", "contract"]
-
 class SourceRange(TypedDict):
     path: EvidencePath
     startLine: float
@@ -216,3 +206,13 @@ class AnalysisResultDomain(TypedDict):
 class AnalysisResultCompleteness(TypedDict):
     kind: Literal["complete", "partial"]
     reason: NotRequired[str]
+
+EvidencePath = str
+
+EvidenceClass = Literal["observed", "counterexample", "potential", "verified-under-assumptions", "measured", "estimated"]
+
+Outcome = Literal["established", "violated", "unknown", "unsupported"]
+
+BackendId = Literal["triton", "cuda", "openmp"]
+
+SemanticRole = Literal["violation", "caution", "activity", "unknown", "contract"]

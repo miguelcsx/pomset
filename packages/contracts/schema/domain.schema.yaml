@@ -283,6 +283,11 @@ $defs:
           $ref: '#/$defs/id'
     additionalProperties: false
   launchConfig:
+    description: How one run is launched. The form decides which backend can run it, so a scenario can never be half a program instantiation and half a thread team.
+    oneOf:
+    - $ref: '#/$defs/programInstanceLaunch'
+    - $ref: '#/$defs/hostThreadsLaunch'
+  programInstanceLaunch:
     description: Program-instance launch configuration as a restricted expression AST, not a host lambda.
     type: object
     required:
@@ -307,6 +312,30 @@ $defs:
         $ref: '#/$defs/intExpr'
       displayHints:
         description: Human-facing rendering only, e.g. triton.cdiv for ceilDivide. Never parsed back.
+        type: array
+        items:
+          type: string
+    additionalProperties: false
+  hostThreadsLaunch:
+    description: How a host runtime parallelises a kernel on the machine it runs on, as a restricted expression AST. There is no grid and no block because nothing is placed — the runtime owns the threads, and what the kernel declares is only how much work it hands each of them.
+    type: object
+    properties:
+      threads:
+        description: The size of the thread team. Absent means the runtime chooses.
+        $ref: '#/$defs/intExpr'
+      schedule:
+        description: The loop schedule the kernel declares. Absent means the runtime default.
+        enum:
+        - static
+        - dynamic
+        - guided
+        - auto
+        - runtime
+      chunk:
+        description: The chunk size a scheduled loop declares. Meaningful only alongside a schedule.
+        $ref: '#/$defs/intExpr'
+      displayHints:
+        description: Human-facing rendering only, e.g. "omp parallel for". Never parsed back.
         type: array
         items:
           type: string

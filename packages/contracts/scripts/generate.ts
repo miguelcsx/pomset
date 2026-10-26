@@ -428,6 +428,40 @@ function pyHeader(comment: string): string[] {
   ];
 }
 
+/**
+ * Orders definitions so Python can evaluate them where they are written.
+ *
+ * `from __future__ import annotations` defers annotations, not assignments:
+ * `LaunchConfig = ProgramInstanceLaunch | HostThreadsLaunch` is evaluated at the
+ * line it appears on, so a union of `$ref`s must follow the definitions it
+ * names. Classes go first — their bodies are annotations and therefore lazy —
+ * and the remaining aliases follow in dependency order.
+ */
+function orderForPython(defs: readonly (readonly [string, Def])[]): (readonly [string, Def])[] {
+  const isClass = (def: Def): boolean => def.type === "object" && Boolean(def.properties);
+  const classes = defs.filter(([, def]) => isClass(def));
+  const names = new Set(defs.map(([name]) => pascal(name)));
+  const emitted = new Set(classes.map(([name]) => pascal(name)));
+
+  /** Every capitalised name the emitted type mentions; only `$ref`s matter. */
+  const references = (def: Def): string[] =>
+    [...pyType(def).matchAll(/\b[A-Z][A-Za-z0-9_]*\b/g)].map((match) => match[0]);
+
+  const remaining = defs.filter(([, def]) => !isClass(def));
+  const ordered: (readonly [string, Def])[] = [];
+  while (remaining.length > 0) {
+    const at = remaining.findIndex(([, def]) =>
+      references(def).every((name) => !names.has(name) || emitted.has(name)),
+    );
+    // A cycle would have no ready entry; emit one rather than loop forever, and
+    // the generated file still names what it cannot order.
+    const [item] = remaining.splice(at >= 0 ? at : 0, 1) as [(readonly [string, Def])];
+    ordered.push(item);
+    emitted.add(pascal(item[0]));
+  }
+  return [...classes, ...ordered];
+}
+
 /** Reads and cross-checks the two copies of the error code enum. */
 function emitErrors(files: SchemaFile[]): { ts: string; py: string } {
   const enums: string[][] = [];
@@ -639,7 +673,13 @@ function buildOutputs(): Map<string, string> {
   );
   outputs.set(
     join(pyOutDir, "primitives.py"),
-    [...pyHeader("Definitions several schemas share, emitted once."), "", ...sharedNames.map((n) => emitPyDef(pascal(n), shared.get(n) as Def))].join("\n\n") + "\n",
+    [
+      ...pyHeader("Definitions several schemas share, emitted once."),
+      "",
+      ...orderForPython(sharedNames.map((n) => [n, shared.get(n) as Def] as const)).map(([n, d]) =>
+        emitPyDef(pascal(n), d),
+      ),
+    ].join("\n\n") + "\n",
   );
 
   for (const file of files) {
@@ -667,7 +707,7 @@ function buildOutputs(): Map<string, string> {
       sharedNames.length > 0
         ? `from .primitives import (  # noqa: F401\n${sharedNames.map((n) => `    ${pascal(n)},`).join("\n")}\n)\n`
         : "";
-    const pyBody = defs.map(([n, d]) => emitPyDef(pascal(n), d)).join("\n\n");
+    const pyBody = orderForPython(defs).map(([n, d]) => emitPyDef(pascal(n), d)).join("\n\n");
     const pyErrorNames = ["ErrorCode", "ErrorRecord"].filter((n) => pyBody.includes(n));
     const pyErrorImport =
       pyErrorNames.length > 0 ? `from .errors import ${pyErrorNames.join(", ")}  # noqa: F401\n` : "";

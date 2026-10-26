@@ -54,11 +54,20 @@ export interface AliasGroup {
   readonly allocationIds: readonly Id[];
 }
 
-export interface LaunchConfig {
+export type LaunchConfig = ProgramInstanceLaunch | HostThreadsLaunch;
+
+export interface ProgramInstanceLaunch {
   readonly grid: readonly IntExpr[];
   readonly block: readonly IntExpr[];
   readonly numWarps?: IntExpr;
   readonly numStages?: IntExpr;
+  readonly displayHints?: readonly string[];
+}
+
+export interface HostThreadsLaunch {
+  readonly threads?: IntExpr;
+  readonly schedule?: "static" | "dynamic" | "guided" | "auto" | "runtime";
+  readonly chunk?: IntExpr;
   readonly displayHints?: readonly string[];
 }
 

@@ -17,12 +17,6 @@ from .primitives import (  # noqa: F401
     Sha256,
 )
 
-EnginePath = str
-
-JobState = Literal["queued", "running", "cancel-requested", "succeeded", "failed", "cancelled"]
-
-Operation = Literal["parse", "bounds", "coverage", "conflicts", "explore", "replay", "validate", "benchmark", "compile", "full"]
-
 class EngineRequest(TypedDict):
     schemaVersion: Literal[1]
     protocolVersion: Literal[1]
@@ -40,8 +34,6 @@ class EngineRequest(TypedDict):
     scratchDir: EnginePath
     artifactDir: NotRequired[EnginePath]
     consent: NotRequired[dict[str, Any]]
-
-JobEventType = Literal["job.created", "job.queued", "job.leased", "job.started", "job.progress", "job.cancel-requested", "job.cancelled", "job.succeeded", "job.failed", "result.committed", "artifact.committed"]
 
 class JobEvent(TypedDict):
     schemaVersion: Literal[1]
@@ -79,8 +71,6 @@ class Job(TypedDict):
     createdAt: str
     startedAt: NotRequired[str]
     finishedAt: NotRequired[str]
-
-EngineMessageType = Literal["hello", "progress", "finding", "artifact", "result", "error"]
 
 class EngineEnvelope(TypedDict):
     protocolVersion: Literal[1]
@@ -135,3 +125,13 @@ class JobEventProgress(TypedDict):
 class HelloPayloadLimits(TypedDict):
     maxMessageBytes: NotRequired[float]
     maxOutputBytes: NotRequired[float]
+
+EnginePath = str
+
+JobState = Literal["queued", "running", "cancel-requested", "succeeded", "failed", "cancelled"]
+
+Operation = Literal["parse", "bounds", "coverage", "conflicts", "explore", "replay", "validate", "benchmark", "compile", "full"]
+
+JobEventType = Literal["job.created", "job.queued", "job.leased", "job.started", "job.progress", "job.cancel-requested", "job.cancelled", "job.succeeded", "job.failed", "result.committed", "artifact.committed"]
+
+EngineMessageType = Literal["hello", "progress", "finding", "artifact", "result", "error"]

@@ -11,13 +11,14 @@
 import type {
   Allocation,
   AliasGroup,
-  IntExpr,
   ReferenceComputation,
   Scenario as ScenarioRecord,
 } from "@pomset/contracts";
 
+import { launchExpressions } from "@pomset/contracts";
+
 import { createWorkloadDomain, type DomainModel } from "./domain.js";
-import { validateLaunch } from "./expr.js";
+import { parametersOf, validateLaunch } from "./expr.js";
 import { isAdmissibleProperty } from "./properties.js";
 import { accepted, inputInvalid, pointer, rejected, type Validated, type Rejection } from "./rejection.js";
 
@@ -188,16 +189,10 @@ export function aliasingAllocations(
   return [allocationId];
 }
 
-/** Every parameter any launch dimension references. */
+/** Every parameter any launch member references, whichever form it takes. */
 export function launchParameters(model: ScenarioModel): readonly string[] {
   const found = new Set<string>();
-  const walk = (spec: IntExpr): void => {
-    if (spec.op === "parameter" && spec.parameter) found.add(spec.parameter);
-    for (const operand of spec.operands ?? []) walk(operand);
-  };
-  for (const dimension of model.scenario.launch.grid) walk(dimension);
-  for (const dimension of model.scenario.launch.block) walk(dimension);
-  if (model.scenario.launch.numWarps) walk(model.scenario.launch.numWarps);
-  if (model.scenario.launch.numStages) walk(model.scenario.launch.numStages);
+  for (const expression of launchExpressions(model.scenario.launch))
+    for (const name of parametersOf(expression)) found.add(name);
   return [...found];
 }

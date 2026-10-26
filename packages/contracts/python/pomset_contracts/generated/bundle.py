@@ -16,8 +16,6 @@ from .primitives import (  # noqa: F401
     Sha256,
 )
 
-RelativePath = str
-
 class BundleEntry(TypedDict):
     path: RelativePath
     contentHash: Sha256
@@ -59,3 +57,5 @@ class ExperimentBundleRequiredHardware(TypedDict):
 class ExperimentBundleProducer(TypedDict):
     tool: NotRequired[str]
     toolVersion: NotRequired[str]
+
+RelativePath = str

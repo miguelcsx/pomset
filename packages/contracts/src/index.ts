@@ -16,6 +16,8 @@ export * from "./validate.js";
 
 export * from "./evidence-links.js";
 
+export * from "./launch.js";
+
 export * from "./semantic.js";
 
 export { canonicalize, canonicalBytes } from "./canonicalize.js";
