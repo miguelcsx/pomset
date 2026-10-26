@@ -1,0 +1,62 @@
+[
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_cuda_compilation",
+    "profileRevisionId": "prf_cuda_local",
+    "backend": "cuda",
+    "feature": "compilation",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "no pinned CUDA toolchain is present in this deployment"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_cuda_ptx_inspection",
+    "profileRevisionId": "prf_cuda_local",
+    "backend": "cuda",
+    "feature": "ptxInspection",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "no pinned CUDA toolchain is present in this deployment"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_cuda_source_maps",
+    "profileRevisionId": "prf_cuda_local",
+    "backend": "cuda",
+    "feature": "sourceMaps",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "source maps depend on the compilation path, which is unavailable here"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_cuda_instrumented_execution",
+    "profileRevisionId": "prf_cuda_local",
+    "backend": "cuda",
+    "feature": "instrumentedExecution",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "Compute Sanitizer needs a device; there is no hosted GPU pool and none is present"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_cuda_hardware_metrics",
+    "profileRevisionId": "prf_cuda_local",
+    "backend": "cuda",
+    "feature": "hardwareMetrics",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "Nsight needs a device; there is no hosted GPU pool and none is present"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_cuda_numerical_reference",
+    "profileRevisionId": "prf_cuda_local",
+    "backend": "cuda",
+    "feature": "numericalReference",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "no device or pinned toolchain is present in this deployment"
+  }
+]

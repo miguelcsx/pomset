@@ -1,0 +1,102 @@
+[
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_triton_parse",
+    "profileRevisionId": "prf_triton_local_cpu",
+    "backend": "triton",
+    "feature": "parse",
+    "support": "untested",
+    "availability": "immediate",
+    "reason": "no conformance corpus has run against this revision"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_triton_bounds",
+    "profileRevisionId": "prf_triton_local_cpu",
+    "backend": "triton",
+    "feature": "bounds",
+    "support": "untested",
+    "availability": "immediate",
+    "reason": "no conformance corpus has run against this revision"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_triton_output_coverage",
+    "profileRevisionId": "prf_triton_local_cpu",
+    "backend": "triton",
+    "feature": "outputCoverage",
+    "support": "untested",
+    "availability": "immediate",
+    "reason": "no conformance corpus has run against this revision"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_triton_write_write_conflict",
+    "profileRevisionId": "prf_triton_local_cpu",
+    "backend": "triton",
+    "feature": "writeWriteConflict",
+    "support": "untested",
+    "availability": "immediate",
+    "reason": "no conformance corpus has run against this revision"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_triton_numerical_reference",
+    "profileRevisionId": "prf_triton_local_cpu",
+    "backend": "triton",
+    "feature": "numericalReference",
+    "support": "untested",
+    "availability": "immediate",
+    "reason": "executing a reference computation needs explicit local consent"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_triton_interpreter_replay",
+    "profileRevisionId": "prf_triton_local_cpu",
+    "backend": "triton",
+    "feature": "interpreterReplay",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "Triton ships wheels for Linux only; the replay extra is not installed on this profile"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_triton_compilation",
+    "profileRevisionId": "prf_triton_local_cpu",
+    "backend": "triton",
+    "feature": "compilation",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "compilation is a separate executable path, gated by local execution consent"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_triton_source_maps",
+    "profileRevisionId": "prf_triton_local_cpu",
+    "backend": "triton",
+    "feature": "sourceMaps",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "source maps come from the compilation path, which this profile does not run"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_triton_atomics",
+    "profileRevisionId": "prf_triton_local_cpu",
+    "backend": "triton",
+    "feature": "atomics",
+    "support": "untested",
+    "availability": "immediate",
+    "reason": "atomics are outside the modelled subset and are reported unsupported, not analysed"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_triton_dynamic_indexing",
+    "profileRevisionId": "prf_triton_local_cpu",
+    "backend": "triton",
+    "feature": "dynamicIndexing",
+    "support": "untested",
+    "availability": "immediate",
+    "reason": "data-dependent indexing is outside the modelled subset and is reported unsupported"
+  }
+]

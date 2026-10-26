@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "profileRevisionId": "prf_cuda_local",
+  "backend": "cuda",
+  "revisionHash": "sha256:7aa836421486b3229cede8f4531a8399c793d59fecf42eb2d458a6a04120c935",
+  "createdAt": "2026-01-05T12:00:00Z",
+  "components": [
+    {
+      "name": "nvcc",
+      "version": "unresolved"
+    },
+    {
+      "name": "compute-sanitizer",
+      "version": "unresolved"
+    }
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x86_64"
+  },
+  "capabilityIds": [
+    "cap_cuda_compilation",
+    "cap_cuda_ptx_inspection",
+    "cap_cuda_source_maps",
+    "cap_cuda_instrumented_execution",
+    "cap_cuda_hardware_metrics",
+    "cap_cuda_numerical_reference"
+  ],
+  "notes": "A probe replaces the unresolved versions with measured ones. Nothing is advertised until its fixtures pass, so every capability is untested and unavailable on a deployment with no pinned vendor toolchain."
+}

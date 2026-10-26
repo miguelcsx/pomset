@@ -1,0 +1,62 @@
+[
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_openmp_compilation",
+    "profileRevisionId": "prf_openmp_local",
+    "backend": "openmp",
+    "feature": "compilation",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "no pinned compiler toolchain is present in this deployment"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_openmp_instrumented_execution",
+    "profileRevisionId": "prf_openmp_local",
+    "backend": "openmp",
+    "feature": "instrumentedExecution",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "ThreadSanitizer and Archer have not been probed against this revision"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_openmp_numerical_reference",
+    "profileRevisionId": "prf_openmp_local",
+    "backend": "openmp",
+    "feature": "numericalReference",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "no pinned compiler toolchain is present in this deployment"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_openmp_synchronization_diagnostics",
+    "profileRevisionId": "prf_openmp_local",
+    "backend": "openmp",
+    "feature": "synchronizationDiagnostics",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "synchronization diagnostics depend on an unprobed instrumentation toolchain"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_openmp_deadlock_diagnostics",
+    "profileRevisionId": "prf_openmp_local",
+    "backend": "openmp",
+    "feature": "deadlockDiagnostics",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "a timeout is unknown progress, and no instrumented path is available to distinguish it here"
+  },
+  {
+    "schemaVersion": 1,
+    "capabilityId": "cap_openmp_benchmark",
+    "profileRevisionId": "prf_openmp_local",
+    "backend": "openmp",
+    "feature": "benchmark",
+    "support": "untested",
+    "availability": "unavailable",
+    "reason": "no eligible validation record can be produced until the toolchain is probed"
+  }
+]

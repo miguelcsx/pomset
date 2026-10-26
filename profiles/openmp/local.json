@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "profileRevisionId": "prf_openmp_local",
+  "backend": "openmp",
+  "revisionHash": "sha256:93317430edaa53c94757a87fb030ddd1d52a19bcfff598150cf8da4ea6d2ad65",
+  "createdAt": "2026-01-05T12:00:00Z",
+  "components": [
+    {
+      "name": "clang",
+      "version": "unresolved"
+    },
+    {
+      "name": "thread-sanitizer",
+      "version": "unresolved"
+    }
+  ],
+  "platform": {
+    "os": "linux",
+    "arch": "x86_64"
+  },
+  "capabilityIds": [
+    "cap_openmp_compilation",
+    "cap_openmp_instrumented_execution",
+    "cap_openmp_numerical_reference",
+    "cap_openmp_synchronization_diagnostics",
+    "cap_openmp_deadlock_diagnostics",
+    "cap_openmp_benchmark"
+  ],
+  "notes": "A probe replaces the unresolved versions with measured ones. Nothing is advertised until its fixtures pass, so every capability is untested and unavailable on a deployment with no pinned toolchain."
+}
