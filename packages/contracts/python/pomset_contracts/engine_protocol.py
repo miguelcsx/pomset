@@ -159,18 +159,30 @@ def read_request(path: str) -> dict[str, Any]:
     return request
 
 
-def command(argv: list[str], timeout_seconds: float) -> dict[str, Any]:
+def command(
+    argv: list[str],
+    timeout_seconds: float,
+    env: dict[str, str] | None = None,
+) -> dict[str, Any]:
     """Runs one tool invocation, bounded, and reports what actually happened.
 
     A timeout is recorded as an unknown outcome with its reason, never as a
     failure of the program under test: a clock cannot tell a program that is
     stuck from one that is slow, and the product is not allowed to pretend
     otherwise.
+
+    `env` replaces the environment when given. It is how a run is given a thread
+    count, which is part of what is being observed rather than a detail of the
+    harness.
     """
     started = time.perf_counter_ns()
     try:
         run = subprocess.run(
-            argv, capture_output=True, text=True, timeout=timeout_seconds
+            argv,
+            capture_output=True,
+            text=True,
+            timeout=timeout_seconds,
+            env=env,
         )
         return {
             "argv": argv,
