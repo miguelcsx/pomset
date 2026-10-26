@@ -21,7 +21,7 @@
     "lint:python": "ruff check engines packages/contracts/python scripts/audit-spec.py",
     "test:python": "uv run pytest engines packages/contracts/python -q",
     "check:semantics": "uv run python -m pomset_contracts.check",
-    "workbench": "node apps/api/dist/local-main.js"
+    "workbench": "node apps/api/dist/bin/workbench.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

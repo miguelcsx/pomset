@@ -5,7 +5,7 @@ import { join, resolve } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
 import { schemaSet } from "@pomset/contracts";
 import type { AnalysisSubmission, Job, Scenario, AnalysisResult } from "@pomset/contracts";
-import { startWorkbench } from "./local-server.js";
+import { startWorkbench } from "./main.js";
 const directory = mkdtempSync(join(tmpdir(), "pomset-workbench-test-"));
 let server: Awaited<ReturnType<typeof startWorkbench>>;
 let origin: string;
@@ -14,7 +14,7 @@ beforeAll(async () => {
   server = await startWorkbench({ directory }); origin = new URL(server.url).origin;
   const scenario = JSON.parse(readFileSync(resolve("../../examples/transform-floor-grid/scenario.json"), "utf8")) as Scenario;
   const files = ["kernels/transform.py", "kernels/reference.py"].map((path) => ({ path, source: readFileSync(resolve("../../examples/transform-floor-grid", path), "utf8") }));
-  input = { scenario, files, profileRevisionId: server.service.profile().profileRevisionId, solverTimeMs: 5000 };
+  input = { scenario, files, profileRevisionId: server.workbench.profile.execute().profileRevisionId, solverTimeMs: 5000 };
 }, 20000);
 afterAll(async () => { await server?.close(); rmSync(directory, { recursive: true, force: true }); });
 function call(path: string, body?: unknown, headers: Record<string, string> = {}) {
