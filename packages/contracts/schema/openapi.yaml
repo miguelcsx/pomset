@@ -1,0 +1,701 @@
+openapi: 3.1.0
+info:
+  title: Pomset API
+  version: "1.0.0"
+  description: >-
+    HTTP surface for projects, snapshots, scenarios, jobs, results, artifacts and
+    publications. Every request and response body references the portable JSON
+    Schema contracts in this directory; this document defines no body type of its
+    own. Ownership is authorized server-side against a server-owned opaque owner
+    identity; a content hash is never an access credential.
+  license:
+    name: Apache-2.0
+servers:
+  - url: http://127.0.0.1:8787
+    description: Local development
+  - url: https://pomset.example.invalid
+    description: Hosted deployment, host set at deploy time
+tags:
+  - name: profiles
+  - name: projects
+  - name: snapshots
+  - name: scenarios
+  - name: jobs
+  - name: results
+  - name: artifacts
+  - name: publications
+  - name: bundles
+  - name: session
+paths:
+  /v1/profiles:
+    get:
+      tags: [profiles]
+      operationId: listProfiles
+      summary: List profile revisions with support level and availability
+      security: []
+      responses:
+        "200":
+          description: Profile catalogue
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "domain.schema.yaml#/$defs/profileRevision"
+  /v1/projects:
+    get:
+      tags: [projects]
+      operationId: listProjects
+      summary: List projects owned by the caller
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Owned projects in creation order then id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [projects]
+      operationId: createProject
+      summary: Create a project
+      responses:
+        "201":
+          description: Created project
+          content:
+            application/json:
+              schema:
+                $ref: "domain.schema.yaml#/$defs/project"
+        "400":
+          $ref: "#/components/responses/InputInvalid"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /v1/projects/{projectId}:
+    get:
+      tags: [projects]
+      operationId: getProject
+      summary: Read one project
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      responses:
+        "200":
+          description: The project
+          content:
+            application/json:
+              schema:
+                $ref: "domain.schema.yaml#/$defs/project"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/projects/{projectId}/snapshots:
+    get:
+      tags: [snapshots]
+      operationId: listSnapshots
+      summary: List snapshots of a project
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Snapshots in creation order then id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      tags: [snapshots]
+      operationId: createSnapshot
+      summary: Create an immutable snapshot; never publishes
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [files]
+              properties:
+                parentSnapshotId:
+                  type: string
+                files:
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: "domain.schema.yaml#/$defs/snapshotFile"
+              additionalProperties: false
+      responses:
+        "201":
+          description: Created snapshot with manifest hash
+          content:
+            application/json:
+              schema:
+                $ref: "domain.schema.yaml#/$defs/snapshotManifest"
+        "400":
+          $ref: "#/components/responses/InputInvalid"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/snapshots/{snapshotId}:
+    get:
+      tags: [snapshots]
+      operationId: getSnapshot
+      summary: Read a snapshot manifest
+      parameters:
+        - $ref: "#/components/parameters/SnapshotId"
+      responses:
+        "200":
+          description: The snapshot manifest
+          content:
+            application/json:
+              schema:
+                $ref: "domain.schema.yaml#/$defs/snapshotManifest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/ProfileNotFound"
+  /v1/snapshots/{snapshotId}/scenarios:
+    post:
+      tags: [scenarios]
+      operationId: createScenario
+      summary: Create a scenario on a snapshot
+      parameters:
+        - $ref: "#/components/parameters/SnapshotId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "domain.schema.yaml#/$defs/scenario"
+      responses:
+        "201":
+          description: Created scenario
+          content:
+            application/json:
+              schema:
+                $ref: "domain.schema.yaml#/$defs/scenario"
+        "400":
+          $ref: "#/components/responses/InputInvalid"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/scenarios/{scenarioId}:
+    get:
+      tags: [scenarios]
+      operationId: getScenario
+      summary: Read a scenario
+      parameters:
+        - $ref: "#/components/parameters/ScenarioId"
+      responses:
+        "200":
+          description: The scenario
+          content:
+            application/json:
+              schema:
+                $ref: "domain.schema.yaml#/$defs/scenario"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/jobs:
+    post:
+      tags: [jobs]
+      operationId: createJob
+      summary: Create a job; never publishes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [snapshotId, scenarioId, profileRevisionId, policyId, policyRevision]
+              properties:
+                snapshotId:
+                  type: string
+                scenarioId:
+                  type: string
+                profileRevisionId:
+                  type: string
+                policyId:
+                  type: string
+                policyRevision:
+                  type: integer
+                  minimum: 1
+                operation:
+                  type: string
+                  enum: [parse, bounds, coverage, conflicts, explore, replay, validate, benchmark, compile, full]
+              additionalProperties: false
+      responses:
+        "202":
+          description: Created job
+          content:
+            application/json:
+              schema:
+                $ref: "engine.schema.yaml#/$defs/job"
+        "400":
+          $ref: "#/components/responses/InputInvalid"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/ProfileNotFound"
+  /v1/jobs/{jobId}:
+    get:
+      tags: [jobs]
+      operationId: getJob
+      summary: Read job state, failure record and attempt identity
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      responses:
+        "200":
+          description: The job
+          content:
+            application/json:
+              schema:
+                $ref: "engine.schema.yaml#/$defs/job"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/jobs/{jobId}/cancel:
+    post:
+      tags: [jobs]
+      operationId: cancelJob
+      summary: Request cooperative cancellation; idempotent
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      responses:
+        "202":
+          description: Cancellation requested
+          content:
+            application/json:
+              schema:
+                $ref: "engine.schema.yaml#/$defs/job"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/jobs/{jobId}/events:
+    get:
+      tags: [jobs]
+      operationId: streamJobEvents
+      summary: Durable event stream; reconnects with Last-Event-ID
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+        - name: Last-Event-ID
+          in: header
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: >-
+            Server-sent events. Each event carries a durable event id and the
+            serialized JobEvent payload. An expired cursor is signalled by an
+            event instructing the client to fetch current job state.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/jobs/{jobId}/results:
+    get:
+      tags: [results]
+      operationId: listJobResults
+      summary: List immutable result records of a job
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Results in creation order then id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/projects/{projectId}/jobs:
+    get:
+      tags: [jobs]
+      operationId: listProjectJobs
+      summary: List jobs of a project
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Jobs in creation order then id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/results/{resultId}:
+    get:
+      tags: [results]
+      operationId: getResult
+      summary: Read an analysis result with findings, coverage and budget
+      parameters:
+        - $ref: "#/components/parameters/ResultId"
+      responses:
+        "200":
+          description: The analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "evidence.schema.yaml#/$defs/analysisResult"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/artifacts/{artifactId}:
+    get:
+      tags: [artifacts]
+      operationId: getArtifact
+      summary: Retrieve an artifact after per-request authorization
+      parameters:
+        - $ref: "#/components/parameters/ArtifactId"
+      responses:
+        "200":
+          description: Artifact bytes
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/publications:
+    post:
+      tags: [publications]
+      operationId: createPublication
+      summary: Publish a selected snapshot and artifacts after an accepted disclosure preview
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [snapshotId, artifactIds, visibility, disclosurePreviewId]
+              properties:
+                snapshotId:
+                  type: string
+                scenarioId:
+                  type: string
+                resultIds:
+                  type: array
+                  items:
+                    type: string
+                artifactIds:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+                visibility:
+                  type: string
+                  enum: [unlisted, public]
+                disclosurePreviewId:
+                  type: string
+              additionalProperties: false
+      responses:
+        "201":
+          description: Created publication
+          content:
+            application/json:
+              schema:
+                $ref: "publication.schema.yaml#/$defs/publication"
+        "400":
+          $ref: "#/components/responses/InputInvalid"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/projects/{projectId}/publications:
+    get:
+      tags: [publications]
+      operationId: listProjectPublications
+      summary: List publications of a project
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Publications in creation order then id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Page"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/publications/{publicationId}:
+    get:
+      tags: [publications]
+      operationId: getPublication
+      summary: Read a publication; unauthorized access is restricted to published views
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/PublicationId"
+      responses:
+        "200":
+          description: The publication
+          content:
+            application/json:
+              schema:
+                $ref: "publication.schema.yaml#/$defs/publication"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    delete:
+      tags: [publications]
+      operationId: revokePublication
+      summary: Revoke a publication; denies subsequent server retrieval only
+      parameters:
+        - $ref: "#/components/parameters/PublicationId"
+      responses:
+        "204":
+          description: Revoked
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/bundles/import:
+    post:
+      tags: [bundles]
+      operationId: importBundle
+      summary: Import a bundle into an owned project; never executes and never publishes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [projectId, bundle]
+              properties:
+                projectId:
+                  type: string
+                bundle:
+                  $ref: "bundle.schema.yaml#/$defs/experimentBundle"
+              additionalProperties: false
+      responses:
+        "201":
+          description: Imported references, labeled origin imported
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportResult"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/BundleInvalid"
+  /v1/results/{resultId}/bundle:
+    get:
+      tags: [bundles]
+      operationId: exportBundle
+      summary: Export a portable experiment bundle for a result
+      parameters:
+        - $ref: "#/components/parameters/ResultId"
+      responses:
+        "200":
+          description: Portable bundle
+          content:
+            application/json:
+              schema:
+                $ref: "bundle.schema.yaml#/$defs/experimentBundle"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /v1/session:
+    get:
+      tags: [session]
+      operationId: getSession
+      summary: Current session and server-owned owner identity
+      responses:
+        "200":
+          description: Session state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionState"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /auth/login:
+    get:
+      tags: [session]
+      operationId: authLogin
+      summary: Begin OIDC authorization-code with PKCE
+      security: []
+      responses:
+        "302":
+          description: Redirect to the configured OIDC issuer
+  /auth/callback:
+    get:
+      tags: [session]
+      operationId: authCallback
+      summary: Complete OIDC sign-in and start a server-side session
+      security: []
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "302":
+          description: Redirect to the application after the session is established
+  /auth/logout:
+    post:
+      tags: [session]
+      operationId: authLogout
+      summary: End the session
+      responses:
+        "204":
+          description: Session ended
+        "403":
+          $ref: "#/components/responses/Forbidden"
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: pomset_session
+      description: >-
+        Server-side session cookie set by /auth/callback. State-changing requests
+        are additionally protected against cross-site request forgery.
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 512
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 50
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+    SnapshotId:
+      name: snapshotId
+      in: path
+      required: true
+      schema:
+        type: string
+    ScenarioId:
+      name: scenarioId
+      in: path
+      required: true
+      schema:
+        type: string
+    JobId:
+      name: jobId
+      in: path
+      required: true
+      schema:
+        type: string
+    ResultId:
+      name: resultId
+      in: path
+      required: true
+      schema:
+        type: string
+    ArtifactId:
+      name: artifactId
+      in: path
+      required: true
+      schema:
+        type: string
+    PublicationId:
+      name: publicationId
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    Page:
+      description: Opaque cursor pagination over a stable creation-order then id ordering.
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items: {}
+        nextCursor:
+          type: string
+    SessionState:
+      type: object
+      required: [authenticated]
+      properties:
+        authenticated:
+          type: boolean
+        ownerId:
+          type: string
+        issuer:
+          type: string
+      additionalProperties: false
+    ImportResult:
+      type: object
+      required: [projectId, snapshotIds, resultIds, origin]
+      properties:
+        projectId:
+          type: string
+        snapshotIds:
+          type: array
+          items:
+            type: string
+        resultIds:
+          type: array
+          items:
+            type: string
+        measurementIds:
+          type: array
+          items:
+            type: string
+        origin:
+          type: string
+          enum: [imported]
+      additionalProperties: false
+  responses:
+    InputInvalid:
+      description: Invalid input or invalid protocol
+      content:
+        application/json:
+          schema:
+            $ref: "evidence.schema.yaml#/$defs/errorRecord"
+    BundleInvalid:
+      description: Structurally invalid, hash-conflicting, path-escaping or unsupported bundle
+      content:
+        application/json:
+          schema:
+            $ref: "evidence.schema.yaml#/$defs/errorRecord"
+    Unauthorized:
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: "evidence.schema.yaml#/$defs/errorRecord"
+    Forbidden:
+      description: Authenticated but not authorized for this resource
+      content:
+        application/json:
+          schema:
+            $ref: "evidence.schema.yaml#/$defs/errorRecord"
+    ProfileNotFound:
+      description: Unknown or unavailable profile revision; never substituted with a nearby profile
+      content:
+        application/json:
+          schema:
+            $ref: "evidence.schema.yaml#/$defs/errorRecord"
+security:
+  - sessionCookie: []

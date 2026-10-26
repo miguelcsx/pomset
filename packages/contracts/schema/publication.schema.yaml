@@ -1,0 +1,158 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://pomset.dev/contracts/publication.schema.yaml
+title: Pomset publication contracts
+description: Authoritative portable definitions for owner identity, publications and the disclosure preview
+  that must be accepted before anything becomes publicly retrievable.
+$defs:
+  id:
+    type: string
+    minLength: 3
+    maxLength: 128
+    pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+  sha256:
+    type: string
+    pattern: ^sha256:[0-9a-f]{64}$
+  ownerIdentity:
+    description: Server-owned opaque owner. (issuer, subject) from the identity provider maps to it; caller-supplied
+      identity is never authority.
+    type: object
+    required:
+    - ownerId
+    - issuer
+    - createdAt
+    properties:
+      ownerId:
+        $ref: '#/$defs/id'
+      issuer:
+        type: string
+        minLength: 1
+        maxLength: 300
+      subjectHash:
+        $ref: '#/$defs/sha256'
+      displayName:
+        type: string
+        maxLength: 120
+      createdAt:
+        type: string
+        format: date-time
+      disabledAt:
+        type: string
+        format: date-time
+    additionalProperties: false
+  disclosureItem:
+    description: One concrete piece of information that disclosure would reveal. Enumerated, not summarized.
+    type: object
+    required:
+    - category
+    - itemId
+    - description
+    properties:
+      category:
+        enum:
+        - source-text
+        - file-paths
+        - logs
+        - compiler-artifacts
+        - witness-details
+        - hardware-metadata
+        - profile-revisions
+        - measurements
+        - result-findings
+      itemId:
+        $ref: '#/$defs/id'
+      description:
+        type: string
+        minLength: 1
+        maxLength: 500
+      count:
+        type: integer
+        minimum: 0
+      bytes:
+        type: integer
+        minimum: 0
+    additionalProperties: false
+  disclosurePreview:
+    description: Computed before publication and shown to the owner. Publication is refused when the preview
+      is absent or stale.
+    type: object
+    required:
+    - previewId
+    - snapshotId
+    - items
+    - generatedAt
+    properties:
+      previewId:
+        $ref: '#/$defs/id'
+      snapshotId:
+        $ref: '#/$defs/id'
+      items:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/disclosureItem'
+      warnings:
+        type: array
+        items:
+          type: string
+          maxLength: 500
+      totalBytes:
+        type: integer
+        minimum: 0
+      generatedAt:
+        type: string
+        format: date-time
+    additionalProperties: false
+  publication:
+    description: Explicit act on one selected immutable snapshot. Running or compiling never creates a
+      publication.
+    type: object
+    required:
+    - schemaVersion
+    - publicationId
+    - ownerId
+    - snapshotId
+    - visibility
+    - artifactIds
+    - disclosurePreviewId
+    - createdAt
+    properties:
+      schemaVersion:
+        type: integer
+        const: 1
+      publicationId:
+        $ref: '#/$defs/id'
+      ownerId:
+        $ref: '#/$defs/id'
+      projectId:
+        $ref: '#/$defs/id'
+      snapshotId:
+        $ref: '#/$defs/id'
+      scenarioId:
+        $ref: '#/$defs/id'
+      resultIds:
+        type: array
+        items:
+          $ref: '#/$defs/id'
+      artifactIds:
+        description: Exactly the artifacts the owner chose. Nothing implied.
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/id'
+      visibility:
+        enum:
+        - unlisted
+        - public
+      disclosurePreviewId:
+        $ref: '#/$defs/id'
+      createdAt:
+        type: string
+        format: date-time
+      revokedAt:
+        description: Revocation denies subsequent server retrieval. It does not prove already-downloaded
+          copies vanished.
+        type: string
+        format: date-time
+      portableBundleArtifactId:
+        $ref: '#/$defs/id'
+    additionalProperties: false
