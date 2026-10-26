@@ -1,0 +1,719 @@
+$ pnpm run check:boundaries && pnpm run check:contracts && pnpm run typecheck && pnpm run lint && pnpm run lint:python && pnpm run format:check && pnpm run build && pnpm run test && pnpm run test:python && pnpm run check:semantics && pnpm run check:docs && pnpm run check:profiles && pnpm run check:licences && pnpm run test:identity
+$ node scripts/check-boundaries.mjs
+boundary check: 9 packages, 0 forbidden imports
+$ pnpm --filter @pomset/contracts run generate --check
+$ node scripts/generate.ts --check
+contract bindings up to date (21 files)
+$ pnpm -r typecheck
+Scope: 9 of 10 workspace projects
+packages/contracts typecheck$ tsc -b
+packages/contracts typecheck: Done
+packages/domain typecheck$ tsc -b
+packages/engine-client typecheck$ tsc -b
+packages/ui typecheck$ tsc -b
+packages/domain typecheck: Done
+packages/engine-client typecheck: Done
+packages/storage typecheck$ tsc -b
+packages/storage typecheck: Done
+apps/worker typecheck$ tsc -b
+apps/worker typecheck: Done
+apps/api typecheck$ tsc -b
+apps/api typecheck: Done
+packages/ui typecheck: Done
+apps/web typecheck$ tsc -p tsconfig.json --noEmit
+apps/cli typecheck$ tsc -b
+apps/cli typecheck: Done
+apps/web typecheck: Done
+$ eslint .
+$ ruff check engines packages/contracts/python scripts/audit-spec.py
+All checks passed!
+$ nixfmt --check flake.nix && ruff format --check engines packages/contracts/python/pomset_contracts/check.py packages/contracts/python/pomset_contracts/semantic.py scripts/audit-spec.py
+29 files already formatted
+$ pnpm -r build
+Scope: 9 of 10 workspace projects
+packages/contracts build$ tsc -b
+packages/contracts build: Done
+packages/domain build$ tsc -b
+packages/engine-client build$ tsc -b
+packages/ui build$ tsc -b
+packages/ui build: Done
+apps/web build$ vite build
+packages/engine-client build: Done
+packages/domain build: Done
+packages/storage build$ tsc -b
+packages/storage build: Done
+apps/cli build$ tsc -b
+apps/worker build$ tsc -b
+apps/web build: vite v6.4.4 building for production...
+apps/web build: transforming...
+apps/worker build: Done
+apps/api build$ tsc -b
+apps/cli build: Done
+apps/api build: Done
+apps/web build: ✓ 2380 modules transformed.
+apps/web build: rendering chunks...
+apps/web build: computing gzip size...
+apps/web build: dist/index.html                            0.39 kB │ gzip:   0.26 kB
+apps/web build: dist/assets/editor.worker-BCzxt1at.js    232.35 kB
+apps/web build: dist/assets/json.worker-B7c_PmGb.js      364.77 kB
+apps/web build: dist/assets/index-Co6hOlid.css            32.44 kB │ gzip:   7.01 kB
+apps/web build: dist/assets/SourceEditor-DyX1CsEw.css     68.26 kB │ gzip:  11.15 kB
+apps/web build: dist/assets/python-BANoFKPQ.js             4.49 kB │ gzip:   1.85 kB
+apps/web build: dist/assets/cpp-CLLBncYj.js                5.55 kB │ gzip:   2.22 kB
+apps/web build: dist/assets/jsonMode-ByR57MfW.js          41.81 kB │ gzip:  12.09 kB
+apps/web build: dist/assets/index-BO2DghuS.js            408.14 kB │ gzip: 122.46 kB
+apps/web build: dist/assets/SourceEditor-Df9AEh88.js   2,303.52 kB │ gzip: 596.56 kB
+apps/web build: ✓ built in 2.68s
+apps/web build: (!) Some chunks are larger than 500 kB after minification. Consider:
+apps/web build: - Using dynamic import() to code-split the application
+apps/web build: - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+apps/web build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+apps/web build: Done
+$ pnpm -r test
+Scope: 9 of 10 workspace projects
+packages/contracts test$ vitest run
+packages/contracts test:  RUN  v3.2.7 /Users/mcs/Documents/study/university/web/pomset/packages/contracts
+packages/contracts test:  ✓ src/index.test.ts (2 tests) 1ms
+packages/contracts test:  ✓ src/contracts.test.ts (3 tests) 63ms
+packages/contracts test:  Test Files  2 passed (2)
+packages/contracts test:       Tests  5 passed (5)
+packages/contracts test:    Start at  20:18:47
+packages/contracts test:    Duration  311ms (transform 53ms, setup 0ms, collect 153ms, tests 64ms, environment 0ms, prepare 74ms)
+packages/contracts test: Done
+packages/engine-client test$ vitest run
+packages/domain test$ vitest run
+packages/ui test$ vitest run
+packages/ui test:  RUN  v3.2.7 /Users/mcs/Documents/study/university/web/pomset/packages/ui
+packages/engine-client test:  RUN  v3.2.7 /Users/mcs/Documents/study/university/web/pomset/packages/engine-client
+packages/domain test:  RUN  v3.2.7 /Users/mcs/Documents/study/university/web/pomset/packages/domain
+packages/ui test:  ✓ src/domain-rows.test.ts (2 tests) 2ms
+packages/ui test:  ✓ src/tokens.test.ts (3 tests) 2ms
+packages/ui test:  Test Files  2 passed (2)
+packages/ui test:       Tests  5 passed (5)
+packages/ui test:    Start at  20:18:48
+packages/ui test:    Duration  663ms (transform 111ms, setup 0ms, collect 106ms, tests 4ms, environment 0ms, prepare 214ms)
+packages/domain test:  ✓ src/properties.test.ts (4 tests) 1ms
+packages/domain test:  ✓ src/expr.test.ts (16 tests) 5ms
+packages/ui test: Done
+apps/web test$ vitest run
+packages/domain test:  ✓ src/manifest.test.ts (11 tests) 2ms
+packages/domain test:  ✓ src/evidence.test.ts (17 tests) 4ms
+packages/domain test:  ✓ src/profile.test.ts (8 tests) 3ms
+packages/engine-client test:  ✓ src/index.test.ts (1 test) 1ms
+packages/domain test:  ✓ src/index.test.ts (2 tests) 1ms
+packages/domain test:  ✓ src/scenario.test.ts (10 tests) 80ms
+packages/domain test:  ✓ src/cache-key.test.ts (7 tests) 87ms
+packages/domain test:  ✓ src/eligibility.test.ts (3 tests) 3ms
+packages/domain test:  Test Files  9 passed (9)
+packages/domain test:       Tests  78 passed (78)
+packages/domain test:    Start at  20:18:48
+packages/domain test:    Duration  933ms (transform 665ms, setup 0ms, collect 1.92s, tests 187ms, environment 1ms, prepare 948ms)
+apps/web test:  RUN  v3.2.7 /Users/mcs/Documents/study/university/web/pomset/apps/web
+packages/domain test: Done
+packages/storage test$ vitest run
+apps/web test:  ✓ src/app/working-copy.test.ts (2 tests) 3ms
+apps/web test:  ✓ src/app/report-session.test.ts (3 tests) 3ms
+apps/web test:  ✓ src/app/expressions.test.ts (2 tests) 3ms
+packages/storage test:  RUN  v3.2.7 /Users/mcs/Documents/study/university/web/pomset/packages/storage
+apps/web test:  ✓ src/app/input-identity.test.ts (1 test) 3ms
+apps/web test:  ✓ src/app/Workbench.test.ts (2 tests) 1ms
+apps/web test:  Test Files  5 passed (5)
+apps/web test:       Tests  10 passed (10)
+apps/web test:    Start at  20:18:49
+apps/web test:    Duration  560ms (transform 312ms, setup 0ms, collect 642ms, tests 14ms, environment 1ms, prepare 219ms)
+apps/web test: Done
+packages/storage test:  ✓ src/index.test.ts (1 test) 1ms
+packages/engine-client test:  ✓ src/protocol.test.ts (26 tests) 933ms
+packages/engine-client test:    ✓ supervising a real engine process > kills an engine that ignores the cooperative cancel  345ms
+packages/storage test:  ✓ src/local.test.ts (4 tests) 111ms
+packages/storage test:  ✓ src/recovery.test.ts (2 tests) 210ms
+packages/storage test:  Test Files  3 passed (3)
+packages/storage test:       Tests  7 passed (7)
+packages/storage test:    Start at  20:18:49
+packages/storage test:    Duration  627ms (transform 106ms, setup 0ms, collect 410ms, tests 322ms, environment 0ms, prepare 125ms)
+packages/storage test: Done
+packages/engine-client test:  ✓ src/supervision.test.ts (4 tests) 2193ms
+packages/engine-client test:    ✓ real supervisor resource and cancellation boundaries > escalates cancellation when an engine ignores stdin  2044ms
+packages/engine-client test:  Test Files  3 passed (3)
+packages/engine-client test:       Tests  31 passed (31)
+packages/engine-client test:    Start at  20:18:48
+packages/engine-client test:    Duration  3.02s (transform 280ms, setup 0ms, collect 713ms, tests 3.13s, environment 0ms, prepare 317ms)
+packages/engine-client test: Done
+apps/worker test$ vitest run
+apps/cli test$ vitest run
+apps/worker test:  RUN  v3.2.7 /Users/mcs/Documents/study/university/web/pomset/apps/worker
+apps/cli test:  RUN  v3.2.7 /Users/mcs/Documents/study/university/web/pomset/apps/cli
+apps/cli test:  ✓ src/index.test.ts (2 tests) 1ms
+apps/worker test:  ✓ src/index.test.ts (2 tests) 1ms
+apps/worker test:  Test Files  1 passed (1)
+apps/worker test:       Tests  2 passed (2)
+apps/worker test:    Start at  20:18:51
+apps/worker test:    Duration  418ms (transform 97ms, setup 0ms, collect 165ms, tests 1ms, environment 0ms, prepare 95ms)
+apps/cli test: {"schemaVersion":1,"error":{"code":"INPUT_INVALID","message":"INPUT_INVALID: benchmark requires --trust-local-code for this invocation"}}
+apps/cli test: {"schemaVersion":1,"error":{"code":"INPUT_INVALID","message":"INPUT_INVALID: unknown command nonsense"}}
+apps/worker test: Done
+apps/api test$ vitest run
+apps/api test:  RUN  v3.2.7 /Users/mcs/Documents/study/university/web/pomset/apps/api
+apps/api test:  ✓ src/index.test.ts (2 tests) 29ms
+apps/cli test: stderr | src/workflow.test.ts > portable local workflow > captures immutable bytes, exports after an edit and imports without executing
+apps/cli test: pomset: outputCoverage=violated memoryBounds=established writeWriteConflict=established
+apps/cli test: {
+apps/cli test:   "schemaVersion": 1,
+apps/cli test:   "tool": {
+apps/cli test:     "name": "@pomset/cli",
+apps/cli test:     "version": "0.0.0"
+apps/cli test:   },
+apps/cli test:   "jobId": "job_c51faaa3-2abd-406d-89e0-183eac1e4dd6",
+apps/cli test:   "scenarioId": "scn_035348f8-b35f-428f-be39-92702364ba26",
+apps/cli test:   "snapshotId": "snp_5b48246a-913f-419d-a156-683db283f524",
+apps/cli test:   "profileRevisionId": "prf_26cf5feaf9ea9905f50db2bdbde6d4d4000542b4299f0e693d84deaa3fdabd59",
+apps/cli test:   "policyId": "pol_default",
+apps/cli test:   "policyRevision": 1,
+apps/cli test:   "properties": [
+apps/cli test:     {
+apps/cli test:       "propertyId": "outputCoverage",
+apps/cli test:       "outcome": "violated",
+apps/cli test:       "method": "symbolic",
+apps/cli test:       "evidenceClass": "counterexample"
+apps/cli test:     },
+apps/cli test:     {
+apps/cli test:       "propertyId": "memoryBounds",
+apps/cli test:       "outcome": "established",
+apps/cli test:       "method": "symbolic",
+apps/cli test:       "evidenceClass": "verified-under-assumptions"
+apps/cli test:     },
+apps/cli test:     {
+apps/cli test:       "propertyId": "writeWriteConflict",
+apps/cli test:       "outcome": "established",
+apps/cli test:       "method": "symbolic",
+apps/cli test:       "evidenceClass": "verified-under-assumptions"
+apps/cli test:     }
+apps/cli test:   ],
+apps/cli test:   "qualifiers": {
+apps/cli test:     "coverage": {
+apps/cli test:       "kind": "enumerated",
+apps/cli test:       "pointCount": 24576,
+apps/cli test:       "duplicatesRemoved": true
+apps/cli test:     },
+apps/cli test:     "assumptions": [
+apps/cli test:       "Addresses and masks are modeled; stored values are uninterpreted. No numerical claim follows.",
+apps/cli test:       "Modular arithmetic at declared widths (N:i32, BLOCK:i32); program_id/arange are i32. Same-signedness integer promotion only.",
+apps/cli test:       "Contiguous one-dimensional allocations are disjoint. Declared alias groups are unsupported.",
+apps/cli test:       "Conflict query concerns distinct program/lane actors and non-atomic stores; no GPU schedule is modeled."
+apps/cli test:     ],
+apps/cli test:     "budget": {
+apps/cli test:       "solverTimeMs": 30000,
+apps/cli test:       "engineWallTimeMs": 120000,
+apps/cli test:       "memoryBytes": 2147483648,
+apps/cli test:       "maxMessageBytes": 1048576,
+apps/cli test:       "maxOutputBytes": 16777216,
+apps/cli test:       "maxArtifactBytes": 268435456
+apps/cli test:     }
+apps/cli test:   },
+apps/cli test:   "events": [
+apps/cli test:     {
+apps/cli test:       "sequence": 1,
+apps/cli test:       "type": "hello"
+apps/cli test:     },
+apps/cli test:     {
+apps/cli test:       "sequence": 2,
+apps/cli test:       "type": "progress"
+apps/cli test:     },
+apps/cli test:     {
+apps/cli test:       "sequence": 3,
+apps/cli test:       "type": "progress"
+apps/cli test:     },
+apps/cli test:     {
+apps/cli test:       "sequence": 4,
+apps/cli test:       "type": "progress"
+apps/cli test:     },
+apps/cli test:     {
+apps/cli test:       "sequence": 5,
+apps/cli test:       "type": "result"
+apps/cli test:     }
+apps/cli test:   ],
+apps/cli test:   "snapshot": {
+apps/cli test:     "schemaVersion": 1,
+apps/cli test:     "snapshotId": "snp_5b48246a-913f-419d-a156-683db283f524",
+apps/cli test:     "projectId": "prj_373e3aa2-0d76-4214-acea-73cf0f8ac1ac",
+apps/cli test:     "createdAt": "2026-10-12T01:18:51.850Z",
+apps/cli test:     "parentSnapshotId": "snp_07d52276-dc3a-41e2-9c33-39a5d1b2ba93",
+apps/cli test:     "files": [
+apps/cli test:       {
+apps/cli test:         "path": "kernels/transform.py",
+apps/cli test:         "role": "source",
+apps/cli test:         "sha256": "sha256:385dc9773904cf42cd970a0602e83ea539cd40f998541906a994ebbfb2b924e4",
+apps/cli test:         "bytes": 1015
+apps/cli test:       },
+apps/cli test:       {
+apps/cli test:         "path": "scenario.json",
+apps/cli test:         "role": "config",
+apps/cli test:         "sha256": "sha256:d380ad65af51df46f7d0b2bac83b1c6e72c7bdc7ae2cf188e8eca691aff95ca1",
+apps/cli test:         "bytes": 2902
+apps/cli test:       },
+apps/cli test:       {
+apps/cli test:         "path": "kernels/reference.py",
+apps/cli test:         "role": "reference",
+apps/cli test:         "sha256": "sha256:aaa486069adc4955487226d3295a803f22d63762a7b173eaba1af5f5495fd6d0",
+apps/cli test:         "bytes": 178
+apps/cli test:       }
+apps/cli test:     ],
+apps/cli test:     "manifestHash": "sha256:04d50f0401826ba9b859bc312e75ed55bfc9f6bdb7293d4d99f985093efda8de"
+apps/cli test:   },
+apps/cli test:   "scenario": {
+apps/cli test:     "schemaVersion": 1,
+apps/cli test:     "scenarioId": "scn_035348f8-b35f-428f-be39-92702364ba26",
+apps/cli test:     "snapshotId": "snp_5b48246a-913f-419d-a156-683db283f524",
+apps/cli test:     "name": "transform output coverage",
+apps/cli test:     "entrypoint": {
+apps/cli test:       "path": "kernels/transform.py",
+apps/cli test:       "symbol": "transform"
+apps/cli test:     },
+apps/cli test:     "allocations": [
+apps/cli test:       {
+apps/cli test:         "allocationId": "al_x",
+apps/cli test:         "name": "X",
+apps/cli test:         "role": "input",
+apps/cli test:         "dtype": "fp16",
+apps/cli test:         "shape": [
+apps/cli test:           {
+apps/cli test:             "op": "parameter",
+apps/cli test:             "parameter": "N"
+apps/cli test:           }
+apps/cli test:         ]
+apps/cli test:       },
+apps/cli test:       {
+apps/cli test:         "allocationId": "al_y",
+apps/cli test:         "name": "Y",
+apps/cli test:         "role": "output",
+apps/cli test:         "dtype": "fp16",
+apps/cli test:         "shape": [
+apps/cli test:           {
+apps/cli test:             "op": "parameter",
+apps/cli test:             "parameter": "N"
+apps/cli test:           }
+apps/cli test:         ],
+apps/cli test:         "poisoned": true
+apps/cli test:       }
+apps/cli test:     ],
+apps/cli test:     "launch": {
+apps/cli test:       "grid": [
+apps/cli test:         {
+apps/cli test:           "op": "floorDivide",
+apps/cli test:           "operands": [
+apps/cli test:             {
+apps/cli test:               "op": "parameter",
+apps/cli test:               "parameter": "N"
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "op": "parameter",
+apps/cli test:               "parameter": "BLOCK"
+apps/cli test:             }
+apps/cli test:           ]
+apps/cli test:         }
+apps/cli test:       ],
+apps/cli test:       "block": [
+apps/cli test:         {
+apps/cli test:           "op": "parameter",
+apps/cli test:           "parameter": "BLOCK"
+apps/cli test:         }
+apps/cli test:       ],
+apps/cli test:       "numWarps": {
+apps/cli test:         "op": "literal",
+apps/cli test:         "value": 4
+apps/cli test:       },
+apps/cli test:       "displayHints": [
+apps/cli test:         "grid = (N // BLOCK,)"
+apps/cli test:       ]
+apps/cli test:     },
+apps/cli test:     "domain": {
+apps/cli test:       "domainId": "dom_f8K2",
+apps/cli test:       "enumerable": true,
+apps/cli test:       "variables": [
+apps/cli test:         {
+apps/cli test:           "name": "N",
+apps/cli test:           "kind": "shape",
+apps/cli test:           "type": "int",
+apps/cli test:           "width": "i32",
+apps/cli test:           "min": 1,
+apps/cli test:           "max": 4096,
+apps/cli test:           "step": 1
+apps/cli test:         },
+apps/cli test:         {
+apps/cli test:           "name": "BLOCK",
+apps/cli test:           "kind": "blockSize",
+apps/cli test:           "type": "enum",
+apps/cli test:           "values": [
+apps/cli test:             128,
+apps/cli test:             256,
+apps/cli test:             512
+apps/cli test:           ]
+apps/cli test:         },
+apps/cli test:         {
+apps/cli test:           "name": "dtype",
+apps/cli test:           "kind": "dtype",
+apps/cli test:           "type": "enum",
+apps/cli test:           "values": [
+apps/cli test:             "fp16",
+apps/cli test:             "bf16"
+apps/cli test:           ]
+apps/cli test:         }
+apps/cli test:       ],
+apps/cli test:       "constraints": [
+apps/cli test:         {
+apps/cli test:           "constraintId": "c_1",
+apps/cli test:           "lhs": {
+apps/cli test:             "op": "parameter",
+apps/cli test:             "parameter": "N"
+apps/cli test:           },
+apps/cli test:           "relation": "ge",
+apps/cli test:           "rhs": {
+apps/cli test:             "op": "literal",
+apps/cli test:             "value": 1
+apps/cli test:           }
+apps/cli test:         },
+apps/cli test:         {
+apps/cli test:           "constraintId": "c_2",
+apps/cli test:           "lhs": {
+apps/cli test:             "op": "parameter",
+apps/cli test:             "parameter": "BLOCK"
+apps/cli test:           },
+apps/cli test:           "relation": "gt",
+apps/cli test:           "rhs": {
+apps/cli test:             "op": "literal",
+apps/cli test:             "value": 0
+apps/cli test:           }
+apps/cli test:         }
+apps/cli test:       ],
+apps/cli test:       "hardwareCohortIds": [
+apps/cli test:         "hw_a100_80g"
+apps/cli test:       ]
+apps/cli test:     },
+apps/cli test:     "reference": {
+apps/cli test:       "kind": "numpy",
+apps/cli test:       "path": "kernels/reference.py",
+apps/cli test:       "symbol": "reference",
+apps/cli test:       "tolerances": {
+apps/cli test:         "atol": 0,
+apps/cli test:         "rtol": 0,
+apps/cli test:         "dtype": "fp16",
+apps/cli test:         "nanPolicy": "equal-nan",
+apps/cli test:         "infPolicy": "equal-inf"
+apps/cli test:       }
+apps/cli test:     },
+apps/cli test:     "requiredProperties": [
+apps/cli test:       "outputCoverage",
+apps/cli test:       "memoryBounds",
+apps/cli test:       "writeWriteConflict"
+apps/cli test:     ],
+apps/cli test:     "notes": "The defective launch: a floor-divided grid leaves the final block's out-of-range lanes unmasked-on but never launched, so the last N mod BLOCK output elements are never written.",
+apps/cli test:     "createdAt": "2026-10-12T01:18:51.850Z"
+apps/cli test:   },
+apps/cli test:   "profile": {
+apps/cli test:     "schemaVersion": 1,
+apps/cli test:     "profileRevisionId": "prf_26cf5feaf9ea9905f50db2bdbde6d4d4000542b4299f0e693d84deaa3fdabd59",
+apps/cli test:     "backend": "triton",
+apps/cli test:     "createdAt": "2026-10-12T00:26:42.436Z",
+apps/cli test:     "components": [
+apps/cli test:       {
+apps/cli test:         "name": "python",
+apps/cli test:         "version": "3.12.14"
+apps/cli test:       },
+apps/cli test:       {
+apps/cli test:         "name": "engine",
+apps/cli test:         "version": "0.2.0",
+apps/cli test:         "digest": "sha256:925d2f73211950be0f7c341fb029fd19335b979d9f27e179296c19603a9a2294"
+apps/cli test:       },
+apps/cli test:       {
+apps/cli test:         "name": "z3",
+apps/cli test:         "version": "4.13.0"
+apps/cli test:       }
+apps/cli test:     ],
+apps/cli test:     "platform": {
+apps/cli test:       "os": "darwin",
+apps/cli test:       "arch": "arm64"
+apps/cli test:     },
+apps/cli test:     "capabilityIds": [],
+apps/cli test:     "notes": "Measured interpreter/engine/solver identity. This probe does not validate capabilities.",
+apps/cli test:     "revisionHash": "sha256:c271066e9e9df9609f726c11a0ff98693a636dc359195c33b37bfa233823a468"
+apps/cli test:   },
+apps/cli test:   "job": {
+apps/cli test:     "attemptId": "att_9cf34d42-5487-472f-91b7-a8958ac35159",
+apps/cli test:     "createdAt": "2026-10-12T01:18:51.854Z",
+apps/cli test:     "domainRef": "dom_f8K2",
+apps/cli test:     "jobId": "job_c51faaa3-2abd-406d-89e0-183eac1e4dd6",
+apps/cli test:     "operation": "full",
+apps/cli test:     "policyId": "pol_default",
+apps/cli test:     "policyRevision": 1,
+apps/cli test:     "profileRevisionId": "prf_26cf5feaf9ea9905f50db2bdbde6d4d4000542b4299f0e693d84deaa3fdabd59",
+apps/cli test:     "projectId": "prj_373e3aa2-0d76-4214-acea-73cf0f8ac1ac",
+apps/cli test:     "scenarioId": "scn_035348f8-b35f-428f-be39-92702364ba26",
+apps/cli test:     "schemaVersion": 1,
+apps/cli test:     "snapshotId": "snp_5b48246a-913f-419d-a156-683db283f524",
+apps/cli test:     "startedAt": "2026-10-12T01:18:51.861Z",
+apps/cli test:     "state": "succeeded",
+apps/cli test:     "resultIds": [
+apps/cli test:       "res_0dafa5d6469c4aca8b8a3bbd1789c0d6"
+apps/cli test:     ],
+apps/cli test:     "finishedAt": "2026-10-12T01:18:52.415Z"
+apps/cli test:   },
+apps/cli test:   "diagnostics": {
+apps/cli test:     "redactionRevision": "2",
+apps/cli test:     "messages": [
+apps/cli test:       ""
+apps/cli test:     ],
+apps/cli test:     "termination": "exited"
+apps/cli test:   },
+apps/cli test:   "analysis": {
+apps/cli test:     "actors": [
+apps/cli test:       {
+apps/cli test:         "actorId": "actor_fd87b11493334bf99f430b6278a78b7f",
+apps/cli test:         "kind": "symbolic-domain",
+apps/cli test:         "label": "Symbolic lane domain (no concrete writer for an output hole)"
+apps/cli test:       }
+apps/cli test:     ],
+apps/cli test:     "attemptId": "att_9cf34d42-5487-472f-91b7-a8958ac35159",
+apps/cli test:     "budget": {
+apps/cli test:       "engineWallTimeMs": 120000,
+apps/cli test:       "maxArtifactBytes": 268435456,
+apps/cli test:       "maxMessageBytes": 1048576,
+apps/cli test:       "maxOutputBytes": 16777216,
+apps/cli test:       "memoryBytes": 2147483648,
+apps/cli test:       "solverTimeMs": 30000
+apps/cli test:     },
+apps/cli test:     "completeness": {
+apps/cli test:       "kind": "complete"
+apps/cli test:     },
+apps/cli test:     "coverage": {
+apps/cli test:       "coverageId": "cov_14c3de12d2c24df9baded45cd42e77ae",
+apps/cli test:       "denominator": {
+apps/cli test:         "duplicatesRemoved": true,
+apps/cli test:         "kind": "enumerated",
+apps/cli test:         "pointCount": 24576
+apps/cli test:       },
+apps/cli test:       "domainRef": "dom_f8K2",
+apps/cli test:       "regions": [
+apps/cli test:         {
+apps/cli test:           "classifications": [
+apps/cli test:             {
+apps/cli test:               "classification": "unknown",
+apps/cli test:               "method": "symbolic",
+apps/cli test:               "propertyId": "outputCoverage",
+apps/cli test:               "resultId": "res_0dafa5d6469c4aca8b8a3bbd1789c0d6"
+apps/cli test:             }
+apps/cli test:           ],
+apps/cli test:           "constraints": [
+apps/cli test:             "Declared domain dom_f8K2; all ranges, value sets, steps and constraints apply.",
+apps/cli test:             "Excludes the concrete domain point in witness witness_639b85edfb734437bade5d4806f6ab36."
+apps/cli test:           ],
+apps/cli test:           "regionId": "region_0a9ecbd2de49431798cf3068ed628f66"
+apps/cli test:         },
+apps/cli test:         {
+apps/cli test:           "classifications": [
+apps/cli test:             {
+apps/cli test:               "classification": "violated",
+apps/cli test:               "method": "symbolic",
+apps/cli test:               "propertyId": "outputCoverage",
+apps/cli test:               "resultId": "res_0dafa5d6469c4aca8b8a3bbd1789c0d6"
+apps/cli test:             }
+apps/cli test:           ],
+apps/cli test:           "constraints": [
+apps/cli test:             "N == 1",
+apps/cli test:             "BLOCK == 512",
+apps/cli test:             "dtype == 'fp16'"
+apps/cli test:           ],
+apps/cli test:           "regionId": "region_a541bf5550a641ac9412706d0c24f8af"
+apps/cli test:         },
+apps/cli test:         {
+apps/cli test:           "classifications": [
+apps/cli test:             {
+apps/cli test:               "classification": "established",
+apps/cli test:               "method": "symbolic",
+apps/cli test:               "propertyId": "memoryBounds",
+apps/cli test:               "resultId": "res_0dafa5d6469c4aca8b8a3bbd1789c0d6"
+apps/cli test:             }
+apps/cli test:           ],
+apps/cli test:           "constraints": [
+apps/cli test:             "Declared domain dom_f8K2; all ranges, value sets, steps and constraints apply.",
+apps/cli test:             "Excludes the concrete domain point in witness witness_639b85edfb734437bade5d4806f6ab36."
+apps/cli test:           ],
+apps/cli test:           "regionId": "region_1100d0ce390a4320b5a960379b614b32"
+apps/cli test:         },
+apps/cli test:         {
+apps/cli test:           "classifications": [
+apps/cli test:             {
+apps/cli test:               "classification": "established",
+apps/cli test:               "method": "symbolic",
+apps/cli test:               "propertyId": "writeWriteConflict",
+apps/cli test:               "resultId": "res_0dafa5d6469c4aca8b8a3bbd1789c0d6"
+apps/cli test:             }
+apps/cli test:           ],
+apps/cli test:           "constraints": [
+apps/cli test:             "Declared domain dom_f8K2; all ranges, value sets, steps and constraints apply.",
+apps/cli test:             "Excludes the concrete domain point in witness witness_639b85edfb734437bade5d4806f6ab36."
+apps/cli test:           ],
+apps/cli test:           "regionId": "region_60af4c0bd7bb40899e9fc9c510c1fd92"
+apps/cli test:         }
+apps/cli test:       ]
+apps/cli test:     },
+apps/cli test:     "createdAt": "2026-10-12T01:18:52.311687Z",
+apps/cli test:     "domain": {
+apps/cli test:       "domainId": "dom_f8K2"
+apps/cli test:     },
+apps/cli test:     "events": [
+apps/cli test:       {
+apps/cli test:         "actorId": "actor_fd87b11493334bf99f430b6278a78b7f",
+apps/cli test:         "addressExpr": "tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)",
+apps/cli test:         "allocationId": "al_y",
+apps/cli test:         "eventId": "event_2ec7371d13a14e918214ee7aa808aeef",
+apps/cli test:         "maskExpr": "tl.program_id(0) * BLOCK + tl.arange(0, BLOCK) < N",
+apps/cli test:         "operation": "write",
+apps/cli test:         "scope": "lane",
+apps/cli test:         "sourceRanges": [
+apps/cli test:           {
+apps/cli test:             "confidence": "exact",
+apps/cli test:             "endColumn": 45,
+apps/cli test:             "endLine": 25,
+apps/cli test:             "kind": "source",
+apps/cli test:             "path": "kernels/transform.py",
+apps/cli test:             "startColumn": 4,
+apps/cli test:             "startLine": 25
+apps/cli test:           }
+apps/cli test:         ]
+apps/cli test:       }
+apps/cli test:     ],
+apps/cli test:     "executedAt": "local",
+apps/cli test:     "findings": [
+apps/cli test:       {
+apps/cli test:         "actorIds": [
+apps/cli test:           "actor_fd87b11493334bf99f430b6278a78b7f"
+apps/cli test:         ],
+apps/cli test:         "allocationIds": [
+apps/cli test:           "al_y"
+apps/cli test:         ],
+apps/cli test:         "backendId": "triton",
+apps/cli test:         "eventIds": [
+apps/cli test:           "event_2ec7371d13a14e918214ee7aa808aeef"
+apps/cli test:         ],
+apps/cli test:         "evidenceClass": "counterexample",
+apps/cli test:         "explanation": "Element offset 0; grid 0, block 512. Qualified by the declared model and domain.",
+apps/cli test:         "findingId": "finding_4b50e35fdaff4a61a28c0983a27ded04",
+apps/cli test:         "propertyId": "outputCoverage",
+apps/cli test:         "provenance": [
+apps/cli test:           {
+apps/cli test:             "method": "symbolic",
+apps/cli test:             "sourceId": "snp_5b48246a-913f-419d-a156-683db283f524",
+apps/cli test:             "tool": "Z3",
+apps/cli test:             "toolVersion": "4.13.0"
+apps/cli test:           }
+apps/cli test:         ],
+apps/cli test:         "schemaVersion": 1,
+apps/cli test:         "sourceRanges": [
+apps/cli test:           {
+apps/cli test:             "confidence": "exact",
+apps/cli test:             "endColumn": 45,
+apps/cli test:             "endLine": 25,
+apps/cli test:             "kind": "source",
+apps/cli test:             "path": "kernels/transform.py",
+apps/cli test:             "startColumn": 4,
+apps/cli test:             "startLine": 25
+apps/cli test:           }
+apps/cli test:         ],
+apps/cli test:         "title": "An output element has no enabled write",
+apps/cli test:         "witnessId": "witness_639b85edfb734437bade5d4806f6ab36"
+apps/cli test:       }
+apps/cli test:     ],
+apps/cli test:     "jobId": "job_c51faaa3-2abd-406d-89e0-183eac1e4dd6",
+apps/cli test:     "method": "symbolic",
+apps/cli test:     "origin": "local",
+apps/cli test:     "policyId": "pol_default",
+apps/cli test:     "policyRevision": 1,
+apps/cli test:     "profileRevisionId": "prf_26cf5feaf9ea9905f50db2bdbde6d4d4000542b4299f0e693d84deaa3fdabd59",
+apps/cli test:     "propertyResults": [
+apps/cli test:       {
+apps/cli test:         "assumptions": {
+apps/cli test:           "domainRef": "dom_f8K2",
+apps/cli test:           "items": [
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_bde2935975a34421b05c6f0d8393ad7d",
+apps/cli test:               "kind": "other",
+apps/cli test:               "statement": "Addresses and masks are modeled; stored values are uninterpreted. No numerical claim follows."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_1041688a3140490899fe8f1b84e27def",
+apps/cli test:               "kind": "width",
+apps/cli test:               "statement": "Modular arithmetic at declared widths (N:i32, BLOCK:i32); program_id/arange are i32. Same-signedness integer promotion only."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_45d151a405004f1b935e7e3b8c87a3ab",
+apps/cli test:               "kind": "aliasing",
+apps/cli test:               "statement": "Contiguous one-dimensional allocations are disjoint. Declared alias groups are unsupported."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_f74fc9e517ec456d9fd9bd0d7c40c114",
+apps/cli test:               "kind": "ordering",
+apps/cli test:               "statement": "Conflict query concerns distinct program/lane actors and non-atomic stores; no GPU schedule is modeled."
+apps/cli test:             }
+apps/cli test:           ],
+apps/cli test:           "model": "triton-address-and-mask",
+apps/cli test:           "modelRevision": "2"
+apps/cli test:         },
+apps/cli test:         "budget": {
+apps/cli test:           "engineWallTimeMs": 120000,
+apps/cli test:           "maxArtifactBytes": 268435456,
+apps/cli test:           "maxMessageBytes": 1048576,
+apps/cli test:           "maxOutputBytes": 16777216,
+apps/cli test:           "memoryBytes": 2147483648,
+apps/cli test:           "solverTimeMs": 30000
+apps/cli test:         },
+apps/cli test:         "coverageRef": "cov_14c3de12d2c24df9baded45cd42e77ae",
+apps/cli test:         "evidenceClass": "counterexample",
+apps/cli test:         "findingIds": [
+apps/cli test:           "finding_4b50e35fdaff4a61a28c0983a27ded04"
+apps/cli test:         ],
+apps/cli test:         "method": "symbolic",
+apps/cli test:         "outcome": "violated",
+apps/cli test:         "propertyId": "outputCoverage",
+apps/cli test:         "propertyResultId": "pr_13292d30885c4613abfd158c70b50cd8",
+apps/cli test:         "witnessIds": [
+apps/cli test:           "witness_639b85edfb734437bade5d4806f6ab36"
+apps/cli test:         ]
+apps/cli test:       },
+apps/cli test:       {
+apps/cli test:         "assumptions": {
+apps/cli test:           "domainRef": "dom_f8K2",
+apps/cli test:           "items": [
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_f589215c0f9447db837aa78ecffb717b",
+apps/cli test:               "kind": "other",
+apps/cli test:               "statement": "Addresses and masks are modeled; stored values are uninterpreted. No numerical claim follows."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_3459e5ce40084c7cb7d01e4340fd7dca",
+apps/cli test:               "kind": "width",
+apps/cli test:               "statement": "Modular arithmetic at declared widths (N:i32, BLOCK:i32); program_id/arange are i32. Same-signedness integer promotion only."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_e68e789cb4774be5a76ed1cc5a42f070",
+apps/cli test:               "kind": "aliasing",
+apps/cli test:               "statement": "Contiguous one-dimensional allocations are disjoint. Declared alias groups are unsupported."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_06519c01d6f6428f8ccb737c5c0366e4",
+apps/cli test:               "kind": "ordering",
+apps/cli test:               "statement": "Conflict query concerns distinct program/lane actors and non-atomic stores; no GPU schedule is modeled."
+apps/cli test:             }
+apps/cli test:           ],
+apps/cli test:           "model": "triton-address-and-mask",
+apps/cli test:           "modelRevision": "2"
+apps/cli test:         },
+apps/cli test:         "budget": {
+apps/cli test:           "engineWallTimeMs": 120000,
+apps/cli test:           "maxArtifactBytes": 268435456,
+apps/cli test:           "maxMessageBytes": 1048576,
+apps/cli test:           "maxOutputBytes": 16777216,
+apps/cli test:           "memoryBytes": 2147483648,
+apps/cli test:           "solverTimeMs": 30000
+apps/cli test:         },
+apps/cli test:         "coverageRef": "cov_14c3de12d2c24df9baded45cd42e77ae",
+apps/cli test:         "evidenceClass": "verified-under-assumptions",
