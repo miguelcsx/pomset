@@ -1,0 +1,17 @@
+{
+  "fixtureId": "fx_triton_transform_ceil_grid",
+  "class": "control",
+  "backend": "triton",
+  "entrypoint": "kernel.py",
+  "symbol": "transform",
+  "origin": "original",
+  "controls": "fx_triton_transform_floor_grid",
+  "licence": "Apache-2.0",
+  "revision": "pomset@0.0.0",
+  "expectedOutcome": {
+    "property": "outputCoverage",
+    "outcome": "established",
+    "qualifier": "over the declared domain, under the modelled address-and-mask semantics"
+  },
+  "notes": "The correct control: the same kernel launched with a ceiling-divided grid. The defect is removed by the launch, so this fixture is what an over-eager check fails against."
+}

@@ -1,0 +1,47 @@
+{
+  "blockedEpics": [
+    "FND",
+    "ENG",
+    "SEC",
+    "TRI",
+    "LOC",
+    "HST",
+    "WEB",
+    "PRS",
+    "CUDA",
+    "OMP",
+    "TRX",
+    "REL"
+  ],
+  "caseCount": 7,
+  "completedIndependentComparisons": 0,
+  "conditions": {
+    "correctControlsNotMisclassified": true,
+    "documentedIndependentBenefit": false,
+    "sourceLinkedReproducibleOutcomes": false
+  },
+  "controlCount": 3,
+  "decision": "no-go",
+  "inputs": {
+    "compare.json": "sha256:316ff34f207954a245afb649eda5ac2f9c56ee7e86d1f617ec81e367dfaff337",
+    "probe.json": "sha256:aabcf5e5c00893d0d07806608199f70e01c8246159661d50277c58b75b840354",
+    "witnesses.json": "sha256:c17ac7680207381920f411f8a7a54f3e299a2ab8d7cfdfe311c219a24869555d"
+  },
+  "limitations": [
+    "This is an evaluation of the existing implementation, not completion of FEA-001 through FEA-005.",
+    "The finite oracle is internal, not an independent comparison tool.",
+    "Bounds/conflict and width regressions now run locally; the feasibility corpus still exercises only coverage and has no strategy comparison.",
+    "Only a reconstructed coverage fixture/control exists; no confirmed conflict pair exists.",
+    "Measured timings describe one CPU run, not GPU speed or comparative performance."
+  ],
+  "measuredBenefit": null,
+  "misclassifiedControls": [],
+  "mismatchCount": 0,
+  "mismatchedCases": [],
+  "unblockConditions": [
+    "Complete the licensed corpus, including a confirmed conflict/control pair.",
+    "Pass sound width, constraint, mask, allocation and query conformance checks.",
+    "Run independent tools at exact versions and demonstrate a comparable benefit.",
+    "Complete strategy measurements and verify reproducible point sequences."
+  ]
+}

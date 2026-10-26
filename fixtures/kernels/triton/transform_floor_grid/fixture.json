@@ -1,0 +1,17 @@
+{
+  "fixtureId": "fx_triton_transform_floor_grid",
+  "class": "defect",
+  "backend": "triton",
+  "entrypoint": "kernel.py",
+  "symbol": "transform",
+  "origin": "reconstructed",
+  "reconstructs": "https://github.com/triton-lang/triton/issues/9230",
+  "licence": "Apache-2.0",
+  "revision": "pomset@0.0.0",
+  "expectedOutcome": {
+    "property": "outputCoverage",
+    "outcome": "violated",
+    "qualifier": "for a floor-divided grid whose remainder is non-zero; no modelled hole when N is a multiple of BLOCK"
+  },
+  "notes": "A minimal fixture demonstrating the mechanism of the upstream report: a kernel that does not write every declared output element when the grid uses floor division and the remainder is masked, hidden in practice by autotune buffer reuse. It is a reconstruction, not the upstream reproducer."
+}

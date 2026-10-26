@@ -1,0 +1,52 @@
+{
+  "capabilityValidation": "No capability is validated by an import probe.",
+  "components": [
+    {
+      "availability": "immediate",
+      "name": "pomset_triton",
+      "supportLevel": "untested",
+      "version": "0.0.0"
+    },
+    {
+      "availability": "immediate",
+      "name": "numpy",
+      "supportLevel": "untested",
+      "version": "2.1.3"
+    },
+    {
+      "availability": "immediate",
+      "name": "z3",
+      "supportLevel": "untested",
+      "version": "4.13.0.0"
+    },
+    {
+      "availability": "unavailable",
+      "name": "triton",
+      "reason": "No module named 'triton'",
+      "supportLevel": "untested"
+    },
+    {
+      "availability": "unavailable",
+      "name": "torch",
+      "reason": "No module named 'torch'",
+      "supportLevel": "untested"
+    },
+    {
+      "availability": "unavailable",
+      "name": "tilelens",
+      "reason": "No module named 'tilelens'",
+      "supportLevel": "untested"
+    },
+    {
+      "availability": "unavailable",
+      "name": "compute-sanitizer",
+      "reason": "compute-sanitizer executable not installed"
+    }
+  ],
+  "imageDigest": null,
+  "platform": {
+    "arch": "arm64",
+    "os": "Darwin"
+  },
+  "python": "3.12.14 (main, Aug 12 2026, 13:57:54) [Clang 21.1.8 ]"
+}
