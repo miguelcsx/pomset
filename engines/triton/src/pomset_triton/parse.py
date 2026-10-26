@@ -12,19 +12,18 @@ import ast
 from dataclasses import dataclass
 from pathlib import Path
 
+from pomset_contracts.engine_protocol import InputInvalid, Unsupported
 
-class InputInvalid(Exception):
-    """The scenario or the module cannot be used as given."""
-
-
-class Unsupported(Exception):
-    """The module uses a construct outside the modelled subset."""
-
-    def __init__(self, construct: str, line: int, column: int) -> None:
-        super().__init__(f"{construct} is outside the modelled subset")
-        self.construct = construct
-        self.line = line
-        self.column = column
+# The two refusals are the protocol's, not this module's: every engine reports a
+# construct it cannot model the same way. They are re-exported here because this
+# is where the rest of the package has always imported them from.
+__all__ = [
+    "Entrypoint",
+    "InputInvalid",
+    "Unsupported",
+    "load_entrypoint",
+    "select_entrypoint",
+]
 
 
 @dataclass(frozen=True)

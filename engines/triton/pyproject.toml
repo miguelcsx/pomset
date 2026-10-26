@@ -4,6 +4,10 @@ version = "0.0.0"
 description = "The Triton engine: parse the supported kernel subset as source text and answer the bounds, output-coverage and write/write-conflict queries symbolically. The symbolic path never imports or executes the user module."
 requires-python = "==3.12.*"
 dependencies = [
+  # The canonical schemas, the record validators and the engine line protocol.
+  # The engine always needed this package; it was reaching it through the shared
+  # environment rather than declaring it, which is not a dependency.
+  "pomset-contracts",
   # The SMT solver the symbolic queries are discharged with. Pinned; the probe
   # in feasibility/probe.py records the exact resolved version in the profile.
   "z3-solver==4.13.0.0",
@@ -30,6 +34,12 @@ replay = [
 dev = [
   "pytest==8.3.4",
 ]
+
+[tool.uv.sources]
+# Resolved from this workspace rather than from an index: the contracts are the
+# ones in this repository, and a published package of the same name would be a
+# different thing entirely.
+pomset-contracts = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]

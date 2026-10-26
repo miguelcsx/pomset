@@ -19,7 +19,7 @@ from .analysis import build_analysis_result
 from .coverage import CoverageAnswer, query
 from .extract import extract
 from .parse import InputInvalid, Unsupported, select_entrypoint
-from .protocol import CAPABILITIES, Session, read_request
+from .protocol import CAPABILITIES, ENGINE_NAME, ENGINE_VERSION, Session, read_request
 from .validation import validate
 
 
@@ -41,7 +41,12 @@ def _resolve_inputs(request: dict) -> tuple[str, str]:
 
 def run(request_path: str) -> int:
     request = read_request(request_path)
-    session = Session(job_id=request["jobId"], attempt_id=request["attemptId"])
+    session = Session(
+        job_id=request["jobId"],
+        attempt_id=request["attemptId"],
+        engine_name=ENGINE_NAME,
+        engine_version=ENGINE_VERSION,
+    )
     session.hello(CAPABILITIES)
 
     operation = request.get("operation", "coverage")
