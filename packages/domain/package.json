@@ -1,0 +1,30 @@
+{
+  "name": "@pomset/domain",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pure policy: what a project, a scenario, a workload domain and an evidence record are, and what the eligibility policy accepts. No React, HTTP, persistence, GPU or solver imports.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pomset/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
