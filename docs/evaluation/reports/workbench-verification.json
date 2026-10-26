@@ -1,0 +1,51 @@
+{
+  "recordedAt": "2026-10-12T01:21:06.315085+00:00",
+  "command": "nix develop -c pnpm run ci",
+  "exitCode": 0,
+  "typescriptTests": 161,
+  "packageTests": {
+    "packages/contracts": 5,
+    "packages/ui": 5,
+    "packages/domain": 78,
+    "apps/web": 10,
+    "packages/storage": 7,
+    "packages/engine-client": 31,
+    "apps/worker": 2,
+    "apps/api": 7,
+    "apps/cli": 16
+  },
+  "pythonTests": 31,
+  "logSha256": "fe5810828ce2ef308af69401817a18e2ddd1ba12505960e8a8ddc738aec04bb5",
+  "browser": {
+    "localServicePort": 8811,
+    "narrowViewport": {
+      "width": 390,
+      "height": 844,
+      "documentWidth": 390,
+      "documentHeight": 844
+    },
+    "appearance": [
+      "dark",
+      "light"
+    ],
+    "verified": [
+      "floor-grid counterexample",
+      "ceiling-grid correction in new snapshot",
+      "source editing and opt-in automatic rerun",
+      "explicit invalid, unsupported and solver-budget states",
+      "historical source selection",
+      "keyboard graph activation",
+      "keyboard split resize 56 to 58 and back",
+      "disclosure download validated by CLI"
+    ],
+    "screenshot": "workbench-visual.jpg"
+  },
+  "limitations": [
+    "No canonical acceptance scenario closed",
+    "No independent analyzer comparison or strategy evaluation",
+    "No user-kernel execution in the local symbolic service",
+    "CUDA/OpenMP user-kernel adapters incomplete",
+    "GPU, Linux gVisor and hosted deployment unverified",
+    "Full screen-reader and application performance-budget evaluation incomplete"
+  ]
+}
