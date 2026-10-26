@@ -1,0 +1,561 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://pomset.dev/contracts/evidence.schema.yaml
+title: Pomset evidence contracts
+description: Authoritative portable definitions for actors, memory-access events, source ranges, findings,
+  witnesses, assumptions, coverage, budgets, sampled checks, property results and the error vocabulary.
+  A finding links multiple actors, events and source ranges; no total order is invented between independent
+  events.
+$defs:
+  schemaVersion:
+    type: integer
+    const: 1
+  id:
+    type: string
+    minLength: 3
+    maxLength: 128
+    pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+  sha256:
+    type: string
+    pattern: ^sha256:[0-9a-f]{64}$
+  path:
+    type: string
+    minLength: 1
+    maxLength: 512
+    pattern: ^(?!/)(?!.*\.\.)(?!.*\\)[A-Za-z0-9._@+-]+(/[A-Za-z0-9._@+-]+)*$
+  propertyId:
+    anyOf:
+    - enum:
+      - memoryBounds
+      - outputCoverage
+      - initialization
+      - writeWriteConflict
+      - readWriteConflict
+      - raceFreedom
+      - synchronizationOrdering
+      - deadlockFreedom
+      - numericalAgreement
+      - performanceRegression
+    - type: string
+      pattern: ^x-[a-z0-9-]{2,64}$
+  method:
+    enum:
+    - static
+    - symbolic
+    - instrumented
+    - benchmark
+    - artifact
+  evidenceClass:
+    description: What the user may conclude. Chosen independently of the outcome value.
+    enum:
+    - observed
+    - counterexample
+    - potential
+    - verified-under-assumptions
+    - measured
+    - estimated
+  outcome:
+    description: Decision of one property check. established is only reachable through static/symbolic
+      reasoning over a stated model and domain.
+    enum:
+    - established
+    - violated
+    - unknown
+    - unsupported
+  backendId:
+    enum:
+    - triton
+    - cuda
+    - openmp
+  semanticRole:
+    description: Presentation role. Decorates an independent state; never replaces it with one green safety
+      label.
+    enum:
+    - violation
+    - caution
+    - activity
+    - unknown
+    - contract
+  sourceRange:
+    description: Half-open source range. backendFile is set when the range belongs to an IR or PTX artifact
+      rather than the user's source text.
+    type: object
+    required:
+    - path
+    - startLine
+    - startColumn
+    - endLine
+    - endColumn
+    properties:
+      path:
+        $ref: '#/$defs/path'
+      startLine:
+        type: integer
+        minimum: 1
+      startColumn:
+        type: integer
+        minimum: 0
+      endLine:
+        type: integer
+        minimum: 1
+      endColumn:
+        type: integer
+        minimum: 0
+      kind:
+        enum:
+        - source
+        - ir
+        - ptx
+        - assembly
+      confidence:
+        description: 'sourceMap quality: exact, approximate or unavailable source mapping.'
+        enum:
+        - exact
+        - approximate
+        - unavailable
+      artifactId:
+        $ref: '#/$defs/id'
+    additionalProperties: false
+  actor:
+    description: 'Execution agent or symbolic execution domain. A symbolic-domain actor has no invented concrete coordinates.'
+    type: object
+    required:
+    - actorId
+    - kind
+    - label
+    properties:
+      actorId:
+        $ref: '#/$defs/id'
+      kind:
+        enum:
+        - symbolic-domain
+        - cpu-thread
+        - program-instance
+        - block
+        - warp
+        - lane
+        - task
+        - task-group
+        - device
+      label:
+        type: string
+        maxLength: 200
+      coordinates:
+        description: Backend-specific index coordinates, e.g. program id, thread id, warp id.
+        type: object
+        additionalProperties:
+          type: integer
+      parentActorId:
+        $ref: '#/$defs/id'
+    additionalProperties: false
+  memoryAccessEvent:
+    description: One memory event attributed to an actor. addressExpr is symbolic and must not be evaluated
+      into a fake concrete address.
+    type: object
+    required:
+    - eventId
+    - actorId
+    - operation
+    - scope
+    - addressExpr
+    properties:
+      eventId:
+        $ref: '#/$defs/id'
+      actorId:
+        $ref: '#/$defs/id'
+      operation:
+        enum:
+        - read
+        - write
+        - atomic-read
+        - atomic-write
+        - atomic-read-modify-write
+        - fence
+        - barrier
+        - task-create
+        - task-join
+        - wait
+        - signal
+      scope:
+        enum:
+        - lane
+        - warp
+        - block
+        - grid
+        - device
+        - system
+        - thread-group
+        - runtime-specific
+      scopeLabel:
+        type: string
+        maxLength: 120
+      allocationId:
+        $ref: '#/$defs/id'
+      addressExpr:
+        type: string
+        minLength: 1
+        maxLength: 4000
+      addressConcrete:
+        description: Present only when a witness fixes every domain variable. Never guessed.
+        type: object
+        required:
+        - bytes
+        properties:
+          bytes:
+            type: integer
+            minimum: 0
+          display:
+            type: string
+            maxLength: 120
+        additionalProperties: false
+      maskExpr:
+        type: string
+        maxLength: 4000
+      enabled:
+        description: True when the mask of this access can be satisfied under the declared domain.
+        type: boolean
+      sourceRanges:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/sourceRange'
+      producedBy:
+        $ref: '#/$defs/id'
+    additionalProperties: false
+  assumptions:
+    description: Everything a reader must know for any established outcome to mean anything.
+    type: object
+    required:
+    - model
+    - domainRef
+    - items
+    properties:
+      model:
+        description: Named semantics used, e.g. a Triton sub-subset or a memory model identifier.
+        type: string
+        minLength: 1
+        maxLength: 500
+      modelRevision:
+        type: string
+        maxLength: 120
+      domainRef:
+        $ref: '#/$defs/id'
+      items:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          required:
+          - assumptionId
+          - statement
+          properties:
+            assumptionId:
+              $ref: '#/$defs/id'
+            statement:
+              type: string
+              minLength: 1
+              maxLength: 2000
+            kind:
+              enum:
+              - width
+              - aliasing
+              - initialization
+              - launch
+              - ordering
+              - tool
+              - environment
+              - other
+          additionalProperties: false
+    additionalProperties: false
+  budget:
+    description: Resource envelope that bounds the analysis. Exhausting it yields unknown, never a failure
+      of the property.
+    type: object
+    required:
+    - solverTimeMs
+    - engineWallTimeMs
+    - memoryBytes
+    - maxMessageBytes
+    - maxOutputBytes
+    - maxArtifactBytes
+    properties:
+      solverTimeMs:
+        type: integer
+        minimum: 0
+      engineWallTimeMs:
+        type: integer
+        minimum: 0
+      memoryBytes:
+        type: integer
+        minimum: 0
+      maxMessageBytes:
+        type: integer
+        minimum: 0
+      maxOutputBytes:
+        type: integer
+        minimum: 0
+      maxArtifactBytes:
+        type: integer
+        minimum: 0
+      usedSolverTimeMs:
+        type: integer
+        minimum: 0
+      usedWallTimeMs:
+        type: integer
+        minimum: 0
+      exhausted:
+        description: True when a limit was hit. The associated property remains unknown.
+        type: boolean
+    additionalProperties: false
+  witness:
+    description: Concrete or model-level assignment that exhibits a violation. Minimized witnesses keep
+      every necessary assumption.
+    type: object
+    required:
+    - witnessId
+    - kind
+    - assignments
+    - actorIds
+    - eventIds
+    - sourceRanges
+    properties:
+      witnessId:
+        $ref: '#/$defs/id'
+      kind:
+        enum:
+        - domain-point
+        - concrete-address
+        - schedule-interleaving
+        - mask-region
+        - output-index
+        - minimized
+      assignments:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          required:
+          - name
+          - value
+          properties:
+            name:
+              type: string
+              minLength: 1
+              maxLength: 64
+            value:
+              type:
+              - integer
+              - string
+          additionalProperties: false
+      actorIds:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/id'
+      eventIds:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/id'
+      sourceRanges:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/sourceRange'
+      addressExpr:
+        type: string
+        maxLength: 4000
+      replay:
+        description: Optional replay of the witness through an independent execution path. Absent means
+          no replay was available.
+        type: object
+        required:
+        - method
+        - outcome
+        properties:
+          method:
+            enum:
+            - cpu-interpreter
+            - native-run
+            - instrumented-run
+            - symbolic-replay
+          outcome:
+            enum:
+            - reproduced
+            - not-reproduced
+            - blocked
+          profileRevisionId:
+            $ref: '#/$defs/id'
+          artifactId:
+            $ref: '#/$defs/id'
+          note:
+            type: string
+            maxLength: 1000
+        additionalProperties: false
+      minimization:
+        type: object
+        required:
+        - attempted
+        - droppedAssumptions
+        properties:
+          attempted:
+            type: boolean
+          droppedAssumptions:
+            type: integer
+            minimum: 0
+          note:
+            type: string
+            maxLength: 1000
+        additionalProperties: false
+    additionalProperties: false
+  partialOrder:
+    description: Causal partial order over events. Only edges the analysis actually established are listed.
+    type: object
+    required:
+    - edgeIds
+    - edges
+    properties:
+      edgeIds:
+        type: array
+        items:
+          $ref: '#/$defs/id'
+      edges:
+        type: array
+        items:
+          type: object
+          required:
+          - fromEventId
+          - toEventId
+          - relation
+          properties:
+            fromEventId:
+              $ref: '#/$defs/id'
+            toEventId:
+              $ref: '#/$defs/id'
+            relation:
+              enum:
+              - program-order
+              - synchronizes-with
+              - happens-before
+              - sequenced-before
+              - unresolved
+            synchronizationEventId:
+              $ref: '#/$defs/id'
+          additionalProperties: false
+      isTotal:
+        description: Always false for an order that leaves independent events unordered.
+        type: boolean
+    additionalProperties: false
+  finding:
+    description: One reportable issue. May link multiple actors, events and source ranges across several
+      tools or sources.
+    type: object
+    required:
+    - schemaVersion
+    - findingId
+    - propertyId
+    - evidenceClass
+    - title
+    - actorIds
+    - eventIds
+    - sourceRanges
+    properties:
+      schemaVersion:
+        $ref: '#/$defs/schemaVersion'
+      findingId:
+        $ref: '#/$defs/id'
+      propertyId:
+        $ref: '#/$defs/propertyId'
+      evidenceClass:
+        $ref: '#/$defs/evidenceClass'
+      title:
+        type: string
+        minLength: 1
+        maxLength: 200
+      explanation:
+        type: string
+        maxLength: 8000
+      actorIds:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/id'
+      eventIds:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/id'
+      sourceRanges:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/sourceRange'
+      allocationIds:
+        type: array
+        items:
+          $ref: '#/$defs/id'
+      witnessId:
+        $ref: '#/$defs/id'
+      order:
+        $ref: '#/$defs/partialOrder'
+      provenance:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          required:
+          - sourceId
+          - method
+          - tool
+          properties:
+            sourceId:
+              $ref: '#/$defs/id'
+            method:
+              $ref: '#/$defs/method'
+            tool:
+              type: string
+              minLength: 1
+              maxLength: 200
+            toolVersion:
+              type: string
+              maxLength: 120
+            artifactIds:
+              type: array
+              items:
+                $ref: '#/$defs/id'
+          additionalProperties: false
+      semanticRole:
+        $ref: '#/$defs/semanticRole'
+      correctionHint:
+        $ref: '#/$defs/correctionHint'
+      backendId:
+        $ref: '#/$defs/backendId'
+    additionalProperties: false
+  correctionHint:
+    description: Qualified explanation of a recognized pattern. Not generic repair synthesis and never
+      a proved functional repair.
+    type: object
+    required:
+    - hintId
+    - patternId
+    - suggestion
+    - qualified
+    properties:
+      hintId:
+        $ref: '#/$defs/id'
+      patternId:
+        enum:
+        - positive-n-positive-block-floor-grid
+        - x-other
+      suggestion:
+        type: string
+        minLength: 1
+        maxLength: 1000
+      requiresUserRerun:
+        description: Always true. Pomset never rewrites the kernel automatically.
+        type: boolean
+      qualified:
+        description: Always true. The hint is an explanation of a pattern, not a verified repair.
+        type: boolean
+      basisFindingId:
+        $ref: '#/$defs/id'
+    additionalProperties: false
