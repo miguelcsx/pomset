@@ -718,3 +718,723 @@ apps/cli test:         },
 apps/cli test:         "coverageRef": "cov_5bb9ef93dfca484f8f51d8264a2d6426",
 apps/cli test:         "evidenceClass": "verified-under-assumptions",
 apps/cli test:         "method": "symbolic",
+apps/cli test:         "outcome": "established",
+apps/cli test:         "propertyId": "memoryBounds",
+apps/cli test:         "propertyResultId": "pr_3bc02a23443f4e13a13553cbce737a02"
+apps/cli test:       },
+apps/cli test:       {
+apps/cli test:         "assumptions": {
+apps/cli test:           "domainRef": "dom_f8K2",
+apps/cli test:           "items": [
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_b5584890aef9490baa3aa7bf746e8a17",
+apps/cli test:               "kind": "other",
+apps/cli test:               "statement": "Addresses and masks are modeled; stored values are uninterpreted. No numerical claim follows."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_f4c4c62cff8748388e4a51bb0b74c6c7",
+apps/cli test:               "kind": "width",
+apps/cli test:               "statement": "Modular arithmetic at declared widths (N:i32, BLOCK:i32); program_id/arange are i32. Same-signedness integer promotion only."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_39952ba4b6f54dec88211bfa94460e77",
+apps/cli test:               "kind": "aliasing",
+apps/cli test:               "statement": "Contiguous one-dimensional allocations are disjoint. Declared alias groups are unsupported."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_0c98243e188b4673ae7814f6d05d4042",
+apps/cli test:               "kind": "ordering",
+apps/cli test:               "statement": "Conflict query concerns distinct program/lane actors and non-atomic stores; no GPU schedule is modeled."
+apps/cli test:             }
+apps/cli test:           ],
+apps/cli test:           "model": "triton-address-and-mask",
+apps/cli test:           "modelRevision": "3"
+apps/cli test:         },
+apps/cli test:         "budget": {
+apps/cli test:           "engineWallTimeMs": 120000,
+apps/cli test:           "maxArtifactBytes": 268435456,
+apps/cli test:           "maxMessageBytes": 1048576,
+apps/cli test:           "maxOutputBytes": 16777216,
+apps/cli test:           "memoryBytes": 2147483648,
+apps/cli test:           "solverTimeMs": 30000
+apps/cli test:         },
+apps/cli test:         "coverageRef": "cov_5bb9ef93dfca484f8f51d8264a2d6426",
+apps/cli test:         "evidenceClass": "verified-under-assumptions",
+apps/cli test:         "method": "symbolic",
+apps/cli test:         "outcome": "established",
+apps/cli test:         "propertyId": "writeWriteConflict",
+apps/cli test:         "propertyResultId": "pr_79fa566790374bd8be247102bb3ea275"
+apps/cli test:       }
+apps/cli test:     ],
+apps/cli test:     "queryRevision": "memory-2",
+apps/cli test:     "resultId": "res_529f505ddd454710924f823a0a492dc4",
+apps/cli test:     "scenarioId": "scn_f8502703-e523-45ed-9960-e214bcfb5f91",
+apps/cli test:     "schemaVersion": 1,
+apps/cli test:     "snapshotId": "snp_39c9daa3-7384-48b2-819e-dcdf2fe6ff9b",
+apps/cli test:     "witnesses": [
+apps/cli test:       {
+apps/cli test:         "actorIds": [
+apps/cli test:           "actor_ad4ffc8e8a794e7ca52e667c8a2e3460"
+apps/cli test:         ],
+apps/cli test:         "assignments": [
+apps/cli test:           {
+apps/cli test:             "name": "BLOCK",
+apps/cli test:             "value": 512
+apps/cli test:           },
+apps/cli test:           {
+apps/cli test:             "name": "N",
+apps/cli test:             "value": 1
+apps/cli test:           },
+apps/cli test:           {
+apps/cli test:             "name": "dtype",
+apps/cli test:             "value": "fp16"
+apps/cli test:           },
+apps/cli test:           {
+apps/cli test:             "name": "outputIndex",
+apps/cli test:             "value": 0
+apps/cli test:           }
+apps/cli test:         ],
+apps/cli test:         "eventIds": [
+apps/cli test:           "event_670300fa40b1439798c5bb1a50fe44d7"
+apps/cli test:         ],
+apps/cli test:         "kind": "output-index",
+apps/cli test:         "minimization": {
+apps/cli test:           "attempted": true,
+apps/cli test:           "droppedAssumptions": 0,
+apps/cli test:           "note": "No smaller objective exists under this query; all assumptions retained."
+apps/cli test:         },
+apps/cli test:         "replay": {
+apps/cli test:           "method": "cpu-interpreter",
+apps/cli test:           "note": "No independent replay was executed; requires compatible tooling and per-invocation consent.",
+apps/cli test:           "outcome": "blocked"
+apps/cli test:         },
+apps/cli test:         "sourceRanges": [
+apps/cli test:           {
+apps/cli test:             "confidence": "exact",
+apps/cli test:             "endColumn": 45,
+apps/cli test:             "endLine": 25,
+apps/cli test:             "kind": "source",
+apps/cli test:             "path": "kernels/transform.py",
+apps/cli test:             "startColumn": 4,
+apps/cli test:             "startLine": 25
+apps/cli test:           }
+apps/cli test:         ],
+apps/cli test:         "witnessId": "witness_4f99796c14b04264a0b5f514b4e3e768"
+apps/cli test:       }
+apps/cli test:     ]
+apps/cli test:   },
+apps/cli test:   "sourceFiles": {
+apps/cli test:     "kernels/transform.py": {
+apps/cli test:       "encoding": "base64",
+apps/cli test:       "data": "IiIiVGhlIGZsYWdzaGlwIG91dHB1dC1jb3ZlcmFnZSBmaXh0dXJlLCBpbiB0aGUgc3VwcG9ydGVkIFRyaXRvbiBzdWJzZXQuCgpPbmUgZXhwbGljaXQgYGBAdHJpdG9uLmppdGBgIGVudHJ5cG9pbnQsIG5hbWVkIHBvaW50ZXIgYW5kIGBgY29uc3RleHByYGAKcGFyYW1ldGVycywgYGB0bC5wcm9ncmFtX2lkYGAsIGEgY29uc3RhbnQtYm91bmRlZCBgYHRsLmFyYW5nZWBgLCBpbnRlZ2VyIGFkZHJlc3MKYXJpdGhtZXRpYywgYSBib29sZWFuIG1hc2ssIGFuZCBgYHRsLmxvYWRgYC9gYHRsLnN0b3JlYGAgd2l0aCBhZGRyZXNzIGFuZCBtYXNrLgpOb3RoaW5nIGhlcmUgaXMgb3V0c2lkZSB0aGUgbW9kZWxsZWQgc3Vic2V0LCBzbyB0aGUgZXh0cmFjdG9yIGNhbiByZWFzb24gYWJvdXQgaXQKc3ltYm9saWNhbGx5IHdpdGhvdXQgZXhlY3V0aW5nIGFueXRoaW5nLgoKVGhlIGRlY2xhcmVkIG91dGNvbWUgaXMgYSBwcm9wZXJ0eSBvZiB0aGUgKnNjZW5hcmlvKiwgbm90IG9mIHRoaXMgZmlsZTogd2l0aApgYGdyaWQgPSAoTiAvLyBCTE9DSywpYGAgYW5kIGEgcmVtYWluZGVyLCB0aGUgZmluYWwgYmxvY2sncyBsYW5lcyBhcmUgYWxsIG1hc2tlZApvZmYgYW5kIHRoZSBvdXRwdXQgaXMgbmV2ZXIgd3JpdHRlbi4gV2l0aCBgYGdyaWQgPSAoY2VpbChOIC8gQkxPQ0spLClgYCDigJQgdGhlCmNvbnRyb2wg4oCUIGV2ZXJ5IGRlY2xhcmVkIG91dHB1dCBlbGVtZW50IGlzIHdyaXR0ZW4uCiIiIgoKaW1wb3J0IHRyaXRvbgppbXBvcnQgdHJpdG9uLmxhbmd1YWdlIGFzIHRsCgoKQHRyaXRvbi5qaXQKZGVmIHRyYW5zZm9ybShYLCBZLCBOLCBCTE9DSzogdGwuY29uc3RleHByKToKICAgIHBpZCA9IHRsLnByb2dyYW1faWQoMCkKICAgIG9mZnNldHMgPSBwaWQgKiBCTE9DSyArIHRsLmFyYW5nZSgwLCBCTE9DSykKICAgIG1hc2sgPSBvZmZzZXRzIDwgTgogICAgeCA9IHRsLmxvYWQoWCArIG9mZnNldHMsIG1hc2s9bWFzaykKICAgIHRsLnN0b3JlKFkgKyBvZmZzZXRzLCB4ICogMi4wLCBtYXNrPW1hc2spCg=="
+apps/cli test:     },
+apps/cli test:     "scenario.json": {
+apps/cli test:       "encoding": "base64",
+apps/cli test:       "data": "ewogICJzY2hlbWFWZXJzaW9uIjogMSwKICAic2NlbmFyaW9JZCI6ICJzY25fZmxvb3IiLAogICJzbmFwc2hvdElkIjogInNucF8wMUhOMyIsCiAgIm5hbWUiOiAidHJhbnNmb3JtIG91dHB1dCBjb3ZlcmFnZSIsCiAgImVudHJ5cG9pbnQiOiB7CiAgICAicGF0aCI6ICJrZXJuZWxzL3RyYW5zZm9ybS5weSIsCiAgICAic3ltYm9sIjogInRyYW5zZm9ybSIKICB9LAogICJhbGxvY2F0aW9ucyI6IFsKICAgIHsKICAgICAgImFsbG9jYXRpb25JZCI6ICJhbF94IiwKICAgICAgIm5hbWUiOiAiWCIsCiAgICAgICJyb2xlIjogImlucHV0IiwKICAgICAgImR0eXBlIjogImZwMTYiLAogICAgICAic2hhcGUiOiBbCiAgICAgICAgewogICAgICAgICAgIm9wIjogInBhcmFtZXRlciIsCiAgICAgICAgICAicGFyYW1ldGVyIjogIk4iCiAgICAgICAgfQogICAgICBdCiAgICB9LAogICAgewogICAgICAiYWxsb2NhdGlvbklkIjogImFsX3kiLAogICAgICAibmFtZSI6ICJZIiwKICAgICAgInJvbGUiOiAib3V0cHV0IiwKICAgICAgImR0eXBlIjogImZwMTYiLAogICAgICAic2hhcGUiOiBbCiAgICAgICAgewogICAgICAgICAgIm9wIjogInBhcmFtZXRlciIsCiAgICAgICAgICAicGFyYW1ldGVyIjogIk4iCiAgICAgICAgfQogICAgICBdLAogICAgICAicG9pc29uZWQiOiB0cnVlCiAgICB9CiAgXSwKICAibGF1bmNoIjogewogICAgImdyaWQiOiBbCiAgICAgIHsKICAgICAgICAib3AiOiAiZmxvb3JEaXZpZGUiLAogICAgICAgICJvcGVyYW5kcyI6IFsKICAgICAgICAgIHsKICAgICAgICAgICAgIm9wIjogInBhcmFtZXRlciIsCiAgICAgICAgICAgICJwYXJhbWV0ZXIiOiAiTiIKICAgICAgICAgIH0sCiAgICAgICAgICB7CiAgICAgICAgICAgICJvcCI6ICJwYXJhbWV0ZXIiLAogICAgICAgICAgICAicGFyYW1ldGVyIjogIkJMT0NLIgogICAgICAgICAgfQogICAgICAgIF0KICAgICAgfQogICAgXSwKICAgICJibG9jayI6IFsKICAgICAgewogICAgICAgICJvcCI6ICJwYXJhbWV0ZXIiLAogICAgICAgICJwYXJhbWV0ZXIiOiAiQkxPQ0siCiAgICAgIH0KICAgIF0sCiAgICAibnVtV2FycHMiOiB7CiAgICAgICJvcCI6ICJsaXRlcmFsIiwKICAgICAgInZhbHVlIjogNAogICAgfSwKICAgICJkaXNwbGF5SGludHMiOiBbCiAgICAgICJncmlkID0gKE4gLy8gQkxPQ0ssKSIKICAgIF0KICB9LAogICJkb21haW4iOiB7CiAgICAiZG9tYWluSWQiOiAiZG9tX2Y4SzIiLAogICAgImVudW1lcmFibGUiOiB0cnVlLAogICAgInZhcmlhYmxlcyI6IFsKICAgICAgewogICAgICAgICJuYW1lIjogIk4iLAogICAgICAgICJraW5kIjogInNoYXBlIiwKICAgICAgICAidHlwZSI6ICJpbnQiLAogICAgICAgICJ3aWR0aCI6ICJpMzIiLAogICAgICAgICJtaW4iOiAxLAogICAgICAgICJtYXgiOiA0MDk2LAogICAgICAgICJzdGVwIjogMQogICAgICB9LAogICAgICB7CiAgICAgICAgIm5hbWUiOiAiQkxPQ0siLAogICAgICAgICJraW5kIjogImJsb2NrU2l6ZSIsCiAgICAgICAgInR5cGUiOiAiZW51bSIsCiAgICAgICAgInZhbHVlcyI6IFsKICAgICAgICAgIDEyOCwKICAgICAgICAgIDI1NiwKICAgICAgICAgIDUxMgogICAgICAgIF0KICAgICAgfSwKICAgICAgewogICAgICAgICJuYW1lIjogImR0eXBlIiwKICAgICAgICAia2luZCI6ICJkdHlwZSIsCiAgICAgICAgInR5cGUiOiAiZW51bSIsCiAgICAgICAgInZhbHVlcyI6IFsKICAgICAgICAgICJmcDE2IiwKICAgICAgICAgICJiZjE2IgogICAgICAgIF0KICAgICAgfQogICAgXSwKICAgICJjb25zdHJhaW50cyI6IFsKICAgICAgewogICAgICAgICJjb25zdHJhaW50SWQiOiAiY18xIiwKICAgICAgICAibGhzIjogewogICAgICAgICAgIm9wIjogInBhcmFtZXRlciIsCiAgICAgICAgICAicGFyYW1ldGVyIjogIk4iCiAgICAgICAgfSwKICAgICAgICAicmVsYXRpb24iOiAiZ2UiLAogICAgICAgICJyaHMiOiB7CiAgICAgICAgICAib3AiOiAibGl0ZXJhbCIsCiAgICAgICAgICAidmFsdWUiOiAxCiAgICAgICAgfQogICAgICB9LAogICAgICB7CiAgICAgICAgImNvbnN0cmFpbnRJZCI6ICJjXzIiLAogICAgICAgICJsaHMiOiB7CiAgICAgICAgICAib3AiOiAicGFyYW1ldGVyIiwKICAgICAgICAgICJwYXJhbWV0ZXIiOiAiQkxPQ0siCiAgICAgICAgfSwKICAgICAgICAicmVsYXRpb24iOiAiZ3QiLAogICAgICAgICJyaHMiOiB7CiAgICAgICAgICAib3AiOiAibGl0ZXJhbCIsCiAgICAgICAgICAidmFsdWUiOiAwCiAgICAgICAgfQogICAgICB9CiAgICBdLAogICAgImhhcmR3YXJlQ29ob3J0SWRzIjogWwogICAgICAiaHdfYTEwMF84MGciCiAgICBdCiAgfSwKICAicmVmZXJlbmNlIjogewogICAgImtpbmQiOiAibnVtcHkiLAogICAgInBhdGgiOiAia2VybmVscy9yZWZlcmVuY2UucHkiLAogICAgInN5bWJvbCI6ICJyZWZlcmVuY2UiLAogICAgInRvbGVyYW5jZXMiOiB7CiAgICAgICJhdG9sIjogMC4wLAogICAgICAicnRvbCI6IDAuMCwKICAgICAgImR0eXBlIjogImZwMTYiLAogICAgICAibmFuUG9saWN5IjogImVxdWFsLW5hbiIsCiAgICAgICJpbmZQb2xpY3kiOiAiZXF1YWwtaW5mIgogICAgfQogIH0sCiAgInJlcXVpcmVkUHJvcGVydGllcyI6IFsKICAgICJvdXRwdXRDb3ZlcmFnZSIsCiAgICAibWVtb3J5Qm91bmRzIiwKICAgICJ3cml0ZVdyaXRlQ29uZmxpY3QiCiAgXSwKICAibm90ZXMiOiAiVGhlIGRlZmVjdGl2ZSBsYXVuY2g6IGEgZmxvb3ItZGl2aWRlZCBncmlkIGxlYXZlcyB0aGUgZmluYWwgYmxvY2sncyBvdXQtb2YtcmFuZ2UgbGFuZXMgdW5tYXNrZWQtb24gYnV0IG5ldmVyIGxhdW5jaGVkLCBzbyB0aGUgbGFzdCBOIG1vZCBCTE9DSyBvdXRwdXQgZWxlbWVudHMgYXJlIG5ldmVyIHdyaXR0ZW4uIiwKICAiY3JlYXRlZEF0IjogIjIwMjYtMTAtMTJUMDk6MTg6MDBaIgp9Cg=="
+apps/cli test:     },
+apps/cli test:     "kernels/reference.py": {
+apps/cli test:       "encoding": "base64",
+apps/cli test:       "data": "IiIiTnVtZXJpY2FsIHJlZmVyZW5jZSBmb3IgdGhlIHJlY29uc3RydWN0ZWQgdHJhbnNmb3JtIGZpeHR1cmUuCgpPbmx5IHRoZSBjb25zZW50LWNvbnRyb2xsZWQgbnVtZXJpY2FsIHBhdGggbWF5IGV4ZWN1dGUgdGhpcyBmdW5jdGlvbi4KIiIiCgoKZGVmIHJlZmVyZW5jZSh4KToKICAgIHJldHVybiB4ICogMi4wCg=="
+apps/cli test:     }
+apps/cli test:   }
+apps/cli test: }
+apps/cli test: stderr | src/workflow.test.ts > portable local workflow > captures immutable bytes, exports after an edit and imports without executing
+apps/cli test: pomset: outputCoverage=violated memoryBounds=established writeWriteConflict=established
+apps/cli test: stderr | src/cli.test.ts > analyzing the flagship fixture end to end > violates on the floor-divided grid
+apps/cli test: pomset: outputCoverage=violated memoryBounds=established writeWriteConflict=established
+apps/cli test: {
+apps/cli test:   "schemaVersion": 1,
+apps/cli test:   "tool": {
+apps/cli test:     "name": "@pomset/cli",
+apps/cli test:     "version": "0.0.0"
+apps/cli test:   },
+apps/cli test:   "jobId": "job_a3f4596e-84d2-4a27-8a71-c58a0139d677",
+apps/cli test:   "scenarioId": "scn_7b6f8b61-a85f-47a5-8cf5-e857734bb4a4",
+apps/cli test:   "snapshotId": "snp_9536555f-c55d-4532-b446-9f7a10137867",
+apps/cli test:   "profileRevisionId": "prf_8f6770f96a6889aed4b024818579855cfbeebb0d92589b2da2b380d4d2601654",
+apps/cli test:   "policyId": "pol_default",
+apps/cli test:   "policyRevision": 1,
+apps/cli test:   "properties": [
+apps/cli test:     {
+apps/cli test:       "propertyId": "outputCoverage",
+apps/cli test:       "outcome": "established",
+apps/cli test:       "method": "symbolic",
+apps/cli test:       "evidenceClass": "verified-under-assumptions"
+apps/cli test:     },
+apps/cli test:     {
+apps/cli test:       "propertyId": "memoryBounds",
+apps/cli test:       "outcome": "established",
+apps/cli test:       "method": "symbolic",
+apps/cli test:       "evidenceClass": "verified-under-assumptions"
+apps/cli test:     },
+apps/cli test:     {
+apps/cli test:       "propertyId": "writeWriteConflict",
+apps/cli test:       "outcome": "established",
+apps/cli test:       "method": "symbolic",
+apps/cli test:       "evidenceClass": "verified-under-assumptions"
+apps/cli test:     }
+apps/cli test:   ],
+apps/cli test:   "qualifiers": {
+apps/cli test:     "coverage": {
+apps/cli test:       "kind": "enumerated",
+apps/cli test:       "pointCount": 24576,
+apps/cli test:       "duplicatesRemoved": true
+apps/cli test:     },
+apps/cli test:     "assumptions": [
+apps/cli test:       "Addresses and masks are modeled; stored values are uninterpreted. No numerical claim follows.",
+apps/cli test:       "Modular arithmetic at declared widths (N:i32, BLOCK:i32); program_id/arange are i32. Same-signedness integer promotion only.",
+apps/cli test:       "Contiguous one-dimensional allocations are disjoint. Declared alias groups are unsupported.",
+apps/cli test:       "Conflict query concerns distinct program/lane actors and non-atomic stores; no GPU schedule is modeled."
+apps/cli test:     ],
+apps/cli test:     "budget": {
+apps/cli test:       "solverTimeMs": 30000,
+apps/cli test:       "engineWallTimeMs": 120000,
+apps/cli test:       "memoryBytes": 2147483648,
+apps/cli test:       "maxMessageBytes": 1048576,
+apps/cli test:       "maxOutputBytes": 16777216,
+apps/cli test:       "maxArtifactBytes": 268435456
+apps/cli test:     }
+apps/cli test:   },
+apps/cli test:   "events": [
+apps/cli test:     {
+apps/cli test:       "sequence": 1,
+apps/cli test:       "type": "hello"
+apps/cli test:     },
+apps/cli test:     {
+apps/cli test:       "sequence": 2,
+apps/cli test:       "type": "progress"
+apps/cli test:     },
+apps/cli test:     {
+apps/cli test:       "sequence": 3,
+apps/cli test:       "type": "progress"
+apps/cli test:     },
+apps/cli test:     {
+apps/cli test:       "sequence": 4,
+apps/cli test:       "type": "progress"
+apps/cli test:     },
+apps/cli test:     {
+apps/cli test:       "sequence": 5,
+apps/cli test:       "type": "result"
+apps/cli test:     }
+apps/cli test:   ],
+apps/cli test:   "snapshot": {
+apps/cli test:     "schemaVersion": 1,
+apps/cli test:     "snapshotId": "snp_9536555f-c55d-4532-b446-9f7a10137867",
+apps/cli test:     "projectId": "prj_373e3aa2-0d76-4214-acea-73cf0f8ac1ac",
+apps/cli test:     "createdAt": "2026-10-12T02:10:07.842Z",
+apps/cli test:     "parentSnapshotId": "snp_39c9daa3-7384-48b2-819e-dcdf2fe6ff9b",
+apps/cli test:     "files": [
+apps/cli test:       {
+apps/cli test:         "path": "kernels/transform.py",
+apps/cli test:         "role": "source",
+apps/cli test:         "sha256": "sha256:385dc9773904cf42cd970a0602e83ea539cd40f998541906a994ebbfb2b924e4",
+apps/cli test:         "bytes": 1015
+apps/cli test:       },
+apps/cli test:       {
+apps/cli test:         "path": "scenario-ceil.json",
+apps/cli test:         "role": "config",
+apps/cli test:         "sha256": "sha256:744f43fc6d74e6433dbf69a49d5a0c847cef641129d47bb122f8d95dea0dc156",
+apps/cli test:         "bytes": 2877
+apps/cli test:       },
+apps/cli test:       {
+apps/cli test:         "path": "kernels/reference.py",
+apps/cli test:         "role": "reference",
+apps/cli test:         "sha256": "sha256:aaa486069adc4955487226d3295a803f22d63762a7b173eaba1af5f5495fd6d0",
+apps/cli test:         "bytes": 178
+apps/cli test:       }
+apps/cli test:     ],
+apps/cli test:     "manifestHash": "sha256:d9a5d3336fab0a0bedc397bf757b7b5b17a812a44587c4b76a3950a6b9cddba2"
+apps/cli test:   },
+apps/cli test:   "scenario": {
+apps/cli test:     "schemaVersion": 1,
+apps/cli test:     "scenarioId": "scn_7b6f8b61-a85f-47a5-8cf5-e857734bb4a4",
+apps/cli test:     "snapshotId": "snp_9536555f-c55d-4532-b446-9f7a10137867",
+apps/cli test:     "name": "transform output coverage",
+apps/cli test:     "entrypoint": {
+apps/cli test:       "path": "kernels/transform.py",
+apps/cli test:       "symbol": "transform"
+apps/cli test:     },
+apps/cli test:     "allocations": [
+apps/cli test:       {
+apps/cli test:         "allocationId": "al_x",
+apps/cli test:         "name": "X",
+apps/cli test:         "role": "input",
+apps/cli test:         "dtype": "fp16",
+apps/cli test:         "shape": [
+apps/cli test:           {
+apps/cli test:             "op": "parameter",
+apps/cli test:             "parameter": "N"
+apps/cli test:           }
+apps/cli test:         ]
+apps/cli test:       },
+apps/cli test:       {
+apps/cli test:         "allocationId": "al_y",
+apps/cli test:         "name": "Y",
+apps/cli test:         "role": "output",
+apps/cli test:         "dtype": "fp16",
+apps/cli test:         "shape": [
+apps/cli test:           {
+apps/cli test:             "op": "parameter",
+apps/cli test:             "parameter": "N"
+apps/cli test:           }
+apps/cli test:         ],
+apps/cli test:         "poisoned": true
+apps/cli test:       }
+apps/cli test:     ],
+apps/cli test:     "launch": {
+apps/cli test:       "grid": [
+apps/cli test:         {
+apps/cli test:           "op": "ceilDivide",
+apps/cli test:           "operands": [
+apps/cli test:             {
+apps/cli test:               "op": "parameter",
+apps/cli test:               "parameter": "N"
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "op": "parameter",
+apps/cli test:               "parameter": "BLOCK"
+apps/cli test:             }
+apps/cli test:           ]
+apps/cli test:         }
+apps/cli test:       ],
+apps/cli test:       "block": [
+apps/cli test:         {
+apps/cli test:           "op": "parameter",
+apps/cli test:           "parameter": "BLOCK"
+apps/cli test:         }
+apps/cli test:       ],
+apps/cli test:       "numWarps": {
+apps/cli test:         "op": "literal",
+apps/cli test:         "value": 4
+apps/cli test:       },
+apps/cli test:       "displayHints": [
+apps/cli test:         "grid = (triton.cdiv(N, BLOCK),)"
+apps/cli test:       ]
+apps/cli test:     },
+apps/cli test:     "domain": {
+apps/cli test:       "domainId": "dom_f8K2",
+apps/cli test:       "enumerable": true,
+apps/cli test:       "variables": [
+apps/cli test:         {
+apps/cli test:           "name": "N",
+apps/cli test:           "kind": "shape",
+apps/cli test:           "type": "int",
+apps/cli test:           "width": "i32",
+apps/cli test:           "min": 1,
+apps/cli test:           "max": 4096,
+apps/cli test:           "step": 1
+apps/cli test:         },
+apps/cli test:         {
+apps/cli test:           "name": "BLOCK",
+apps/cli test:           "kind": "blockSize",
+apps/cli test:           "type": "enum",
+apps/cli test:           "values": [
+apps/cli test:             128,
+apps/cli test:             256,
+apps/cli test:             512
+apps/cli test:           ]
+apps/cli test:         },
+apps/cli test:         {
+apps/cli test:           "name": "dtype",
+apps/cli test:           "kind": "dtype",
+apps/cli test:           "type": "enum",
+apps/cli test:           "values": [
+apps/cli test:             "fp16",
+apps/cli test:             "bf16"
+apps/cli test:           ]
+apps/cli test:         }
+apps/cli test:       ],
+apps/cli test:       "constraints": [
+apps/cli test:         {
+apps/cli test:           "constraintId": "c_1",
+apps/cli test:           "lhs": {
+apps/cli test:             "op": "parameter",
+apps/cli test:             "parameter": "N"
+apps/cli test:           },
+apps/cli test:           "relation": "ge",
+apps/cli test:           "rhs": {
+apps/cli test:             "op": "literal",
+apps/cli test:             "value": 1
+apps/cli test:           }
+apps/cli test:         },
+apps/cli test:         {
+apps/cli test:           "constraintId": "c_2",
+apps/cli test:           "lhs": {
+apps/cli test:             "op": "parameter",
+apps/cli test:             "parameter": "BLOCK"
+apps/cli test:           },
+apps/cli test:           "relation": "gt",
+apps/cli test:           "rhs": {
+apps/cli test:             "op": "literal",
+apps/cli test:             "value": 0
+apps/cli test:           }
+apps/cli test:         }
+apps/cli test:       ],
+apps/cli test:       "hardwareCohortIds": [
+apps/cli test:         "hw_a100_80g"
+apps/cli test:       ]
+apps/cli test:     },
+apps/cli test:     "reference": {
+apps/cli test:       "kind": "numpy",
+apps/cli test:       "path": "kernels/reference.py",
+apps/cli test:       "symbol": "reference",
+apps/cli test:       "tolerances": {
+apps/cli test:         "atol": 0,
+apps/cli test:         "rtol": 0,
+apps/cli test:         "dtype": "fp16",
+apps/cli test:         "nanPolicy": "equal-nan",
+apps/cli test:         "infPolicy": "equal-inf"
+apps/cli test:       }
+apps/cli test:     },
+apps/cli test:     "requiredProperties": [
+apps/cli test:       "outputCoverage",
+apps/cli test:       "memoryBounds",
+apps/cli test:       "writeWriteConflict"
+apps/cli test:     ],
+apps/cli test:     "notes": "The correct control: the same kernel with a ceiling-divided grid, so every declared output element is written and the modelled hole disappears.",
+apps/cli test:     "createdAt": "2026-10-12T02:10:07.842Z"
+apps/cli test:   },
+apps/cli test:   "profile": {
+apps/cli test:     "schemaVersion": 1,
+apps/cli test:     "profileRevisionId": "prf_8f6770f96a6889aed4b024818579855cfbeebb0d92589b2da2b380d4d2601654",
+apps/cli test:     "backend": "triton",
+apps/cli test:     "createdAt": "2026-10-12T02:06:21.105Z",
+apps/cli test:     "components": [
+apps/cli test:       {
+apps/cli test:         "name": "python",
+apps/cli test:         "version": "3.12.14"
+apps/cli test:       },
+apps/cli test:       {
+apps/cli test:         "name": "engine",
+apps/cli test:         "version": "0.2.0",
+apps/cli test:         "digest": "sha256:f00ed1fb1a8e1211a1df712e575506ad7f3e847bad1e27fc37da5d41644c36bb"
+apps/cli test:       },
+apps/cli test:       {
+apps/cli test:         "name": "z3",
+apps/cli test:         "version": "4.13.0"
+apps/cli test:       }
+apps/cli test:     ],
+apps/cli test:     "platform": {
+apps/cli test:       "os": "darwin",
+apps/cli test:       "arch": "arm64"
+apps/cli test:     },
+apps/cli test:     "capabilityIds": [],
+apps/cli test:     "notes": "Measured interpreter/engine/solver identity. This probe does not validate capabilities.",
+apps/cli test:     "revisionHash": "sha256:3de93a90e7ac5c2ae38fe3a8f9dbefeca0655268e5cae61ac2d9e5a6b93e5591"
+apps/cli test:   },
+apps/cli test:   "job": {
+apps/cli test:     "attemptId": "att_51d1d816-0240-4adc-8673-9fdcd4dfb490",
+apps/cli test:     "createdAt": "2026-10-12T02:10:07.843Z",
+apps/cli test:     "domainRef": "dom_f8K2",
+apps/cli test:     "jobId": "job_a3f4596e-84d2-4a27-8a71-c58a0139d677",
+apps/cli test:     "operation": "full",
+apps/cli test:     "policyId": "pol_default",
+apps/cli test:     "policyRevision": 1,
+apps/cli test:     "profileRevisionId": "prf_8f6770f96a6889aed4b024818579855cfbeebb0d92589b2da2b380d4d2601654",
+apps/cli test:     "projectId": "prj_373e3aa2-0d76-4214-acea-73cf0f8ac1ac",
+apps/cli test:     "scenarioId": "scn_7b6f8b61-a85f-47a5-8cf5-e857734bb4a4",
+apps/cli test:     "schemaVersion": 1,
+apps/cli test:     "snapshotId": "snp_9536555f-c55d-4532-b446-9f7a10137867",
+apps/cli test:     "startedAt": "2026-10-12T02:10:07.848Z",
+apps/cli test:     "state": "succeeded",
+apps/cli test:     "resultIds": [
+apps/cli test:       "res_3fbf8987b698418ab3494508dee005dc"
+apps/cli test:     ],
+apps/cli test:     "finishedAt": "2026-10-12T02:10:08.225Z"
+apps/cli test:   },
+apps/cli test:   "diagnostics": {
+apps/cli test:     "redactionRevision": "2",
+apps/cli test:     "messages": [
+apps/cli test:       ""
+apps/cli test:     ],
+apps/cli test:     "termination": "exited"
+apps/cli test:   },
+apps/cli test:   "analysis": {
+apps/cli test:     "actors": [],
+apps/cli test:     "attemptId": "att_51d1d816-0240-4adc-8673-9fdcd4dfb490",
+apps/cli test:     "budget": {
+apps/cli test:       "engineWallTimeMs": 120000,
+apps/cli test:       "maxArtifactBytes": 268435456,
+apps/cli test:       "maxMessageBytes": 1048576,
+apps/cli test:       "maxOutputBytes": 16777216,
+apps/cli test:       "memoryBytes": 2147483648,
+apps/cli test:       "solverTimeMs": 30000
+apps/cli test:     },
+apps/cli test:     "completeness": {
+apps/cli test:       "kind": "complete"
+apps/cli test:     },
+apps/cli test:     "coverage": {
+apps/cli test:       "coverageId": "cov_ab0348c87a884110b9b0be2a7e6780de",
+apps/cli test:       "denominator": {
+apps/cli test:         "duplicatesRemoved": true,
+apps/cli test:         "kind": "enumerated",
+apps/cli test:         "pointCount": 24576
+apps/cli test:       },
+apps/cli test:       "domainRef": "dom_f8K2",
+apps/cli test:       "regions": [
+apps/cli test:         {
+apps/cli test:           "classifications": [
+apps/cli test:             {
+apps/cli test:               "classification": "established",
+apps/cli test:               "method": "symbolic",
+apps/cli test:               "propertyId": "outputCoverage",
+apps/cli test:               "resultId": "res_3fbf8987b698418ab3494508dee005dc"
+apps/cli test:             }
+apps/cli test:           ],
+apps/cli test:           "constraints": [
+apps/cli test:             "Declared domain dom_f8K2; all ranges, value sets, steps and constraints apply."
+apps/cli test:           ],
+apps/cli test:           "regionId": "region_233d6beff2a04ce4b138be099bb424d7"
+apps/cli test:         },
+apps/cli test:         {
+apps/cli test:           "classifications": [
+apps/cli test:             {
+apps/cli test:               "classification": "established",
+apps/cli test:               "method": "symbolic",
+apps/cli test:               "propertyId": "memoryBounds",
+apps/cli test:               "resultId": "res_3fbf8987b698418ab3494508dee005dc"
+apps/cli test:             }
+apps/cli test:           ],
+apps/cli test:           "constraints": [
+apps/cli test:             "Declared domain dom_f8K2; all ranges, value sets, steps and constraints apply."
+apps/cli test:           ],
+apps/cli test:           "regionId": "region_e92a5ee3137649a4b9f14f5f41717a50"
+apps/cli test:         },
+apps/cli test:         {
+apps/cli test:           "classifications": [
+apps/cli test:             {
+apps/cli test:               "classification": "established",
+apps/cli test:               "method": "symbolic",
+apps/cli test:               "propertyId": "writeWriteConflict",
+apps/cli test:               "resultId": "res_3fbf8987b698418ab3494508dee005dc"
+apps/cli test:             }
+apps/cli test:           ],
+apps/cli test:           "constraints": [
+apps/cli test:             "Declared domain dom_f8K2; all ranges, value sets, steps and constraints apply."
+apps/cli test:           ],
+apps/cli test:           "regionId": "region_5ab86e658c5e4d35ae552fd1348deb4c"
+apps/cli test:         }
+apps/cli test:       ]
+apps/cli test:     },
+apps/cli test:     "createdAt": "2026-10-12T02:10:08.156401Z",
+apps/cli test:     "domain": {
+apps/cli test:       "domainId": "dom_f8K2"
+apps/cli test:     },
+apps/cli test:     "events": [],
+apps/cli test:     "executedAt": "local",
+apps/cli test:     "findings": [],
+apps/cli test:     "jobId": "job_a3f4596e-84d2-4a27-8a71-c58a0139d677",
+apps/cli test:     "method": "symbolic",
+apps/cli test:     "origin": "local",
+apps/cli test:     "policyId": "pol_default",
+apps/cli test:     "policyRevision": 1,
+apps/cli test:     "profileRevisionId": "prf_8f6770f96a6889aed4b024818579855cfbeebb0d92589b2da2b380d4d2601654",
+apps/cli test:     "propertyResults": [
+apps/cli test:       {
+apps/cli test:         "assumptions": {
+apps/cli test:           "domainRef": "dom_f8K2",
+apps/cli test:           "items": [
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_3241a78d191546c0957f270cd5cc6d77",
+apps/cli test:               "kind": "other",
+apps/cli test:               "statement": "Addresses and masks are modeled; stored values are uninterpreted. No numerical claim follows."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_e6b71e5df4e344339117407b8903710f",
+apps/cli test:               "kind": "width",
+apps/cli test:               "statement": "Modular arithmetic at declared widths (N:i32, BLOCK:i32); program_id/arange are i32. Same-signedness integer promotion only."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_9fa42f9d6e584c20bf572b73767f695d",
+apps/cli test:               "kind": "aliasing",
+apps/cli test:               "statement": "Contiguous one-dimensional allocations are disjoint. Declared alias groups are unsupported."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_5365b2e334484f1d8b9c5125b72f421b",
+apps/cli test:               "kind": "ordering",
+apps/cli test:               "statement": "Conflict query concerns distinct program/lane actors and non-atomic stores; no GPU schedule is modeled."
+apps/cli test:             }
+apps/cli test:           ],
+apps/cli test:           "model": "triton-address-and-mask",
+apps/cli test:           "modelRevision": "3"
+apps/cli test:         },
+apps/cli test:         "budget": {
+apps/cli test:           "engineWallTimeMs": 120000,
+apps/cli test:           "maxArtifactBytes": 268435456,
+apps/cli test:           "maxMessageBytes": 1048576,
+apps/cli test:           "maxOutputBytes": 16777216,
+apps/cli test:           "memoryBytes": 2147483648,
+apps/cli test:           "solverTimeMs": 30000
+apps/cli test:         },
+apps/cli test:         "coverageRef": "cov_ab0348c87a884110b9b0be2a7e6780de",
+apps/cli test:         "evidenceClass": "verified-under-assumptions",
+apps/cli test:         "method": "symbolic",
+apps/cli test:         "outcome": "established",
+apps/cli test:         "propertyId": "outputCoverage",
+apps/cli test:         "propertyResultId": "pr_4e717114cf5549dda2b62081ca80fb94"
+apps/cli test:       },
+apps/cli test:       {
+apps/cli test:         "assumptions": {
+apps/cli test:           "domainRef": "dom_f8K2",
+apps/cli test:           "items": [
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_29911f99d8604df79f6b2dde1092c330",
+apps/cli test:               "kind": "other",
+apps/cli test:               "statement": "Addresses and masks are modeled; stored values are uninterpreted. No numerical claim follows."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_b24a85cae23a4bbfbbb97cfe87ad6c25",
+apps/cli test:               "kind": "width",
+apps/cli test:               "statement": "Modular arithmetic at declared widths (N:i32, BLOCK:i32); program_id/arange are i32. Same-signedness integer promotion only."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_27442ffca25a4624987cc98cd91089b1",
+apps/cli test:               "kind": "aliasing",
+apps/cli test:               "statement": "Contiguous one-dimensional allocations are disjoint. Declared alias groups are unsupported."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_1c0c4bb0efb1433c9ca7466b92c88189",
+apps/cli test:               "kind": "ordering",
+apps/cli test:               "statement": "Conflict query concerns distinct program/lane actors and non-atomic stores; no GPU schedule is modeled."
+apps/cli test:             }
+apps/cli test:           ],
+apps/cli test:           "model": "triton-address-and-mask",
+apps/cli test:           "modelRevision": "3"
+apps/cli test:         },
+apps/cli test:         "budget": {
+apps/cli test:           "engineWallTimeMs": 120000,
+apps/cli test:           "maxArtifactBytes": 268435456,
+apps/cli test:           "maxMessageBytes": 1048576,
+apps/cli test:           "maxOutputBytes": 16777216,
+apps/cli test:           "memoryBytes": 2147483648,
+apps/cli test:           "solverTimeMs": 30000
+apps/cli test:         },
+apps/cli test:         "coverageRef": "cov_ab0348c87a884110b9b0be2a7e6780de",
+apps/cli test:         "evidenceClass": "verified-under-assumptions",
+apps/cli test:         "method": "symbolic",
+apps/cli test:         "outcome": "established",
+apps/cli test:         "propertyId": "memoryBounds",
+apps/cli test:         "propertyResultId": "pr_e665ed6ed5f24980a5e2b5fcc21f1dda"
+apps/cli test:       },
+apps/cli test:       {
+apps/cli test:         "assumptions": {
+apps/cli test:           "domainRef": "dom_f8K2",
+apps/cli test:           "items": [
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_3d8385bfbbcc4fc1a3e302c466f6a0f3",
+apps/cli test:               "kind": "other",
+apps/cli test:               "statement": "Addresses and masks are modeled; stored values are uninterpreted. No numerical claim follows."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_e0e64dd932e049adb36be303513f11e3",
+apps/cli test:               "kind": "width",
+apps/cli test:               "statement": "Modular arithmetic at declared widths (N:i32, BLOCK:i32); program_id/arange are i32. Same-signedness integer promotion only."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_ce124ebc49904e059108e253d101c03e",
+apps/cli test:               "kind": "aliasing",
+apps/cli test:               "statement": "Contiguous one-dimensional allocations are disjoint. Declared alias groups are unsupported."
+apps/cli test:             },
+apps/cli test:             {
+apps/cli test:               "assumptionId": "asm_8a61dccc1bf1493288b6f6bd4176fd69",
+apps/cli test:               "kind": "ordering",
+apps/cli test:               "statement": "Conflict query concerns distinct program/lane actors and non-atomic stores; no GPU schedule is modeled."
+apps/cli test:             }
+apps/cli test:           ],
+apps/cli test:           "model": "triton-address-and-mask",
+apps/cli test:           "modelRevision": "3"
+apps/cli test:         },
+apps/cli test:         "budget": {
+apps/cli test:           "engineWallTimeMs": 120000,
+apps/cli test:           "maxArtifactBytes": 268435456,
+apps/cli test:           "maxMessageBytes": 1048576,
+apps/cli test:           "maxOutputBytes": 16777216,
+apps/cli test:           "memoryBytes": 2147483648,
+apps/cli test:           "solverTimeMs": 30000
+apps/cli test:         },
+apps/cli test:         "coverageRef": "cov_ab0348c87a884110b9b0be2a7e6780de",
+apps/cli test:         "evidenceClass": "verified-under-assumptions",
+apps/cli test:         "method": "symbolic",
+apps/cli test:         "outcome": "established",
+apps/cli test:         "propertyId": "writeWriteConflict",
+apps/cli test:         "propertyResultId": "pr_dda22808bb2a4c4fa7ed0c15dbf7cfd2"
+apps/cli test:       }
+apps/cli test:     ],
+apps/cli test:     "queryRevision": "memory-2",
+apps/cli test:     "resultId": "res_3fbf8987b698418ab3494508dee005dc",
+apps/cli test:     "scenarioId": "scn_7b6f8b61-a85f-47a5-8cf5-e857734bb4a4",
+apps/cli test:     "schemaVersion": 1,
+apps/cli test:     "snapshotId": "snp_9536555f-c55d-4532-b446-9f7a10137867",
+apps/cli test:     "witnesses": []
+apps/cli test:   },
+apps/cli test:   "sourceFiles": {
+apps/cli test:     "kernels/transform.py": {
+apps/cli test:       "encoding": "base64",
+apps/cli test:       "data": "IiIiVGhlIGZsYWdzaGlwIG91dHB1dC1jb3ZlcmFnZSBmaXh0dXJlLCBpbiB0aGUgc3VwcG9ydGVkIFRyaXRvbiBzdWJzZXQuCgpPbmUgZXhwbGljaXQgYGBAdHJpdG9uLmppdGBgIGVudHJ5cG9pbnQsIG5hbWVkIHBvaW50ZXIgYW5kIGBgY29uc3RleHByYGAKcGFyYW1ldGVycywgYGB0bC5wcm9ncmFtX2lkYGAsIGEgY29uc3RhbnQtYm91bmRlZCBgYHRsLmFyYW5nZWBgLCBpbnRlZ2VyIGFkZHJlc3MKYXJpdGhtZXRpYywgYSBib29sZWFuIG1hc2ssIGFuZCBgYHRsLmxvYWRgYC9gYHRsLnN0b3JlYGAgd2l0aCBhZGRyZXNzIGFuZCBtYXNrLgpOb3RoaW5nIGhlcmUgaXMgb3V0c2lkZSB0aGUgbW9kZWxsZWQgc3Vic2V0LCBzbyB0aGUgZXh0cmFjdG9yIGNhbiByZWFzb24gYWJvdXQgaXQKc3ltYm9saWNhbGx5IHdpdGhvdXQgZXhlY3V0aW5nIGFueXRoaW5nLgoKVGhlIGRlY2xhcmVkIG91dGNvbWUgaXMgYSBwcm9wZXJ0eSBvZiB0aGUgKnNjZW5hcmlvKiwgbm90IG9mIHRoaXMgZmlsZTogd2l0aApgYGdyaWQgPSAoTiAvLyBCTE9DSywpYGAgYW5kIGEgcmVtYWluZGVyLCB0aGUgZmluYWwgYmxvY2sncyBsYW5lcyBhcmUgYWxsIG1hc2tlZApvZmYgYW5kIHRoZSBvdXRwdXQgaXMgbmV2ZXIgd3JpdHRlbi4gV2l0aCBgYGdyaWQgPSAoY2VpbChOIC8gQkxPQ0spLClgYCDigJQgdGhlCmNvbnRyb2wg4oCUIGV2ZXJ5IGRlY2xhcmVkIG91dHB1dCBlbGVtZW50IGlzIHdyaXR0ZW4uCiIiIgoKaW1wb3J0IHRyaXRvbgppbXBvcnQgdHJpdG9uLmxhbmd1YWdlIGFzIHRsCgoKQHRyaXRvbi5qaXQKZGVmIHRyYW5zZm9ybShYLCBZLCBOLCBCTE9DSzogdGwuY29uc3RleHByKToKICAgIHBpZCA9IHRsLnByb2dyYW1faWQoMCkKICAgIG9mZnNldHMgPSBwaWQgKiBCTE9DSyArIHRsLmFyYW5nZSgwLCBCTE9DSykKICAgIG1hc2sgPSBvZmZzZXRzIDwgTgogICAgeCA9IHRsLmxvYWQoWCArIG9mZnNldHMsIG1hc2s9bWFzaykKICAgIHRsLnN0b3JlKFkgKyBvZmZzZXRzLCB4ICogMi4wLCBtYXNrPW1hc2spCg=="
+apps/cli test:     },
+apps/cli test:     "scenario-ceil.json": {
+apps/cli test:       "encoding": "base64",
+apps/cli test:       "data": "ewogICJzY2hlbWFWZXJzaW9uIjogMSwKICAic2NlbmFyaW9JZCI6ICJzY25fY2VpbCIsCiAgInNuYXBzaG90SWQiOiAic25wXzAxSE4zIiwKICAibmFtZSI6ICJ0cmFuc2Zvcm0gb3V0cHV0IGNvdmVyYWdlIiwKICAiZW50cnlwb2ludCI6IHsKICAgICJwYXRoIjogImtlcm5lbHMvdHJhbnNmb3JtLnB5IiwKICAgICJzeW1ib2wiOiAidHJhbnNmb3JtIgogIH0sCiAgImFsbG9jYXRpb25zIjogWwogICAgewogICAgICAiYWxsb2NhdGlvbklkIjogImFsX3giLAogICAgICAibmFtZSI6ICJYIiwKICAgICAgInJvbGUiOiAiaW5wdXQiLAogICAgICAiZHR5cGUiOiAiZnAxNiIsCiAgICAgICJzaGFwZSI6IFsKICAgICAgICB7CiAgICAgICAgICAib3AiOiAicGFyYW1ldGVyIiwKICAgICAgICAgICJwYXJhbWV0ZXIiOiAiTiIKICAgICAgICB9CiAgICAgIF0KICAgIH0sCiAgICB7CiAgICAgICJhbGxvY2F0aW9uSWQiOiAiYWxfeSIsCiAgICAgICJuYW1lIjogIlkiLAogICAgICAicm9sZSI6ICJvdXRwdXQiLAogICAgICAiZHR5cGUiOiAiZnAxNiIsCiAgICAgICJzaGFwZSI6IFsKICAgICAgICB7CiAgICAgICAgICAib3AiOiAicGFyYW1ldGVyIiwKICAgICAgICAgICJwYXJhbWV0ZXIiOiAiTiIKICAgICAgICB9CiAgICAgIF0sCiAgICAgICJwb2lzb25lZCI6IHRydWUKICAgIH0KICBdLAogICJsYXVuY2giOiB7CiAgICAiZ3JpZCI6IFsKICAgICAgewogICAgICAgICJvcCI6ICJjZWlsRGl2aWRlIiwKICAgICAgICAib3BlcmFuZHMiOiBbCiAgICAgICAgICB7CiAgICAgICAgICAgICJvcCI6ICJwYXJhbWV0ZXIiLAogICAgICAgICAgICAicGFyYW1ldGVyIjogIk4iCiAgICAgICAgICB9LAogICAgICAgICAgewogICAgICAgICAgICAib3AiOiAicGFyYW1ldGVyIiwKICAgICAgICAgICAgInBhcmFtZXRlciI6ICJCTE9DSyIKICAgICAgICAgIH0KICAgICAgICBdCiAgICAgIH0KICAgIF0sCiAgICAiYmxvY2siOiBbCiAgICAgIHsKICAgICAgICAib3AiOiAicGFyYW1ldGVyIiwKICAgICAgICAicGFyYW1ldGVyIjogIkJMT0NLIgogICAgICB9CiAgICBdLAogICAgIm51bVdhcnBzIjogewogICAgICAib3AiOiAibGl0ZXJhbCIsCiAgICAgICJ2YWx1ZSI6IDQKICAgIH0sCiAgICAiZGlzcGxheUhpbnRzIjogWwogICAgICAiZ3JpZCA9ICh0cml0b24uY2RpdihOLCBCTE9DSyksKSIKICAgIF0KICB9LAogICJkb21haW4iOiB7CiAgICAiZG9tYWluSWQiOiAiZG9tX2Y4SzIiLAogICAgImVudW1lcmFibGUiOiB0cnVlLAogICAgInZhcmlhYmxlcyI6IFsKICAgICAgewogICAgICAgICJuYW1lIjogIk4iLAogICAgICAgICJraW5kIjogInNoYXBlIiwKICAgICAgICAidHlwZSI6ICJpbnQiLAogICAgICAgICJ3aWR0aCI6ICJpMzIiLAogICAgICAgICJtaW4iOiAxLAogICAgICAgICJtYXgiOiA0MDk2LAogICAgICAgICJzdGVwIjogMQogICAgICB9LAogICAgICB7CiAgICAgICAgIm5hbWUiOiAiQkxPQ0siLAogICAgICAgICJraW5kIjogImJsb2NrU2l6ZSIsCiAgICAgICAgInR5cGUiOiAiZW51bSIsCiAgICAgICAgInZhbHVlcyI6IFsKICAgICAgICAgIDEyOCwKICAgICAgICAgIDI1NiwKICAgICAgICAgIDUxMgogICAgICAgIF0KICAgICAgfSwKICAgICAgewogICAgICAgICJuYW1lIjogImR0eXBlIiwKICAgICAgICAia2luZCI6ICJkdHlwZSIsCiAgICAgICAgInR5cGUiOiAiZW51bSIsCiAgICAgICAgInZhbHVlcyI6IFsKICAgICAgICAgICJmcDE2IiwKICAgICAgICAgICJiZjE2IgogICAgICAgIF0KICAgICAgfQogICAgXSwKICAgICJjb25zdHJhaW50cyI6IFsKICAgICAgewogICAgICAgICJjb25zdHJhaW50SWQiOiAiY18xIiwKICAgICAgICAibGhzIjogewogICAgICAgICAgIm9wIjogInBhcmFtZXRlciIsCiAgICAgICAgICAicGFyYW1ldGVyIjogIk4iCiAgICAgICAgfSwKICAgICAgICAicmVsYXRpb24iOiAiZ2UiLAogICAgICAgICJyaHMiOiB7CiAgICAgICAgICAib3AiOiAibGl0ZXJhbCIsCiAgICAgICAgICAidmFsdWUiOiAxCiAgICAgICAgfQogICAgICB9LAogICAgICB7CiAgICAgICAgImNvbnN0cmFpbnRJZCI6ICJjXzIiLAogICAgICAgICJsaHMiOiB7CiAgICAgICAgICAib3AiOiAicGFyYW1ldGVyIiwKICAgICAgICAgICJwYXJhbWV0ZXIiOiAiQkxPQ0siCiAgICAgICAgfSwKICAgICAgICAicmVsYXRpb24iOiAiZ3QiLAogICAgICAgICJyaHMiOiB7CiAgICAgICAgICAib3AiOiAibGl0ZXJhbCIsCiAgICAgICAgICAidmFsdWUiOiAwCiAgICAgICAgfQogICAgICB9CiAgICBdLAogICAgImhhcmR3YXJlQ29ob3J0SWRzIjogWwogICAgICAiaHdfYTEwMF84MGciCiAgICBdCiAgfSwKICAicmVmZXJlbmNlIjogewogICAgImtpbmQiOiAibnVtcHkiLAogICAgInBhdGgiOiAia2VybmVscy9yZWZlcmVuY2UucHkiLAogICAgInN5bWJvbCI6ICJyZWZlcmVuY2UiLAogICAgInRvbGVyYW5jZXMiOiB7CiAgICAgICJhdG9sIjogMC4wLAogICAgICAicnRvbCI6IDAuMCwKICAgICAgImR0eXBlIjogImZwMTYiLAogICAgICAibmFuUG9saWN5IjogImVxdWFsLW5hbiIsCiAgICAgICJpbmZQb2xpY3kiOiAiZXF1YWwtaW5mIgogICAgfQogIH0sCiAgInJlcXVpcmVkUHJvcGVydGllcyI6IFsKICAgICJvdXRwdXRDb3ZlcmFnZSIsCiAgICAibWVtb3J5Qm91bmRzIiwKICAgICJ3cml0ZVdyaXRlQ29uZmxpY3QiCiAgXSwKICAibm90ZXMiOiAiVGhlIGNvcnJlY3QgY29udHJvbDogdGhlIHNhbWUga2VybmVsIHdpdGggYSBjZWlsaW5nLWRpdmlkZWQgZ3JpZCwgc28gZXZlcnkgZGVjbGFyZWQgb3V0cHV0IGVsZW1lbnQgaXMgd3JpdHRlbiBhbmQgdGhlIG1vZGVsbGVkIGhvbGUgZGlzYXBwZWFycy4iLAogICJjcmVhdGVkQXQiOiAiMjAyNi0xMC0xMlQwOToxODowMFoiCn0K"
+apps/cli test:     },
+apps/cli test:     "kernels/reference.py": {
+apps/cli test:       "encoding": "base64",
+apps/cli test:       "data": "IiIiTnVtZXJpY2FsIHJlZmVyZW5jZSBmb3IgdGhlIHJlY29uc3RydWN0ZWQgdHJhbnNmb3JtIGZpeHR1cmUuCgpPbmx5IHRoZSBjb25zZW50LWNvbnRyb2xsZWQgbnVtZXJpY2FsIHBhdGggbWF5IGV4ZWN1dGUgdGhpcyBmdW5jdGlvbi4KIiIiCgoKZGVmIHJlZmVyZW5jZSh4KToKICAgIHJldHVybiB4ICogMi4wCg=="
+apps/cli test:     }
+apps/cli test:   }
+apps/cli test: }
+apps/cli test:  ✓ src/cli.test.ts (8 tests) 1154ms
+apps/cli test:    ✓ analyzing the flagship fixture end to end > violates on the floor-divided grid  689ms
+apps/cli test:    ✓ analyzing the flagship fixture end to end > leaves the correct control silent  434ms
+apps/cli test: stderr | src/cli.test.ts > analyzing the flagship fixture end to end > leaves the correct control silent
+apps/cli test: pomset: outputCoverage=established memoryBounds=established writeWriteConflict=established
+apps/cli test: stderr | src/workflow.test.ts > portable local workflow > rejects an unsafe or tampered bundle before workspace creation
+apps/cli test: pomset: outputCoverage=established memoryBounds=established writeWriteConflict=established
+apps/cli test: stderr | src/workflow.test.ts > portable local workflow > compares same-domain named snapshots and refuses domain drift
+apps/cli test: pomset: outputCoverage=violated memoryBounds=established writeWriteConflict=established
+apps/cli test: stderr | src/workflow.test.ts > portable local workflow > compares same-domain named snapshots and refuses domain drift
+apps/cli test: pomset: outputCoverage=established memoryBounds=established writeWriteConflict=established
+apps/cli test: stderr | src/workflow.test.ts > portable local workflow > retains imported measurements but removes their recommendation eligibility
+apps/cli test: pomset: outputCoverage=established memoryBounds=established writeWriteConflict=established
+apps/api test:  ✓ src/local-server.test.ts (5 tests) 2026ms
+apps/api test:    ✓ analyzes changed declarations and preserves the previous captured evidence  894ms
+apps/api test:    ✓ never executes top-level source and preserves cancellation precedence  937ms
+apps/api test:  Test Files  2 passed (2)
+apps/api test:       Tests  7 passed (7)
+apps/api test:    Start at  21:10:07
+apps/api test:    Duration  2.34s (transform 107ms, setup 0ms, collect 266ms, tests 2.06s, environment 0ms, prepare 75ms)
+apps/api test: Done
+apps/cli test: stderr | src/workflow.test.ts > portable local workflow > does not compare a forged summary or accept inconsistent portable provenance
+apps/cli test: pomset: outputCoverage=violated memoryBounds=established writeWriteConflict=established
+apps/cli test: {"schemaVersion":1,"error":{"code":"INPUT_INVALID","message":"Unknown option '--garbage'"}}
+apps/cli test:  ✓ src/workflow.test.ts (6 tests) 2952ms
+apps/cli test:    ✓ portable local workflow > captures immutable bytes, exports after an edit and imports without executing  729ms
+apps/cli test:    ✓ portable local workflow > rejects an unsafe or tampered bundle before workspace creation  443ms
+apps/cli test:    ✓ portable local workflow > compares same-domain named snapshots and refuses domain drift  873ms
+apps/cli test:    ✓ portable local workflow > retains imported measurements but removes their recommendation eligibility  437ms
+apps/cli test:    ✓ portable local workflow > does not compare a forged summary or accept inconsistent portable provenance  423ms
+apps/cli test:  Test Files  3 passed (3)
+apps/cli test:       Tests  16 passed (16)
+apps/cli test:    Start at  21:10:06
+apps/cli test:    Duration  3.38s (transform 132ms, setup 0ms, collect 440ms, tests 4.11s, environment 0ms, prepare 134ms)
+apps/cli test: Done
+$ uv run pytest engines packages/contracts/python -q
+..................................................                       [100%]
+50 passed in 2.55s
+$ uv run python -m pomset_contracts.check
+fixtures: 22 accepted, 13 rejected, 0 deferred
+$ pnpm --filter @pomset/contracts run check:docs
+$ node scripts/check-docs.mjs
+docs links: 1157 relative links resolve
+$ pnpm --filter @pomset/contracts run check:profiles
+$ node scripts/check-profiles.mjs
+  cuda/local.json: 6 capabilities
+  openmp/local.json: 6 capabilities
+  triton/local-cpu.json: 10 capabilities
+profiles: 3 revisions and 22 capabilities validate
+$ pnpm --filter @pomset/contracts run check:licences
+$ node scripts/check-licences.mjs
+  fixtures/kernels/triton/transform_ceil_grid: control (Apache-2.0)
+  fixtures/kernels/triton/transform_floor_grid: defect (Apache-2.0)
+licences: 2 fixtures (1 defect, 1 control), NOTICE present
+$ node scripts/check-identity.mjs
+identity: 22 canonical cases and 3 manifest hashes agree across languages
