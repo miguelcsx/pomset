@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "scn_invalid_divisor",
+  "snapshotId": "snp_01HN3",
+  "name": "transform output coverage",
+  "entrypoint": {
+    "path": "kernels/transform.py",
+    "symbol": "transform"
+  },
+  "allocations": [
+    {
+      "allocationId": "al_x",
+      "name": "X",
+      "role": "input",
+      "dtype": "fp16",
+      "shape": [
+        {
+          "op": "parameter",
+          "parameter": "N"
+        }
+      ]
+    },
+    {
+      "allocationId": "al_y",
+      "name": "Y",
+      "role": "output",
+      "dtype": "fp16",
+      "shape": [
+        {
+          "op": "parameter",
+          "parameter": "N"
+        }
+      ],
+      "poisoned": true
+    }
+  ],
+  "launch": {
+    "grid": [
+      {
+        "op": "floorDivide",
+        "operands": [
+          {
+            "op": "parameter",
+            "parameter": "N"
+          },
+          {
+            "op": "literal",
+            "value": 0
+          }
+        ]
+      }
+    ],
+    "block": [
+      {
+        "op": "parameter",
+        "parameter": "BLOCK"
+      }
+    ],
+    "numWarps": {
+      "op": "literal",
+      "value": 4
+    },
+    "displayHints": [
+      "grid = (N // BLOCK,)"
+    ]
+  },
+  "domain": {
+    "domainId": "dom_f8K2",
+    "enumerable": true,
+    "variables": [
+      {
+        "name": "N",
+        "kind": "shape",
+        "type": "int",
+        "width": "i32",
+        "min": 1,
+        "max": 4096,
+        "step": 1
+      },
+      {
+        "name": "BLOCK",
+        "kind": "blockSize",
+        "type": "enum",
+        "values": [
+          128,
+          256,
+          512
+        ]
+      },
+      {
+        "name": "dtype",
+        "kind": "dtype",
+        "type": "enum",
+        "values": [
+          "fp16",
+          "bf16"
+        ]
+      }
+    ],
+    "constraints": [
+      {
+        "constraintId": "c1",
+        "lhs": {
+          "op": "parameter",
+          "parameter": "N"
+        },
+        "relation": "ge",
+        "rhs": {
+          "op": "literal",
+          "value": 1
+        }
+      },
+      {
+        "constraintId": "c2",
+        "lhs": {
+          "op": "parameter",
+          "parameter": "BLOCK"
+        },
+        "relation": "gt",
+        "rhs": {
+          "op": "literal",
+          "value": 0
+        }
+      }
+    ],
+    "hardwareCohortIds": [
+      "hw_a100_80g"
+    ]
+  },
+  "reference": {
+    "kind": "numpy",
+    "path": "kernels/reference.py",
+    "symbol": "reference",
+    "tolerances": {
+      "atol": 0.0,
+      "rtol": 0.0,
+      "dtype": "fp16",
+      "nanPolicy": "equal-nan",
+      "infPolicy": "equal-inf"
+    }
+  },
+  "requiredProperties": [
+    "outputCoverage",
+    "memoryBounds",
+    "writeWriteConflict"
+  ],
+  "notes": "Mirrors the floor-divided grid used in production.",
+  "createdAt": "2026-10-12T09:18:00Z"
+}
