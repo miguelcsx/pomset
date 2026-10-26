@@ -1,0 +1,15 @@
+# The root of the Python side of the monorepo. It is a virtual uv workspace: it
+# owns no code of its own, but it resolves one lockfile across the Python
+# members so `uv sync --frozen` installs a single, pinned environment for the
+# engines and for the contract bindings.
+#
+# The TypeScript side is a pnpm workspace; the two are coordinated here, and no
+# Python or native build is ever routed through a JavaScript bundler.
+[tool.uv.workspace]
+members = ["engines/triton", "packages/contracts/python"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

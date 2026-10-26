@@ -1,0 +1,36 @@
+{
+  "name": "pomset",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint .",
+    "format:check": "nixfmt --check flake.nix && ruff format --check engines packages/contracts/python/pomset_contracts/check.py packages/contracts/python/pomset_contracts/semantic.py scripts/audit-spec.py",
+    "check:boundaries": "node scripts/check-boundaries.mjs",
+    "test:identity": "node scripts/check-identity.mjs",
+    "check:contracts": "pnpm --filter @pomset/contracts run generate --check",
+    "check:docs": "pnpm --filter @pomset/contracts run check:docs",
+    "ci": "pnpm run check:boundaries && pnpm run check:contracts && pnpm run typecheck && pnpm run lint && pnpm run lint:python && pnpm run format:check && pnpm run build && pnpm run test && pnpm run test:python && pnpm run check:semantics && pnpm run check:docs && pnpm run check:profiles && pnpm run check:licences && pnpm run test:identity",
+    "check:profiles": "pnpm --filter @pomset/contracts run check:profiles",
+    "check:licences": "pnpm --filter @pomset/contracts run check:licences",
+    "lint:python": "ruff check engines packages/contracts/python scripts/audit-spec.py",
+    "test:python": "uv run pytest engines packages/contracts/python -q",
+    "check:semantics": "uv run python -m pomset_contracts.check",
+    "workbench": "node apps/api/dist/local-main.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/node": "^22.10.2",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "eslint": "^9.17.0",
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.18.1",
+    "vitest": "^3.0.5"
+  }
+}

@@ -1,0 +1,21 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+allowBuilds:
+  # esbuild's install script links its platform binary; Vite and Vitest need it.
+  esbuild: true
+
+# One version per shared development dependency, declared here rather than
+# repeated in nine manifests. A member references these with `catalog:`.
+catalog:
+  "@types/node": ^22.10.2
+  ajv: ^8.17.1
+  typescript: ~5.7.2
+  vitest: ^3.0.5
+
+# The Nix development shell provides the pnpm that executes these scripts. No
+# `packageManager` field is set on the root manifest on purpose: pnpm 10 and
+# later re-execute themselves as whatever version that field declares, fetching
+# it when it is not already present, which breaks the offline shell. See the
+# comment in flake.nix.

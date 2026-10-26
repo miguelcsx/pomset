@@ -1,0 +1,19 @@
+Pomset
+Licensed under the Apache License, Version 2.0; see LICENSE.
+
+Kernel fixtures
+
+fx_triton_transform_floor_grid and fx_triton_transform_ceil_grid are Pomset
+fixtures distributed under Apache-2.0. Their fixture.json files record their
+origin, declared outcomes and relationship.
+
+The floor-grid fixture is a reconstruction of an output-coverage failure
+pattern, with research context at https://github.com/triton-lang/triton/issues/9230.
+It is not the upstream reproducer and does not reproduce the issue's complete
+autotune/buffer-reuse behavior. The ceiling-grid fixture is its control.
+
+Design references
+
+The local inspo/ and dont-track/ directories are excluded from distribution.
+Compiler Explorer is an interaction reference, not a bundled implementation.
+Third-party runtime dependencies retain their own licenses in their packages.

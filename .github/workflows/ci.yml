@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+# Every job here is CPU-only and runnable on a machine with no GPU. The GPU job
+# at the bottom is declared optional: it is skipped without a self-hosted runner
+# and never gates a merge, because a missing device is a documented blocker and
+# not a failure.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  boundaries:
+    name: dependency boundaries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - run: nix develop -c pnpm install --frozen-lockfile
+      - run: nix develop -c pnpm run check:boundaries
+
+  package:
+    name: ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - "@pomset/contracts"
+          - "@pomset/domain"
+          - "@pomset/engine-client"
+          - "@pomset/storage"
+          - "@pomset/ui"
+          - "@pomset/cli"
+          - "@pomset/worker"
+          - "@pomset/api"
+          - "@pomset/web"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - run: nix develop -c pnpm install --frozen-lockfile
+      - run: nix develop -c pnpm --filter "${{ matrix.package }}" run typecheck
+      - run: nix develop -c pnpm --filter "${{ matrix.package }}" run build
+      - run: nix develop -c pnpm --filter "${{ matrix.package }}" run test
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - run: nix develop -c pnpm install --frozen-lockfile
+      - run: nix develop -c pnpm run lint
+      - run: nix develop -c pnpm run lint:python
+      - run: nix develop -c pnpm run format:check
+
+  bindings:
+    name: contract bindings, fixtures, profiles and licences
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - run: nix develop -c pnpm install --frozen-lockfile
+      - run: nix develop -c uv sync --frozen
+      - run: nix develop -c pnpm run check:contracts
+      - run: nix develop -c pnpm run check:semantics
+      - run: nix develop -c pnpm run check:docs
+      - run: nix develop -c pnpm run check:profiles
+      - run: nix develop -c pnpm run check:licences
+      - run: nix develop -c pnpm run test:identity
+
+  python:
+    name: python engines
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - run: nix develop -c uv sync --frozen
+      - run: nix develop -c pnpm run test:python
+
+  e2e:
+    name: end-to-end analysis and viewer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - run: nix develop -c pnpm install --frozen-lockfile
+      - run: nix develop -c uv sync --frozen
+      - run: nix develop -c pnpm -r build
+      - run: nix develop -c pnpm --filter @pomset/cli run test
+      - name: the flagship fixture violates, its control stays silent
+        run: |
+          nix develop -c node apps/cli/dist/bin/pomset.js analyze --scenario examples/transform-floor-grid/scenario.json --report /tmp/report.json; test $? -eq 1
+          nix develop -c node apps/cli/dist/bin/pomset.js analyze --scenario examples/transform-floor-grid/scenario-ceil.json --report /tmp/report.json; test $? -eq 0
+
+  gpu:
+    name: local GPU checks (optional)
+    # Skipped unless a self-hosted runner with a device is present. A missing
+    # device is a blocker, never a pass, and never gates a merge.
+    runs-on: [self-hosted, gpu]
+    continue-on-error: true
+    if: ${{ vars.POMSET_GPU_RUNNER == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - run: nix develop -c uv sync --frozen --extra replay
+      - run: nix develop -c pnpm run test:python -m gpu

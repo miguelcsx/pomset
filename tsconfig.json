@@ -1,0 +1,13 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/contracts" },
+    { "path": "packages/domain" },
+    { "path": "packages/engine-client" },
+    { "path": "packages/storage" },
+    { "path": "packages/ui" },
+    { "path": "apps/cli" },
+    { "path": "apps/worker" },
+    { "path": "apps/api" }
+  ]
+}

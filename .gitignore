@@ -3,6 +3,9 @@
 
 # Node
 node_modules/
+dist/
+*.tsbuildinfo
+.vite/
 
 # Rust
 target/
@@ -11,6 +14,8 @@ target/
 __pycache__/
 *.py[cod]
 .venv/
+.pytest_cache/
+.ruff_cache/
 
 # Local environment
 .env
@@ -22,3 +27,12 @@ __pycache__/
 
 # Design notes stay local
 docs/about.md
+
+# Untracked inputs: never committed
+inspo/
+dont-track/
+
+# Local run artifacts
+.pomset/
+
+.pomset-workbench/
