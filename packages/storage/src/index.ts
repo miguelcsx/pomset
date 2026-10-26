@@ -7,6 +7,6 @@
 export const RETENTION_CLASSES = ["job", "project", "publication", "permanent"] as const;
 
 export type RetentionClass = (typeof RETENTION_CLASSES)[number];
-export { LocalStore } from "./local.js";
+export { LocalStore, RECORD_IDENTITY_FIELDS, RECORD_TARGETS } from "./local.js";
 
 export { recoverAbandoned, recordEngineProcess, processIdentity, type ProcessIdentity } from "./recovery.js";

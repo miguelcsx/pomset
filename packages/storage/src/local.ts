@@ -7,11 +7,28 @@ import { schemaSet, type AnalysisResult, type ErrorRecord, type Job, type JobEve
 import { processIdentity } from "./recovery.js";
 import { canonicalize, sha256Of, manifestHash, acceptsEvidence, canTransition, cancellationTarget, completionTarget, isEnqueueable } from "@pomset/domain";
 
-const targets: Record<string, string> = {
+/**
+ * Which canonical schema every stored record must satisfy, and which field of it
+ * carries the identity it is stored under.
+ *
+ * Exported because the rules of a record are not the rules of SQLite: a
+ * PostgreSQL backend must apply exactly these, and a second copy of this table
+ * would be a second answer to what a snapshot is.
+ */
+export const RECORD_TARGETS: Readonly<Record<string, string>> = {
   snapshot: "domain.schema.yaml#/$defs/snapshotManifest", scenario: "domain.schema.yaml#/$defs/scenario",
   profile: "domain.schema.yaml#/$defs/profileRevision", result: "evidence.schema.yaml#/$defs/analysisResult",
   measurement: "measurement.schema.yaml#/$defs/measurement", project: "domain.schema.yaml#/$defs/project",
 };
+
+/** The field each record kind must carry, equal to the id it is stored under. */
+export const RECORD_IDENTITY_FIELDS: Readonly<Record<string, string>> = {
+  snapshot: "snapshotId", scenario: "scenarioId", profile: "profileRevisionId",
+  result: "resultId", measurement: "measurementId", project: "projectId",
+};
+
+const targets = RECORD_TARGETS;
+const identityFields = RECORD_IDENTITY_FIELDS;
 
 function check(record: unknown, target: string): void {
   const validate = schemaSet().validatorFor(target);
@@ -44,7 +61,7 @@ export class LocalStore {
     const target = targets[kind];
     if (!target) throw new Error(`Unknown record kind ${kind}`);
     check(value, target);
-    const field = { snapshot: "snapshotId", scenario: "scenarioId", profile: "profileRevisionId", result: "resultId", measurement: "measurementId", project: "projectId" }[kind as "snapshot" | "scenario" | "profile" | "result" | "measurement" | "project"];
+    const field = identityFields[kind]!;
     if ((value as Record<string, unknown>)[field] !== id) throw new Error("INPUT_INVALID: record identifier differs from its storage key");
     if (kind === "snapshot" && manifestHash(value as SnapshotManifest) !== (value as SnapshotManifest).manifestHash) throw new Error("INPUT_INVALID: snapshot manifest hash mismatch");
     const document = canonicalize(value);
