@@ -16,6 +16,7 @@ export * from "./evidence.js";
 export * from "./eligibility.js";
 export * from "./expr.js";
 export * from "./identity.js";
+export * from "./job.js";
 export * from "./manifest.js";
 export * from "./project.js";
 export * from "./profile.js";

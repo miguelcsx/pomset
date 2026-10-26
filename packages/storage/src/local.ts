@@ -5,12 +5,8 @@ import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { schemaSet, type AnalysisResult, type ErrorRecord, type Job, type JobEvent, type JobState, type SnapshotManifest } from "@pomset/contracts";
 import { processIdentity } from "./recovery.js";
-import { canonicalize, sha256Of, manifestHash } from "@pomset/domain";
+import { canonicalize, sha256Of, manifestHash, acceptsEvidence, canTransition, cancellationTarget, completionTarget, isEnqueueable } from "@pomset/domain";
 
-const transitions: Record<JobState, readonly JobState[]> = {
-  queued: ["running", "failed", "cancelled"], running: ["succeeded", "failed", "cancel-requested"],
-  "cancel-requested": ["cancelled"], succeeded: [], failed: [], cancelled: [],
-};
 const targets: Record<string, string> = {
   snapshot: "domain.schema.yaml#/$defs/snapshotManifest", scenario: "domain.schema.yaml#/$defs/scenario",
   profile: "domain.schema.yaml#/$defs/profileRevision", result: "evidence.schema.yaml#/$defs/analysisResult",
@@ -92,14 +88,14 @@ export class LocalStore {
   }
   enqueue(job: Job): void {
     check(job, "engine.schema.yaml#/$defs/job");
-    if (job.state !== "queued" || !job.attemptId) throw new Error("INPUT_INVALID: a new job has one attempt and starts queued");
+    if (!isEnqueueable(job)) throw new Error("INPUT_INVALID: a new job has one attempt and starts queued");
     this.transaction(() => {
       this.db.prepare("INSERT INTO jobs VALUES(?,?)").run(job.jobId, canonicalize(job));
       this.event(job, "job.queued");
     });
   }
   private change(job: Job, state: JobState, patch: Partial<Job> = {}): Job {
-    if (!transitions[job.state].includes(state)) throw new Error(`INPUT_INVALID: forbidden transition ${job.state} -> ${state}`);
+    if (!canTransition(job.state, state)) throw new Error(`INPUT_INVALID: forbidden transition ${job.state} -> ${state}`);
     const updated: Job = { ...job, ...patch, state };
     check(updated, "engine.schema.yaml#/$defs/job");
     this.db.prepare("UPDATE jobs SET document=? WHERE id=?").run(canonicalize(updated), job.jobId);
@@ -119,16 +115,17 @@ export class LocalStore {
   cancel(id: string): Job {
     return this.transaction(() => {
       const job = this.job(id);
-      if (["succeeded", "failed", "cancelled", "cancel-requested"].includes(job.state)) return job;
-      return this.change(job, job.state === "queued" ? "cancelled" : "cancel-requested", { cancelRequestedAt: new Date().toISOString() });
+      const target = cancellationTarget(job.state);
+      if (!target) return job;
+      return this.change(job, target, { cancelRequestedAt: new Date().toISOString() });
     });
   }
   finish(id: string, results: readonly AnalysisResult[], failure?: ErrorRecord): Job {
     return this.transaction(() => {
       const job = this.job(id);
-      const cancelled = job.state === "cancel-requested";
-      const state = cancelled ? "cancelled" : failure ? "failed" : "succeeded";
-      if (!transitions[job.state].includes(state)) throw new Error("INPUT_INVALID: job is already terminal or was not started");
+      const state = completionTarget(job.state, Boolean(failure));
+      if (!state) throw new Error("INPUT_INVALID: job is already terminal or was not started");
+      const cancelled = state === "cancelled";
       const resultIds = [];
       for (const result of results) {
         if (result.jobId !== job.jobId || result.attemptId !== job.attemptId || result.snapshotId !== job.snapshotId || result.scenarioId !== job.scenarioId || result.profileRevisionId !== job.profileRevisionId) throw new Error("INPUT_INVALID: result provenance mismatch");
@@ -146,7 +143,7 @@ export class LocalStore {
   appendChunk(id: string, chunk: { readonly sequence: number; readonly type: string; readonly payload: Readonly<Record<string, unknown>> }): void {
     this.transaction(() => {
       const job = this.job(id);
-      if (job.state !== "running" && job.state !== "cancel-requested") throw new Error("INPUT_INVALID: an inactive attempt cannot append evidence");
+      if (!acceptsEvidence(job.state)) throw new Error("INPUT_INVALID: an inactive attempt cannot append evidence");
       const next = Number(this.db.prepare("SELECT COALESCE(MAX(sequence),0)+1 AS next FROM engine_chunks WHERE job_id=?").get(id)?.["next"]);
       if (chunk.sequence !== next) throw new Error("PROTOCOL_INVALID: durable chunk sequence mismatch");
       this.db.prepare("INSERT INTO engine_chunks VALUES(?,?,?)").run(id, chunk.sequence, canonicalize(chunk));
