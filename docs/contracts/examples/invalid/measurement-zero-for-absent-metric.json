@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "measurementId": "msr_zero_metric",
+  "resultId": "res_1",
+  "snapshotId": "snp_01HN3",
+  "scenarioId": "scn_91Bx",
+  "profileRevisionId": "prf_triton_cpu_z3_1",
+  "evidenceClass": "measured",
+  "origin": "local",
+  "metric": {
+    "name": "bankConflicts",
+    "unit": "count",
+    "statistic": "median"
+  },
+  "value": 0,
+  "distribution": {
+    "bucketEdges": [
+      12,
+      14,
+      16,
+      18,
+      20,
+      22,
+      24
+    ],
+    "counts": [
+      3,
+      9,
+      41,
+      52,
+      28,
+      7,
+      1
+    ]
+  },
+  "cohortId": "hw_a100_80g",
+  "hardware": {
+    "device": "NVIDIA A100-SXM4-80GB",
+    "arch": "sm_80",
+    "driver": "550.54.15",
+    "runtime": "cuda 12.4",
+    "clockMhz": 1410,
+    "clockMethod": "locked"
+  },
+  "tool": {
+    "name": "pomset-local-benchmark-harness",
+    "version": "0.1.0"
+  },
+  "instrumentation": {
+    "kind": "cuda-events",
+    "serializes": false
+  },
+  "samples": {
+    "warmupCount": 10,
+    "sampleCount": 120,
+    "outlierCount": 2,
+    "statistics": {
+      "min": 12.1,
+      "median": 18.4,
+      "mean": 18.9,
+      "max": 27.6,
+      "stdev": 2.3
+    }
+  },
+  "synchronization": {
+    "method": "event-elapsed",
+    "compileTimeSeparated": true,
+    "compileTimeMs": 412.0,
+    "jitCacheState": "warm"
+  },
+  "referenceOutcome": {
+    "checked": true,
+    "outcome": "agreed",
+    "propertyResultId": "pr_1",
+    "freshBufferUsed": true,
+    "autotuneBufferReuse": false
+  },
+  "eligibility": {
+    "state": "eligible",
+    "reasonCodes": [],
+    "policyId": "pol_default",
+    "policyRevision": 3
+  },
+  "notes": "Measured on the author's own device. Not a hosted measurement.",
+  "createdAt": "2026-10-12T10:02:00Z"
+}

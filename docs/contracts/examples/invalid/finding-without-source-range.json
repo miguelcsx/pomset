@@ -1,0 +1,516 @@
+{
+  "schemaVersion": 1,
+  "resultId": "res_invalid_nosource",
+  "jobId": "job_7Kd",
+  "attemptId": "att_7Kd_1",
+  "snapshotId": "snp_01HN3",
+  "scenarioId": "scn_91Bx",
+  "profileRevisionId": "prf_triton_cpu_z3_1",
+  "domain": {
+    "domainId": "dom_f8K2"
+  },
+  "policyId": "pol_default",
+  "policyRevision": 3,
+  "origin": "local",
+  "executedAt": "none",
+  "method": "symbolic",
+  "actors": [
+    {
+      "actorId": "act_p3t0",
+      "kind": "program-instance",
+      "label": "program 3, lane 0",
+      "coordinates": {
+        "programId": 3,
+        "lane": 0
+      }
+    },
+    {
+      "actorId": "act_p4t0",
+      "kind": "program-instance",
+      "label": "program 4, lane 0",
+      "coordinates": {
+        "programId": 4,
+        "lane": 0
+      }
+    }
+  ],
+  "events": [
+    {
+      "eventId": "ev_a1",
+      "actorId": "act_p3t0",
+      "operation": "write",
+      "scope": "grid",
+      "allocationId": "al_y",
+      "addressExpr": "Y + 3*BLOCK + arange(0,BLOCK)",
+      "maskExpr": "3*BLOCK + arange(0,BLOCK) < N",
+      "enabled": true,
+      "sourceRanges": [
+        {
+          "path": "kernels/transform.py",
+          "startLine": 8,
+          "startColumn": 4,
+          "endLine": 8,
+          "endColumn": 46,
+          "kind": "source",
+          "confidence": "exact"
+        }
+      ],
+      "producedBy": "src_z3"
+    },
+    {
+      "eventId": "ev_b1",
+      "actorId": "act_p4t0",
+      "operation": "write",
+      "scope": "grid",
+      "allocationId": "al_y",
+      "addressExpr": "Y + 4*BLOCK + arange(0,BLOCK)",
+      "maskExpr": "4*BLOCK + arange(0,BLOCK) < N",
+      "enabled": true,
+      "sourceRanges": [
+        {
+          "path": "kernels/transform.py",
+          "startLine": 8,
+          "startColumn": 4,
+          "endLine": 8,
+          "endColumn": 46,
+          "kind": "source",
+          "confidence": "exact"
+        }
+      ],
+      "producedBy": "src_z3"
+    }
+  ],
+  "findings": [
+    {
+      "schemaVersion": 1,
+      "findingId": "fnd_1",
+      "propertyId": "outputCoverage",
+      "evidenceClass": "counterexample",
+      "title": "Output index 1024 is never written when N is not a multiple of BLOCK",
+      "explanation": "With BLOCK=256 and a floor-divided grid, four program instances cover indices 0-1023. For N=1025 the declared output index 1024 has no enabled write.",
+      "actorIds": [
+        "act_p3t0",
+        "act_p4t0"
+      ],
+      "eventIds": [
+        "ev_a1",
+        "ev_b1"
+      ],
+      "sourceRanges": [],
+      "allocationIds": [
+        "al_y"
+      ],
+      "witnessId": "wit_1",
+      "order": {
+        "edgeIds": [],
+        "edges": [],
+        "isTotal": false
+      },
+      "provenance": [
+        {
+          "sourceId": "src_z3",
+          "method": "symbolic",
+          "tool": "z3",
+          "toolVersion": "4.13.0",
+          "artifactIds": [
+            "art_rep_1"
+          ]
+        }
+      ],
+      "semanticRole": "violation",
+      "backendId": "triton",
+      "correctionHint": {
+        "hintId": "hint_1",
+        "patternId": "positive-n-positive-block-floor-grid",
+        "suggestion": "grid = (triton.cdiv(N, BLOCK),)",
+        "requiresUserRerun": true,
+        "qualified": true,
+        "basisFindingId": "fnd_1"
+      }
+    }
+  ],
+  "witnesses": [
+    {
+      "witnessId": "wit_1",
+      "kind": "output-index",
+      "assignments": [
+        {
+          "name": "N",
+          "value": 1025
+        },
+        {
+          "name": "BLOCK",
+          "value": 256
+        },
+        {
+          "name": "dtype",
+          "value": "fp16"
+        }
+      ],
+      "actorIds": [
+        "act_p3t0",
+        "act_p4t0"
+      ],
+      "eventIds": [
+        "ev_a1",
+        "ev_b1"
+      ],
+      "sourceRanges": [
+        {
+          "path": "kernels/transform.py",
+          "startLine": 8,
+          "startColumn": 4,
+          "endLine": 8,
+          "endColumn": 46,
+          "kind": "source",
+          "confidence": "exact"
+        }
+      ],
+      "addressExpr": "Y + 1024",
+      "replay": {
+        "method": "cpu-interpreter",
+        "outcome": "reproduced",
+        "profileRevisionId": "prf_triton_cpu_z3_1",
+        "artifactId": "art_trace_1",
+        "note": "Numerical replay only. Not evidence about GPU scheduling or GPU speed."
+      },
+      "minimization": {
+        "attempted": true,
+        "droppedAssumptions": 0,
+        "note": "N=1025 is already minimal for BLOCK=256."
+      }
+    }
+  ],
+  "sampledChecks": [
+    {
+      "sampledCheckId": "chk_1",
+      "strategyId": "boundary",
+      "strategyRevision": 1,
+      "seed": 41,
+      "budget": {
+        "solverTimeMs": 30000,
+        "engineWallTimeMs": 120000,
+        "memoryBytes": 2147483648,
+        "maxMessageBytes": 1048576,
+        "maxOutputBytes": 16777216,
+        "maxArtifactBytes": 268435456,
+        "usedSolverTimeMs": 1840,
+        "usedWallTimeMs": 6210,
+        "exhausted": false
+      },
+      "points": [
+        {
+          "pointId": "pt_1",
+          "assignments": [
+            {
+              "name": "N",
+              "value": 256
+            },
+            {
+              "name": "BLOCK",
+              "value": 256
+            }
+          ]
+        },
+        {
+          "pointId": "pt_2",
+          "assignments": [
+            {
+              "name": "N",
+              "value": 257
+            },
+            {
+              "name": "BLOCK",
+              "value": 256
+            }
+          ]
+        },
+        {
+          "pointId": "pt_3",
+          "assignments": [
+            {
+              "name": "N",
+              "value": 1025
+            },
+            {
+              "name": "BLOCK",
+              "value": 256
+            }
+          ]
+        }
+      ],
+      "observations": [
+        {
+          "pointId": "pt_1",
+          "observation": "passed"
+        },
+        {
+          "pointId": "pt_2",
+          "observation": "failed",
+          "findingId": "fnd_1"
+        },
+        {
+          "pointId": "pt_3",
+          "observation": "failed",
+          "findingId": "fnd_1"
+        }
+      ]
+    }
+  ],
+  "propertyResults": [
+    {
+      "propertyResultId": "pr_1",
+      "propertyId": "outputCoverage",
+      "outcome": "violated",
+      "method": "symbolic",
+      "evidenceClass": "counterexample",
+      "assumptions": {
+        "model": "triton-subset-v1",
+        "modelRevision": "2026-10-a",
+        "domainRef": "dom_f8K2",
+        "items": [
+          {
+            "assumptionId": "asm1",
+            "statement": "One program instance is the unit of unordered execution; lanes within an instance execute in lockstep.",
+            "kind": "ordering"
+          },
+          {
+            "assumptionId": "asm2",
+            "statement": "X and Y do not alias; no alias group relates them.",
+            "kind": "aliasing"
+          },
+          {
+            "assumptionId": "asm3",
+            "statement": "Address arithmetic is 32-bit signed and does not overflow within the declared shape range.",
+            "kind": "width"
+          },
+          {
+            "assumptionId": "asm4",
+            "statement": "All enabled stores are non-atomic. Atomics are outside the supported subset.",
+            "kind": "other"
+          }
+        ]
+      },
+      "coverageRef": "cov_1",
+      "budget": {
+        "solverTimeMs": 30000,
+        "engineWallTimeMs": 120000,
+        "memoryBytes": 2147483648,
+        "maxMessageBytes": 1048576,
+        "maxOutputBytes": 16777216,
+        "maxArtifactBytes": 268435456,
+        "usedSolverTimeMs": 1840,
+        "usedWallTimeMs": 6210,
+        "exhausted": false
+      },
+      "findingIds": [
+        "fnd_1"
+      ],
+      "witnessIds": [
+        "wit_1"
+      ],
+      "sampledCheckIds": [
+        "chk_1"
+      ],
+      "semanticRole": "violation"
+    },
+    {
+      "propertyResultId": "pr_2",
+      "propertyId": "memoryBounds",
+      "outcome": "established",
+      "method": "symbolic",
+      "evidenceClass": "verified-under-assumptions",
+      "assumptions": {
+        "model": "triton-subset-v1",
+        "modelRevision": "2026-10-a",
+        "domainRef": "dom_f8K2",
+        "items": [
+          {
+            "assumptionId": "asm1",
+            "statement": "One program instance is the unit of unordered execution; lanes within an instance execute in lockstep.",
+            "kind": "ordering"
+          },
+          {
+            "assumptionId": "asm2",
+            "statement": "X and Y do not alias; no alias group relates them.",
+            "kind": "aliasing"
+          },
+          {
+            "assumptionId": "asm3",
+            "statement": "Address arithmetic is 32-bit signed and does not overflow within the declared shape range.",
+            "kind": "width"
+          },
+          {
+            "assumptionId": "asm4",
+            "statement": "All enabled stores are non-atomic. Atomics are outside the supported subset.",
+            "kind": "other"
+          }
+        ]
+      },
+      "coverageRef": "cov_1",
+      "budget": {
+        "solverTimeMs": 30000,
+        "engineWallTimeMs": 120000,
+        "memoryBytes": 2147483648,
+        "maxMessageBytes": 1048576,
+        "maxOutputBytes": 16777216,
+        "maxArtifactBytes": 268435456,
+        "usedSolverTimeMs": 1840,
+        "usedWallTimeMs": 6210,
+        "exhausted": false
+      },
+      "semanticRole": "contract"
+    },
+    {
+      "propertyResultId": "pr_3",
+      "propertyId": "writeWriteConflict",
+      "outcome": "unsupported",
+      "method": "symbolic",
+      "evidenceClass": "potential",
+      "assumptions": {
+        "model": "triton-subset-v1",
+        "modelRevision": "2026-10-a",
+        "domainRef": "dom_f8K2",
+        "items": [
+          {
+            "assumptionId": "asm1",
+            "statement": "One program instance is the unit of unordered execution; lanes within an instance execute in lockstep.",
+            "kind": "ordering"
+          },
+          {
+            "assumptionId": "asm2",
+            "statement": "X and Y do not alias; no alias group relates them.",
+            "kind": "aliasing"
+          },
+          {
+            "assumptionId": "asm3",
+            "statement": "Address arithmetic is 32-bit signed and does not overflow within the declared shape range.",
+            "kind": "width"
+          },
+          {
+            "assumptionId": "asm4",
+            "statement": "All enabled stores are non-atomic. Atomics are outside the supported subset.",
+            "kind": "other"
+          }
+        ]
+      },
+      "coverageRef": "cov_1",
+      "budget": {
+        "solverTimeMs": 30000,
+        "engineWallTimeMs": 120000,
+        "memoryBytes": 2147483648,
+        "maxMessageBytes": 1048576,
+        "maxOutputBytes": 16777216,
+        "maxArtifactBytes": 268435456,
+        "usedSolverTimeMs": 1840,
+        "usedWallTimeMs": 6210,
+        "exhausted": false
+      },
+      "unsupportedReason": "Kernel variants using tl.atomic_add are outside the supported subset.",
+      "semanticRole": "unknown"
+    }
+  ],
+  "coverage": {
+    "coverageId": "cov_1",
+    "domainRef": "dom_f8K2",
+    "denominator": {
+      "kind": "enumerated",
+      "pointCount": 24576,
+      "duplicatesRemoved": true,
+      "constraintIds": [
+        "c1",
+        "c2"
+      ]
+    },
+    "regions": [
+      {
+        "regionId": "reg_full_tiles",
+        "label": "N divisible by BLOCK",
+        "constraints": [
+          "N modulo BLOCK == 0"
+        ],
+        "classifications": [
+          {
+            "propertyId": "outputCoverage",
+            "classification": "established",
+            "method": "symbolic",
+            "resultId": "res_1"
+          },
+          {
+            "propertyId": "memoryBounds",
+            "classification": "established",
+            "method": "symbolic",
+            "resultId": "res_1"
+          },
+          {
+            "propertyId": "writeWriteConflict",
+            "classification": "established",
+            "method": "symbolic",
+            "resultId": "res_1"
+          }
+        ]
+      },
+      {
+        "regionId": "reg_ragged",
+        "label": "N not divisible by BLOCK",
+        "constraints": [
+          "N modulo BLOCK != 0"
+        ],
+        "classifications": [
+          {
+            "propertyId": "outputCoverage",
+            "classification": "violated",
+            "method": "symbolic",
+            "resultId": "res_1",
+            "sampledCheckId": "chk_1"
+          },
+          {
+            "propertyId": "memoryBounds",
+            "classification": "established",
+            "method": "symbolic",
+            "resultId": "res_1"
+          },
+          {
+            "propertyId": "writeWriteConflict",
+            "classification": "unknown",
+            "method": "symbolic",
+            "resultId": "res_1"
+          }
+        ]
+      },
+      {
+        "regionId": "reg_atomics",
+        "label": "kernel variants using tl.atomic_add",
+        "constraints": [
+          "uses tl.atomic_add"
+        ],
+        "classifications": [
+          {
+            "propertyId": "writeWriteConflict",
+            "classification": "unsupported",
+            "method": "symbolic",
+            "resultId": "res_1"
+          }
+        ]
+      }
+    ],
+    "notes": "Percentages are reported only because this domain is finite and enumerated."
+  },
+  "budget": {
+    "solverTimeMs": 30000,
+    "engineWallTimeMs": 120000,
+    "memoryBytes": 2147483648,
+    "maxMessageBytes": 1048576,
+    "maxOutputBytes": 16777216,
+    "maxArtifactBytes": 268435456,
+    "usedSolverTimeMs": 1840,
+    "usedWallTimeMs": 6210,
+    "exhausted": false
+  },
+  "artifactManifestIds": [
+    "art_rep_1",
+    "art_trace_1"
+  ],
+  "queryRevision": "2026-10-a",
+  "createdAt": "2026-10-12T09:22:10Z"
+}

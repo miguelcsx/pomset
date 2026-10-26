@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "jobId": "job_invalid_state",
+  "projectId": "prj_01HN2",
+  "ownerId": "own_7Qd2",
+  "snapshotId": "snp_01HN3",
+  "scenarioId": "scn_91Bx",
+  "profileRevisionId": "prf_triton_cpu_z3_1",
+  "domainRef": "dom_f8K2",
+  "policyId": "pol_default",
+  "policyRevision": 3,
+  "operation": "coverage",
+  "state": "completed",
+  "attemptId": "att_7Kd_1",
+  "leaseId": "lease_5",
+  "leaseFencingToken": 5,
+  "leaseExpiresAt": "2026-10-12T09:22:15Z",
+  "resultIds": [
+    "res_1"
+  ],
+  "createdAt": "2026-10-12T09:20:00Z",
+  "startedAt": "2026-10-12T09:20:01Z",
+  "finishedAt": "2026-10-12T09:22:10Z"
+}
