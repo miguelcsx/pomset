@@ -1,0 +1,34 @@
+[project]
+name = "pomset-contracts"
+version = "0.0.0"
+description = "Generated Python bindings for the canonical Pomset contracts, plus the checker that replays docs/contracts/examples/manifest.json."
+requires-python = "==3.12.*"
+dependencies = [
+  # JSON Schema 2020-12 validation of instances against #/$defs/<name>, exactly
+  # as the example fixtures address them.
+  "jsonschema[format]==4.23.0",
+  # The registry that resolves the schemas' https://pomset.dev $id values to the
+  # local schema files.
+  "referencing==0.35.1",
+  # The schemas are YAML; one parser reads both YAML and its JSON subset.
+  "pyyaml==6.0.2",
+]
+
+[dependency-groups]
+dev = [
+  "pytest==8.3.4",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["pomset_contracts"]
+
+[tool.pytest.ini_options]
+testpaths = ["pomset_contracts"]
+
+[tool.ruff]
+# The generated bindings are the generator's output, not hand-written code.
+extend-exclude = ["pomset_contracts/generated"]
