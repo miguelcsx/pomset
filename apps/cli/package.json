@@ -1,0 +1,37 @@
+{
+  "name": "@pomset/cli",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The local and CI command line: offline analysis, validation, comparison, bundle import and export, and a read-only loopback report viewer. No telemetry, no account, no implicit upload.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pomset/contracts": "workspace:*",
+    "@pomset/domain": "workspace:*",
+    "@pomset/engine-client": "workspace:*",
+    "@pomset/storage": "workspace:*",
+    "@pomset/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "bin": {
+    "pomset": "./dist/bin/pomset.js"
+  }
+}
