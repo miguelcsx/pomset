@@ -50,9 +50,11 @@ export async function serve(options: ServeOptions): Promise<ServedReport> {
   if (!Number.isInteger(requestedPort) || requestedPort < 0 || requestedPort > 65535) throw new Error("INPUT_INVALID: invalid loopback port");
   const webRoot = join(REPO_ROOT, "apps/web/out");
   if (!existsSync(join(webRoot, "index.html"))) throw new Error("INPUT_INVALID: built workbench missing; run pnpm build");
-  const report = options.reportPath ? readFileSync(options.reportPath) : Buffer.from("null");
-  if (report.byteLength > 16_777_216) throw new Error("INPUT_INVALID: report exceeds the viewer byte limit");
-  JSON.parse(report.toString("utf8"));
+  const file = options.reportPath ? readFileSync(options.reportPath) : Buffer.from("null");
+  if (file.byteLength > 16_777_216) throw new Error("INPUT_INVALID: report exceeds the viewer byte limit");
+  const document: unknown = JSON.parse(file.toString("utf8"));
+  // The client reads one shape from both transports: a payload under `data`.
+  const report = Buffer.from(JSON.stringify({ data: document }));
   const capability = randomBytes(24).toString("hex");
   let port = requestedPort;
   const server = createServer((request, response) => {

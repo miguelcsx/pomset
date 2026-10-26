@@ -30,11 +30,13 @@ export function workbenchController(workbench: Workbench) {
     get(_request: Request, response: Response, next: NextFunction): void {
       try {
         response.json({
-          mode: "local-symbolic",
-          profile: workbench.profile.execute(),
-          maxSolverTimeMs: MAX_SOLVER_TIME_MS,
-          jobs: workbench.history.execute(),
-          unavailable: UNAVAILABLE,
+          data: {
+            mode: "local-symbolic",
+            profile: workbench.profile.execute(),
+            maxSolverTimeMs: MAX_SOLVER_TIME_MS,
+            jobs: workbench.history.execute(),
+            unavailable: UNAVAILABLE,
+          },
         });
       } catch (error) {
         next(error);

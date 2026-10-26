@@ -21,14 +21,20 @@ function call(path: string, body?: unknown, headers: Record<string, string> = {}
   return fetch(origin + path, { method: body === undefined ? "GET" : "POST", headers: { Authorization: `Bearer ${server.token}`, Origin: origin, "Content-Type": "application/json", ...headers }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
 }
 type Report = { job: Job; analysis?: AnalysisResult; sourceFiles: Record<string, { data: string }> };
+/** A successful response carries its payload under `data`, and nothing else is accepted. */
+function payload(body: unknown): unknown {
+  expect(body).toBeTypeOf("object");
+  expect(body).toHaveProperty("data");
+  return (body as { data: unknown }).data;
+}
 function checkedJob(raw: unknown): Job { expect(schemaSet().validatorFor("engine.schema.yaml#/$defs/job")(raw)).toBe(true); return raw as Job; }
 function checkedReport(raw: unknown): Report { expect(raw).toBeTypeOf("object"); const report = raw as Report; checkedJob(report.job); if (report.analysis) expect(schemaSet().validatorFor("evidence.schema.yaml#/$defs/analysisResult")(report.analysis)).toBe(true); return report; }
-async function finish(raw: unknown): Promise<Report> {
-  const job = checkedJob(raw);
+async function finish(body: unknown): Promise<Report> {
+  const job = checkedJob(payload(body));
   const deadline = Date.now() + 15000;
   while (Date.now() < deadline) {
     const response = await call(`/api/analyses/${job.jobId}`); expect(response.status).toBe(200);
-    const report = checkedReport(await response.json());
+    const report = checkedReport(payload(await response.json()));
     if (["succeeded", "failed", "cancelled"].includes(report.job.state)) return report;
     await new Promise((resolve) => setTimeout(resolve, 60));
   }
@@ -54,14 +60,16 @@ it("analyzes changed declarations and preserves the previous captured evidence",
   const after = await finish(await second.json()); expect(after.job.state).toBe("succeeded");
   expect(after.analysis?.propertyResults.find((item) => item.propertyId === "outputCoverage")?.outcome).toBe("established");
   expect(after.job.snapshotId).not.toBe(before.job.snapshotId);
-  expect(checkedReport(await (await call(`/api/analyses/${before.job.jobId}`)).json()).analysis).toEqual(before.analysis);
+  expect(checkedReport(payload(await (await call(`/api/analyses/${before.job.jobId}`)).json())).analysis).toEqual(before.analysis);
 }, 30000);
 it("never executes top-level source and preserves cancellation precedence", async () => {
   const sentinel = join(directory, "must-not-exist");
   const files = input.files.map((file) => ({ ...file, source: file.path === input.scenario.entrypoint.path ? `open(${JSON.stringify(sentinel)}, "w").write("executed")\n${file.source}` : file.source }));
   const response = await call("/api/analyses", { ...input, files }); expect(response.status).toBe(202);
-  const job = checkedJob(await response.json()); await call(`/api/analyses/${job.jobId}/cancel`, {});
-  const report = await finish(job); expect(report.job.state).toBe("cancelled"); expect(existsSync(sentinel)).toBe(false);
+  const submitted = await response.json();
+  const job = checkedJob(payload(submitted));
+  await call(`/api/analyses/${job.jobId}/cancel`, {});
+  const report = await finish(submitted); expect(report.job.state).toBe("cancelled"); expect(existsSync(sentinel)).toBe(false);
   // Without cancellation, unsupported top-level code still must never execute.
   const next = await call("/api/analyses", { ...input, files }); expect(next.status).toBe(202);
   await finish(await next.json()); expect(existsSync(sentinel)).toBe(false);

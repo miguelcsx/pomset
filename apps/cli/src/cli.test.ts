@@ -67,8 +67,8 @@ describe("the read-only viewer", () => {
       expect(sameOrigin.status).toBe(200);
       const foreignOrigin = await fetch(`http://127.0.0.1:${port}/api/report?capability=${served.capability}`, { headers: { Origin: "https://evil.example" } });
       expect(foreignOrigin.status).toBe(403);
-      const body = (await withCapability.json()) as { jobId: string };
-      expect(body.jobId).toBe("job_1");
+      const body = (await withCapability.json()) as { data: { jobId: string } };
+      expect(body.data.jobId).toBe("job_1");
 
       // `fetch` refuses to send a custom Host header, so this one is a raw
       // request: the check must hold for a client that does send one.

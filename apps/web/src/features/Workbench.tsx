@@ -15,7 +15,7 @@ import { ScenarioEditor } from "./scenario/ScenarioEditor";
 import { newScenario, parseScenario } from "./scenario/scenario-draft";
 import { Splitter } from "./editor/Splitter";
 import { ReportExport } from "./evidence/ReportExport";
-import { connect, request, submit, terminal, workbenchToken, type Connection } from "./analysis/workbench-client";
+import { connect, request, submit, terminal, unwrap, workbenchToken, type Connection } from "./analysis/workbench-client";
 import { observeJob } from "./analysis/poll-job";
 import { readWorkspace, saveWorkspace } from "./workspace/workspace-persistence";
 // Monaco touches `self` as it loads, so it is kept out of the server render
@@ -76,7 +76,7 @@ export function Workbench(_props: WorkbenchProps): JSX.Element {
     void readWorkspace().then((value) => { if (live && !new URLSearchParams(location.hash.slice(1)).has("capability") && value?.copy?.files.length && value.scenario) { setCopy(value.copy); setScenario(value.scenario); setPath(value.copy.files[0]!.path); setSelection({ path: value.copy.files[0]!.path, line: 1 }); } }).catch(() => { if (live) setSaved("Browser storage unavailable"); }).finally(() => { if (live) setReady(true); });
     if (workbenchToken()) void connect().then((value) => { if (live) { setConnection(value); setProfileId(value.profile.profileRevisionId); setJobs(value.jobs); } }).catch((failure: unknown) => { if (live) setError(String(failure)); });
     const capability = new URLSearchParams(location.hash.slice(1)).get("capability");
-    if (capability) void fetch(`/api/report?capability=${encodeURIComponent(capability)}`).then(async (response) => { if (!response.ok) throw new Error(`Report transport returned ${response.status}`); const raw: unknown = await response.json(); if (raw) { const value = await inspectionDocument(raw); if (live) { acceptDocument(value); editDocument(value); } } }).catch((failure: unknown) => { if (live) setError(String(failure)); });
+    if (capability) void fetch(`/api/report?capability=${encodeURIComponent(capability)}`).then(async (response) => { if (!response.ok) throw new Error(`Report transport returned ${response.status}`); const raw: unknown = await response.json(); if (raw) { const value = await inspectionDocument(unwrap(raw)); if (live) { acceptDocument(value); editDocument(value); } } }).catch((failure: unknown) => { if (live) setError(String(failure)); });
     return () => { live = false; };
   }, []);
   useEffect(() => { if (!ready) return; setSaved("Unsaved changes"); const timer = setTimeout(() => { void saveWorkspace({ copy, scenario }).then(() => setSaved("Saved locally")).catch(() => setSaved("Not saved · storage full or unavailable")); }, 400); return () => clearTimeout(timer); }, [copy, scenario, ready]);

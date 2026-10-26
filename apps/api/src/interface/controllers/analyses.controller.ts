@@ -1,10 +1,11 @@
 /**
  * The analysis routes' handlers.
  *
- * Each one delegates to a use case and forwards any failure to the error
- * handler. A status code is chosen here only where the HTTP contract itself
- * decides it, such as the 202 that says the work has been accepted rather than
- * finished.
+ * A payload is returned under `data` and a failure under `error`, so a caller
+ * never has to guess which it received. Each handler delegates to a use case and
+ * forwards any failure to the error handler; a status code is chosen here only
+ * where the HTTP contract itself decides it, such as the 202 that says the work
+ * has been accepted rather than finished.
  */
 
 import type { NextFunction, Request, Response } from "express";
@@ -15,7 +16,7 @@ export function analysesController(workbench: Workbench) {
   return {
     submit(request: Request, response: Response, next: NextFunction): void {
       try {
-        response.status(202).json(workbench.submit.execute(request.body));
+        response.status(202).json({ data: workbench.submit.execute(request.body) });
       } catch (error) {
         next(error);
       }
@@ -23,7 +24,7 @@ export function analysesController(workbench: Workbench) {
 
     get(request: Request, response: Response, next: NextFunction): void {
       try {
-        response.json(workbench.report.execute(request.params["id"]!));
+        response.json({ data: workbench.report.execute(request.params["id"]!) });
       } catch (error) {
         next(error);
       }
@@ -31,7 +32,7 @@ export function analysesController(workbench: Workbench) {
 
     cancel(request: Request, response: Response, next: NextFunction): void {
       try {
-        response.json(workbench.cancel.execute(request.params["id"]!));
+        response.json({ data: workbench.cancel.execute(request.params["id"]!) });
       } catch (error) {
         next(error);
       }
