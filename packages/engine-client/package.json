@@ -1,0 +1,31 @@
+{
+  "name": "@pomset/engine-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The engine process boundary: JSON Lines codec, validated envelope, fixed-argv launch over a read-only request file, input mounts, limits, cooperative cancellation and secret redaction. Protocol and supervision only, never language analysis.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pomset/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "ajv": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
