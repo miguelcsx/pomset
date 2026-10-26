@@ -559,3 +559,508 @@ $defs:
       basisFindingId:
         $ref: '#/$defs/id'
     additionalProperties: false
+  coverage:
+    description: Per-property classification over the declared domain. Percentages only exist for a finite,
+      explicitly enumerated denominator with duplicate points removed.
+    type: object
+    required:
+    - coverageId
+    - domainRef
+    - regions
+    - denominator
+    properties:
+      coverageId:
+        $ref: '#/$defs/id'
+      domainRef:
+        $ref: '#/$defs/id'
+      denominator:
+        $ref: '#/$defs/coverageDenominator'
+      regions:
+        type: array
+        items:
+          type: object
+          required:
+          - regionId
+          - constraints
+          - classifications
+          properties:
+            regionId:
+              $ref: '#/$defs/id'
+            label:
+              type: string
+              maxLength: 200
+            constraints:
+              type: array
+              minItems: 1
+              items:
+                type: string
+                maxLength: 500
+            classifications:
+              type: array
+              minItems: 1
+              items:
+                type: object
+                required:
+                - propertyId
+                - classification
+                - method
+                properties:
+                  propertyId:
+                    $ref: '#/$defs/propertyId'
+                  classification:
+                    enum:
+                    - established
+                    - violated
+                    - sampled
+                    - unknown
+                    - unsupported
+                  method:
+                    $ref: '#/$defs/method'
+                  resultId:
+                    $ref: '#/$defs/id'
+                  sampledCheckId:
+                    $ref: '#/$defs/id'
+                allOf:
+                - description: sampled and unknown/unsupported regions carry their sampled check or the
+                    reason, not a bare verdict.
+                  if:
+                    properties:
+                      classification:
+                        const: sampled
+                    required:
+                    - classification
+                  then:
+                    required:
+                    - sampledCheckId
+                additionalProperties: false
+          additionalProperties: false
+      notes:
+        type: string
+        maxLength: 2000
+    additionalProperties: false
+  sampledCheck:
+    description: Finite sampling run. Its observations never become a domain-wide established outcome.
+    type: object
+    required:
+    - sampledCheckId
+    - strategyId
+    - strategyRevision
+    - seed
+    - budget
+    - points
+    - observations
+    properties:
+      sampledCheckId:
+        $ref: '#/$defs/id'
+      strategyId:
+        enum:
+        - exhaustive
+        - random
+        - boundary
+        - counterexample-guided
+        - partition-guided
+      strategyRevision:
+        type: integer
+        minimum: 1
+      seed:
+        type: integer
+        minimum: 0
+      budget:
+        $ref: '#/$defs/budget'
+      points:
+        type: array
+        items:
+          type: object
+          required:
+          - pointId
+          - assignments
+          properties:
+            pointId:
+              $ref: '#/$defs/id'
+            assignments:
+              type: array
+              minItems: 1
+              items:
+                type: object
+                required:
+                - name
+                - value
+                properties:
+                  name:
+                    type: string
+                  value:
+                    type:
+                    - integer
+                    - string
+                additionalProperties: false
+          additionalProperties: false
+      observations:
+        type: array
+        items:
+          type: object
+          required:
+          - pointId
+          - observation
+          properties:
+            pointId:
+              $ref: '#/$defs/id'
+            observation:
+              enum:
+              - passed
+              - failed
+              - error
+            findingId:
+              $ref: '#/$defs/id'
+            errorCode:
+              $ref: '#/$defs/errorCode'
+          additionalProperties: false
+    additionalProperties: false
+  propertyResult:
+    description: Outcome of one property over one domain, with its method and evidence class. The allowed
+      (outcome, method, evidenceClass) combinations are fixed in contracts/README.md.
+    type: object
+    required:
+    - propertyResultId
+    - propertyId
+    - outcome
+    - method
+    - evidenceClass
+    - assumptions
+    - coverageRef
+    properties:
+      propertyResultId:
+        $ref: '#/$defs/id'
+      propertyId:
+        $ref: '#/$defs/propertyId'
+      outcome:
+        $ref: '#/$defs/outcome'
+      method:
+        $ref: '#/$defs/method'
+      evidenceClass:
+        $ref: '#/$defs/evidenceClass'
+      assumptions:
+        $ref: '#/$defs/assumptions'
+      coverageRef:
+        $ref: '#/$defs/id'
+      budget:
+        $ref: '#/$defs/budget'
+      findingIds:
+        type: array
+        items:
+          $ref: '#/$defs/id'
+      witnessIds:
+        type: array
+        items:
+          $ref: '#/$defs/id'
+      sampledCheckIds:
+        type: array
+        items:
+          $ref: '#/$defs/id'
+      unsupportedReason:
+        description: Required when outcome is unsupported. Names the capability and why it is unavailable.
+        type: string
+        maxLength: 2000
+      unknownReason:
+        description: Required when outcome is unknown, e.g. solver budget exhaustion or incomplete extraction.
+        type: string
+        maxLength: 2000
+      semanticRole:
+        $ref: '#/$defs/semanticRole'
+    allOf:
+    - description: established is reachable only through static or symbolic reasoning under stated assumptions.
+      if:
+        properties:
+          outcome:
+            const: established
+        required:
+        - outcome
+      then:
+        properties:
+          method:
+            enum:
+            - static
+            - symbolic
+          evidenceClass:
+            const: verified-under-assumptions
+    - description: violated is either a modelled counterexample or a concretely observed dynamic violation.
+      if:
+        properties:
+          outcome:
+            const: violated
+        required:
+        - outcome
+      then:
+        properties:
+          evidenceClass:
+            enum:
+            - counterexample
+            - observed
+    - description: unsupported names the missing capability.
+      if:
+        properties:
+          outcome:
+            const: unsupported
+        required:
+        - outcome
+      then:
+        required:
+        - unsupportedReason
+        properties:
+          evidenceClass:
+            enum:
+            - potential
+            - estimated
+    - description: unknown names why the analysis was inconclusive.
+      if:
+        properties:
+          outcome:
+            const: unknown
+        required:
+        - outcome
+      then:
+        required:
+        - unknownReason
+    additionalProperties: false
+  coverageDenominator:
+    description: A percentage or count exists only for a finite, explicitly enumerated denominator with
+      duplicates removed.
+    type: object
+    required:
+    - kind
+    properties:
+      kind:
+        enum:
+        - enumerated
+        - unenumerated
+      pointCount:
+        type: integer
+        minimum: 0
+      duplicatesRemoved:
+        type: boolean
+      constraintIds:
+        type: array
+        items:
+          $ref: '#/$defs/id'
+    allOf:
+    - if:
+        properties:
+          kind:
+            const: enumerated
+        required:
+        - kind
+      then:
+        required:
+        - pointCount
+        - duplicatesRemoved
+        properties:
+          duplicatesRemoved:
+            const: true
+    - if:
+        properties:
+          kind:
+            const: unenumerated
+        required:
+        - kind
+      then:
+        not:
+          required:
+          - pointCount
+    additionalProperties: false
+  analysisResult:
+    description: Immutable result record of one attempt. Carries full provenance; identifiers never substitute
+      for it. A succeeded job may produce violated, unknown and unsupported property results.
+    type: object
+    required:
+    - schemaVersion
+    - resultId
+    - jobId
+    - attemptId
+    - snapshotId
+    - scenarioId
+    - profileRevisionId
+    - domain
+    - policyId
+    - policyRevision
+    - origin
+    - method
+    - propertyResults
+    - coverage
+    - budget
+    - createdAt
+    properties:
+      schemaVersion:
+        $ref: '#/$defs/schemaVersion'
+      resultId:
+        $ref: '#/$defs/id'
+      jobId:
+        $ref: '#/$defs/id'
+      attemptId:
+        $ref: '#/$defs/id'
+      snapshotId:
+        $ref: '#/$defs/id'
+      scenarioId:
+        $ref: '#/$defs/id'
+      profileRevisionId:
+        $ref: '#/$defs/id'
+      domain:
+        type: object
+        required:
+        - domainId
+        properties:
+          domainId:
+            $ref: '#/$defs/id'
+        additionalProperties: true
+      policyId:
+        $ref: '#/$defs/id'
+      policyRevision:
+        type: integer
+        minimum: 1
+      origin:
+        description: 'Ingestion trust: where this record entered Pomset. Execution location is carried
+          separately.'
+        enum:
+        - local
+        - hosted
+        - imported
+      executedAt:
+        enum:
+        - local
+        - hosted
+        - none
+      method:
+        $ref: '#/$defs/method'
+      actors:
+        type: array
+        items:
+          $ref: '#/$defs/actor'
+      events:
+        type: array
+        items:
+          $ref: '#/$defs/memoryAccessEvent'
+      findings:
+        type: array
+        items:
+          $ref: '#/$defs/finding'
+      witnesses:
+        type: array
+        items:
+          $ref: '#/$defs/witness'
+      sampledChecks:
+        type: array
+        items:
+          $ref: '#/$defs/sampledCheck'
+      propertyResults:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/propertyResult'
+      coverage:
+        $ref: '#/$defs/coverage'
+      budget:
+        $ref: '#/$defs/budget'
+      artifactManifestIds:
+        type: array
+        items:
+          $ref: '#/$defs/id'
+      queryRevision:
+        description: Revision of the extraction and query model that produced this result.
+        type: string
+        maxLength: 120
+      completeness:
+        description: Supervisor-qualified completeness. Partial evidence never becomes an eligible completed validation.
+        type: object
+        required: [kind]
+        properties:
+          kind:
+            enum: [complete, partial]
+          reason:
+            type: string
+            minLength: 1
+            maxLength: 1000
+        additionalProperties: false
+      createdAt:
+        type: string
+        format: date-time
+    additionalProperties: false
+  artifactManifest:
+    description: Immutable description of one stored artifact. contentHash identifies bytes; artifactId
+      is the authorization handle.
+    type: object
+    required:
+    - schemaVersion
+    - artifactId
+    - kind
+    - contentHash
+    - bytes
+    - createdAt
+    properties:
+      schemaVersion:
+        $ref: '#/$defs/schemaVersion'
+      artifactId:
+        $ref: '#/$defs/id'
+      kind:
+        enum:
+        - source-snapshot
+        - ir
+        - ptx
+        - assembly
+        - compiler-log
+        - profiler-export
+        - trace
+        - witness-json
+        - report-json
+        - report-html
+        - measurement-csv
+        - bundle
+      contentHash:
+        $ref: '#/$defs/sha256'
+      bytes:
+        type: integer
+        minimum: 0
+      mediaType:
+        type: string
+        maxLength: 120
+      producedBy:
+        $ref: '#/$defs/id'
+      profileRevisionId:
+        $ref: '#/$defs/id'
+      createdAt:
+        type: string
+        format: date-time
+      retention:
+        enum:
+        - job
+        - project
+        - publication
+        - permanent
+      notes:
+        type: string
+        maxLength: 2000
+    additionalProperties: false
+  errorCode:
+    description: Single error vocabulary shared by HTTP, engine envelopes, job failures and CLI reports.
+    enum:
+    - PROFILE_NOT_FOUND
+    - ENGINE_FAILED
+    - WORKER_LOST
+    - PROTOCOL_INVALID
+    - INPUT_INVALID
+    - BUNDLE_INVALID
+    - UNAUTHORIZED
+    - FORBIDDEN
+  errorRecord:
+    type: object
+    required:
+    - code
+    - message
+    properties:
+      code:
+        $ref: '#/$defs/errorCode'
+      message:
+        type: string
+        minLength: 1
+        maxLength: 2000
+      details:
+        type: object
+        additionalProperties: true
+    additionalProperties: false
