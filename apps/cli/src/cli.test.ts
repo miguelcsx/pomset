@@ -33,8 +33,10 @@ describe("the report page", () => {
     try {
       const response = await fetch(served.url);
       const html = await response.text();
-      expect(html).toContain('id="root"');
-      expect(html).toContain("/assets/");
+      // The viewer serves the same exported client the workbench does, with the
+      // client's own bundled assets and no report data inlined into it.
+      expect(html).toContain('<main class="ide"');
+      expect(html).toContain("/_next/static/");
       expect(html).not.toContain("job_1");
     } finally {
       await served.close();

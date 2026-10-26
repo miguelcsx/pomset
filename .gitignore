@@ -6,6 +6,8 @@ node_modules/
 dist/
 *.tsbuildinfo
 .vite/
+.next/
+out/
 
 # Rust
 target/

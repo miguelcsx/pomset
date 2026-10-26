@@ -9,6 +9,9 @@
 
 import { randomBytes } from "node:crypto";
 import { createServer } from "node:http";
+import { join } from "node:path";
+
+import { REPO_ROOT } from "@pomset/worker";
 
 import { createWorkbenchApp } from "./app.js";
 import { createWorkbench } from "./application/Workbench.js";
@@ -36,7 +39,12 @@ export async function startWorkbench(
 
   const token = randomBytes(32).toString("hex");
   let port = options.port ?? 0;
-  const app = createWorkbenchApp({ workbench, token, boundPort: () => port });
+  const app = createWorkbenchApp({
+    workbench,
+    token,
+    boundPort: () => port,
+    webRoot: join(REPO_ROOT, "apps/web/out"),
+  });
 
   const server = createServer(app);
   server.requestTimeout = 15000;

@@ -3,26 +3,26 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "The React, Monaco and Vite client: the four-panel workbench over the three experiences Explore, Validate and Optimize.",
+  "description": "The Next.js client: the editor-first workbench over the three experiences Explore, Validate and Optimize. It renders evidence the API supplies and never analyses, measures or decides eligibility itself.",
   "scripts": {
-    "build": "vite build",
+    "dev": "next dev --port 3000",
+    "build": "POMSET_WEB_EXPORT=1 next build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run",
-    "dev": "vite"
+    "test": "vitest run"
   },
   "dependencies": {
     "@pomset/contracts": "workspace:*",
     "@pomset/ui": "workspace:*",
     "monaco-editor": "0.52.2",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "next": "16.4.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
   },
   "devDependencies": {
-    "@types/react": "^18.3.17",
-    "@types/react-dom": "^18.3.5",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@types/node": "catalog:",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "typescript": "catalog:",
-    "vite": "^6.0.7",
     "vitest": "catalog:"
   }
 }
