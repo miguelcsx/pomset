@@ -1,0 +1,63 @@
+{
+  "domainId": "dom_f8K2",
+  "enumerable": true,
+  "variables": [
+    {
+      "name": "N",
+      "kind": "shape",
+      "type": "int",
+      "width": "i32",
+      "min": 1,
+      "max": 4096,
+      "step": 1
+    },
+    {
+      "name": "BLOCK",
+      "kind": "blockSize",
+      "type": "enum",
+      "values": [
+        128,
+        256,
+        512
+      ]
+    },
+    {
+      "name": "dtype",
+      "kind": "dtype",
+      "type": "enum",
+      "values": [
+        "fp16",
+        "bf16"
+      ]
+    }
+  ],
+  "constraints": [
+    {
+      "constraintId": "c_1",
+      "lhs": {
+        "op": "parameter",
+        "parameter": "N"
+      },
+      "relation": "ge",
+      "rhs": {
+        "op": "literal",
+        "value": 1
+      }
+    },
+    {
+      "constraintId": "c_2",
+      "lhs": {
+        "op": "parameter",
+        "parameter": "BLOCK"
+      },
+      "relation": "gt",
+      "rhs": {
+        "op": "literal",
+        "value": 0
+      }
+    }
+  ],
+  "hardwareCohortIds": [
+    "hw_a100_80g"
+  ]
+}

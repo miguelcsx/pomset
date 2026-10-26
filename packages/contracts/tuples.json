@@ -1,0 +1,28 @@
+{
+  "$comment": "The closed outcome x method x evidenceClass table. The schema encodes only part of it as if/then conditions, so this file is the authority the generator emits from and cross-checks against propertyResult.allOf. A Measurement carries measured or estimated and never a correctness outcome; that rule belongs to measurement.schema.yaml and is not a row here.",
+  "outcome": ["established", "violated", "unknown", "unsupported"],
+  "method": ["static", "symbolic", "instrumented", "benchmark", "artifact"],
+  "evidenceClass": [
+    "observed",
+    "counterexample",
+    "potential",
+    "verified-under-assumptions",
+    "measured",
+    "estimated"
+  ],
+  "allowed": [
+    ["established", ["static", "symbolic"], ["verified-under-assumptions"]],
+    ["violated", ["symbolic", "static"], ["counterexample"]],
+    ["violated", ["instrumented"], ["observed"]],
+    [
+      "unknown",
+      ["static", "symbolic", "instrumented", "benchmark", "artifact"],
+      ["potential", "estimated"]
+    ],
+    [
+      "unsupported",
+      ["static", "symbolic", "instrumented", "benchmark", "artifact"],
+      ["potential", "estimated"]
+    ]
+  ]
+}

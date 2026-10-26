@@ -1,0 +1,69 @@
+{
+  "$comment": "Snapshot-manifest hashing cases. The manifest hash is SHA-256 over the RFC 8785 canonical serialization with the manifestHash member omitted. `expectedHash` is filled from the TypeScript implementation; the Python implementation must produce the identical value, which the cross-language check asserts.",
+  "cases": [
+    {
+      "name": "single-file",
+      "manifest": {
+        "schemaVersion": 1,
+        "snapshotId": "snp_01HN3",
+        "projectId": "prj_7Qd2",
+        "createdAt": "2026-01-05T12:00:00Z",
+        "files": [
+          {
+            "path": "kernels/transform.py",
+            "role": "source",
+            "sha256": "sha256:4d3f0a0f2b6d1c8e9a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f",
+            "bytes": 412
+          }
+        ],
+        "manifestHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expectedHash": "sha256:4d9782793342d029c93c64b6c4724e523962cd80b7592818bd41215a5c7622f8"
+    },
+    {
+      "name": "two-files-reordered",
+      "manifest": {
+        "schemaVersion": 1,
+        "snapshotId": "snp_01HN4",
+        "projectId": "prj_7Qd2",
+        "createdAt": "2026-01-05T12:05:00Z",
+        "files": [
+          {
+            "path": "reference/expected.py",
+            "role": "reference",
+            "sha256": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+            "bytes": 90
+          },
+          {
+            "path": "kernels/transform.py",
+            "role": "source",
+            "sha256": "sha256:4d3f0a0f2b6d1c8e9a7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f",
+            "bytes": 412
+          }
+        ],
+        "manifestHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expectedHash": "sha256:8f3eaa4ff9b2dd78188f3a6d0e6039baf7453b5517f33be810ada2de528dc363"
+    },
+    {
+      "name": "child-of-an-edit",
+      "manifest": {
+        "schemaVersion": 1,
+        "snapshotId": "snp_01HN5",
+        "projectId": "prj_7Qd2",
+        "createdAt": "2026-01-05T12:09:00Z",
+        "parentSnapshotId": "snp_01HN3",
+        "files": [
+          {
+            "path": "kernels/transform.py",
+            "role": "source",
+            "sha256": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+            "bytes": 420
+          }
+        ],
+        "manifestHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "expectedHash": "sha256:b0297bd97144675477e27847cc625330c9aecbcb052f8d40164188563487fb37"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "$comment": "RFC 8785 canonicalisation cases. `canonical` is the expected serialization, taken from the RFC's own number and string rules; both implementations must produce it. A case without `canonical` is only required to be produced identically by the TypeScript and the Python implementation, which the cross-language check compares.",
+  "cases": [
+    { "name": "zero", "value": 0, "canonical": "0" },
+    { "name": "negative-zero", "value": -0, "canonical": "0" },
+    { "name": "integer", "value": 1, "canonical": "1" },
+    { "name": "simple-decimal", "value": 1.5, "canonical": "1.5" },
+    { "name": "trailing-zero", "value": 4.5, "canonical": "4.5" },
+    { "name": "exponent-positive", "value": 1e30, "canonical": "1e+30" },
+    { "name": "exponent-small", "value": 1e-7, "canonical": "1e-7" },
+    { "name": "exponent-threshold", "value": 1e21, "canonical": "1e+21" },
+    { "name": "max-safe-integer", "value": 9007199254740991, "canonical": "9007199254740991" },
+    { "name": "denormal-minimum", "value": 5e-324, "canonical": "5e-324" },
+    { "name": "max-double", "value": 1.7976931348623157e308, "canonical": "1.7976931348623157e+308" },
+    { "name": "string", "value": "hello", "canonical": "\"hello\"" },
+    { "name": "string-controls", "value": "\u0008\u000c\n\r\t", "canonical": "\"\\b\\f\\n\\r\\t\"" },
+    { "name": "string-quote-backslash", "value": "\"\\", "canonical": "\"\\\"\\\\\"" },
+    { "name": "string-non-ascii", "value": "café — 日本", "canonical": "\"café — 日本\"" },
+    { "name": "null", "value": null, "canonical": "null" },
+    { "name": "true", "value": true, "canonical": "true" },
+    { "name": "false", "value": false, "canonical": "false" },
+    { "name": "empty-array", "value": [], "canonical": "[]" },
+    {
+      "name": "object-sorted-by-utf16",
+      "value": { "b": 2, "a": 1, "C": 3, "á": 4, "10": 10, "2": 2 },
+      "canonical": "{\"10\":10,\"2\":2,\"C\":3,\"a\":1,\"b\":2,\"á\":4}"
+    },
+    {
+      "name": "nested",
+      "value": { "z": [{ "y": 1, "x": 2 }], "a": { "c": null, "b": true } },
+      "canonical": "{\"a\":{\"b\":true,\"c\":null},\"z\":[{\"x\":2,\"y\":1}]}"
+    },
+    {
+      "name": "array-order-preserved",
+      "value": [3, 1, 2, "b", "a"],
+      "canonical": "[3,1,2,\"b\",\"a\"]"
+    }
+  ]
+}

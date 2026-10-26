@@ -1,0 +1,41 @@
+{
+  "name": "@pomset/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Canonical portable contracts: the moved JSON Schemas, their generated TypeScript and Python bindings, and the single error registry.",
+  "exports": {
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "import": "./dist/browser.js"
+    },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "schema"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b",
+    "generate": "node scripts/generate.ts",
+    "check:docs": "node scripts/check-docs.mjs",
+    "check:profiles": "node scripts/check-profiles.mjs",
+    "check:licences": "node scripts/check-licences.mjs",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "ajv": "catalog:",
+    "ajv-formats": "3.0.1",
+    "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

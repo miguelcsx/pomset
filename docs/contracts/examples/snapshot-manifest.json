@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "snapshotId": "snp_01HN3",
+  "projectId": "prj_01HN2",
+  "createdAt": "2026-10-12T09:16:20Z",
+  "files": [
+    {
+      "path": "kernels/transform.py",
+      "role": "source",
+      "sha256": "sha256:f85b1d5a3b0a36b55fee9818a9b40675fce10b3e730c891bc0ebf36ea03208b9",
+      "bytes": 412
+    },
+    {
+      "path": "kernels/reference.py",
+      "role": "reference",
+      "sha256": "sha256:1538f3c2e88056e15cbd682c884d20a1c47b4500cea8432317fd7c1d496531f0",
+      "bytes": 288
+    },
+    {
+      "path": "pomset.json",
+      "role": "config",
+      "sha256": "sha256:cafe9aa92f240c6f2cc59ac5e63fc49415c6dd5abd64389e6e4f75603671c94e",
+      "bytes": 640
+    }
+  ],
+  "manifestHash": "sha256:d1c701395def37791dbb5b2918fcfeda3e26fab62c89037644ea0f4531770763"
+}
