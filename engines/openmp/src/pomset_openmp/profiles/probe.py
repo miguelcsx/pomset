@@ -19,7 +19,6 @@ from __future__ import annotations
 import hashlib
 import platform
 import shutil
-import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -63,9 +62,7 @@ def _build(directory: Path, name: str, source: str, extra: list[str]) -> dict:
     path = directory / f"{name}.c"
     path.write_text(source, encoding="utf-8")
     binary = directory / name
-    return command(
-        ["clang", *extra, str(path), "-o", str(binary)], TIMEOUT_SECONDS
-    )
+    return command(["clang", *extra, str(path), "-o", str(binary)], TIMEOUT_SECONDS)
 
 
 def measure() -> dict:
@@ -82,7 +79,6 @@ def measure() -> dict:
         ],
         "checks": [],
     }
-    checks = record["checks"]
 
     if compiler is None:
         record["compiler"] = None
@@ -97,7 +93,13 @@ def measure() -> dict:
             _openmp_run(root, "openmp-plain", PLAIN_SOURCE, [], expect_race=False)
         )
         record["checks"].append(
-            _openmp_run(root, "openmp-thread-sanitizer", RACY_SOURCE, ["-fsanitize=thread"], expect_race=True)
+            _openmp_run(
+                root,
+                "openmp-thread-sanitizer",
+                RACY_SOURCE,
+                ["-fsanitize=thread"],
+                expect_race=True,
+            )
         )
     return record
 
@@ -116,7 +118,8 @@ def _openmp_run(
             "sourceHash": _source_hash(source),
             "stages": stages,
             "status": "failed",
-            "reason": _first_line(build["stderr"]) or "the compiler refused the fixture",
+            "reason": _first_line(build["stderr"])
+            or "the compiler refused the fixture",
         }
 
     binary = root / name
@@ -191,7 +194,9 @@ def capabilities(record: dict) -> dict[str, dict]:
             else f"the owned fixture did not run to a correct result: {_detail(plain, 'run')}",
         },
         "instrumentedExecution": {
-            "availability": "immediate" if instrumentation == "passed" else "unavailable",
+            "availability": "immediate"
+            if instrumentation == "passed"
+            else "unavailable",
             "reason": None
             if instrumentation == "passed"
             else f"ThreadSanitizer cannot run on this platform: {_detail(instrumented, 'run')}",
