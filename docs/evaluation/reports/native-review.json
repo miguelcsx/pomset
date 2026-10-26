@@ -1,0 +1,98 @@
+{
+  "createdAt": "2026-10-12T02:07:43.291599+00:00",
+  "platform": {
+    "os": "Darwin",
+    "arch": "arm64"
+  },
+  "checks": [
+    {
+      "backend": "openmp",
+      "requiresGpu": false,
+      "sourceHash": "sha256:bf5aba88e6e37abd63b41595f7270abe435f0df72842f87519837109c094c7da",
+      "source": "#include <stdio.h>\nint main(void) {\n  long sum = 0;\n  #pragma omp parallel for reduction(+:sum)\n  for (int i = 0; i < 1024; ++i) sum += i;\n  printf(\"%d %ld\\n\", _OPENMP, sum);\n  return sum == (1024L * 1023L / 2) ? 0 : 1;\n}\n",
+      "compilerPath": "/nix/store/ih16kjj55va0p2l8g35j1kdqzi7x7i5p-clang-wrapper-21.1.8/bin/clang",
+      "stages": [
+        {
+          "stage": "frontend",
+          "status": "passed",
+          "evidenceClass": "artifact",
+          "invocation": {
+            "argv": [
+              "/nix/store/ih16kjj55va0p2l8g35j1kdqzi7x7i5p-clang-wrapper-21.1.8/bin/clang",
+              "-fopenmp",
+              "-fsyntax-only",
+              "/tmp/nix-shell.xczGx6/pomset-native-4cgtchwy/probe.c"
+            ],
+            "exitCode": 0,
+            "stdout": "",
+            "stderr": "clang: warning: argument unused during compilation: '-L/nix/store/8zi2g097h2s1n6arp49isa0hqpqa2bhg-python3-3.12.14/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/kb0zi9qnwagh1x69kqssxf9fglvybgsb-z3-4.16.0-lib/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/rck3i2yggkbmsab56sdl0q6lkp239p3i-openmp-21.1.8/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/cxjiwns9hl9jbg4cymfndj0vhi1g9l25-sqlite-3.51.2/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/dzlmgycfr9hx3249kh0dz8kmxcq4dyc7-jq-1.8.2/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/vcawr4dn40mk7dzh3z5vwf890pcs89p2-python3-3.12.14-env/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/9xp7s5p6cjznhcr14qsp96xcc3s1yhsa-libcxx-21.1.6+apple-sdk-26.4/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/38xp7w35762h93gscvh46368cprmazw0-compiler-rt-libc-21.1.8/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/l6d8k1c03qd9f4vbnn94w8vj7s9m2xsj-libiconv-113/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/pz8yy14p8c86adkxa9ha5w5cdv4x6qn4-libresolv-93/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/1503j86bk5y2h09jbsbj1lggyw4cxp1k-libsbuf-14.1.0/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/kc291h9h9xsk5g7ciqsg8x4sj7prlpmk-libutil-73/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/8zi2g097h2s1n6arp49isa0hqpqa2bhg-python3-3.12.14/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/kb0zi9qnwagh1x69kqssxf9fglvybgsb-z3-4.16.0-lib/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/rck3i2yggkbmsab56sdl0q6lkp239p3i-openmp-21.1.8/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/cxjiwns9hl9jbg4cymfndj0vhi1g9l25-sqlite-3.51.2/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/dzlmgycfr9hx3249kh0dz8kmxcq4dyc7-jq-1.8.2/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/vcawr4dn40mk7dzh3z5vwf890pcs89p2-python3-3.12.14-env/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/9xp7s5p6cjznhcr14qsp96xcc3s1yhsa-libcxx-21.1.6+apple-sdk-26.4/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/38xp7w35762h93gscvh46368cprmazw0-compiler-rt-libc-21.1.8/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/l6d8k1c03qd9f4vbnn94w8vj7s9m2xsj-libiconv-113/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/pz8yy14p8c86adkxa9ha5w5cdv4x6qn4-libresolv-93/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/1503j86bk5y2h09jbsbj1lggyw4cxp1k-libsbuf-14.1.0/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/kc291h9h9xsk5g7ciqsg8x4sj7prlpmk-libutil-73/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/417jjis8il32i7hlfgsmv320rjhi99qg-libSystem-B/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/3m6igbgl1plvsrbfmqsnm6g0c1hbm6hz-clang-21.1.8-lib/lib' [-Wunused-command-line-argument]\nclang: warning: argument unused during compilation: '-L/nix/store/9xp7s5p6cjznhcr14qsp96xcc3s1yhsa-libcxx-21.1.6+apple-sdk-26.4/lib' [-Wunused-command-line-argument]\n",
+            "elapsedNs": 83556667
+          }
+        },
+        {
+          "stage": "compile-and-link",
+          "status": "passed",
+          "evidenceClass": "artifact",
+          "invocation": {
+            "argv": [
+              "/nix/store/ih16kjj55va0p2l8g35j1kdqzi7x7i5p-clang-wrapper-21.1.8/bin/clang",
+              "-fopenmp",
+              "/tmp/nix-shell.xczGx6/pomset-native-4cgtchwy/probe.c",
+              "-o",
+              "/tmp/nix-shell.xczGx6/pomset-native-4cgtchwy/probe-openmp"
+            ],
+            "exitCode": 0,
+            "stdout": "",
+            "stderr": "ld: warning: directory not found for option '-L/nix/store/qi3a6l96mgcxfnh7rgkpqk0bbjg8jgm7-clang-21.1.8/lib'\n",
+            "elapsedNs": 136658708
+          }
+        },
+        {
+          "stage": "owned-cpu-reference",
+          "status": "passed",
+          "evidenceClass": "observed",
+          "invocation": {
+            "argv": [
+              "/tmp/nix-shell.xczGx6/pomset-native-4cgtchwy/probe-openmp"
+            ],
+            "exitCode": 0,
+            "stdout": "202011 523776\n",
+            "stderr": "",
+            "elapsedNs": 398328459
+          },
+          "openmpSpecification": 202011,
+          "actual": 523776,
+          "expected": 523776
+        }
+      ],
+      "versionProbe": {
+        "argv": [
+          "/nix/store/ih16kjj55va0p2l8g35j1kdqzi7x7i5p-clang-wrapper-21.1.8/bin/clang",
+          "--version"
+        ],
+        "exitCode": 0,
+        "stdout": "clang version 21.1.8\nTarget: arm64-apple-darwin\nThread model: posix\nInstalledDir: /nix/store/qi3a6l96mgcxfnh7rgkpqk0bbjg8jgm7-clang-21.1.8/bin\n",
+        "stderr": "",
+        "elapsedNs": 122533375
+      },
+      "status": "passed"
+    },
+    {
+      "backend": "cuda",
+      "requiresGpu": false,
+      "sourceHash": "sha256:ccc8c489b35c41252c0eed5e51ee79c9b8130ef525d7b23b744e2c8c1e11d982",
+      "source": "extern \"C\" __global__ void identity(float *output) {\n  unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;\n  output[i] = (float)i;\n}\n",
+      "compilerPath": null,
+      "stages": [],
+      "status": "blocked",
+      "reason": "nvcc executable not installed"
+    }
+  ],
+  "limitations": [
+    "Owned fixture conformance only; no arbitrary-kernel correctness claim.",
+    "Compilation is artifact evidence; successful compilation establishes no memory property.",
+    "An OpenMP clean run is observed coverage, never race freedom.",
+    "CUDA device execution and sanitizer/measurement checks are not executed by this probe.",
+    "A tool invocation is not a product capability promotion."
+  ]
+}
