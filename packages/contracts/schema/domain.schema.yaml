@@ -1,0 +1,776 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://pomset.dev/contracts/domain.schema.yaml
+title: Pomset domain contracts
+description: Authoritative portable definitions for projects, immutable snapshots, scenarios, workload
+  domains, profile revisions, capability records and the single eligibility policy. Portable records say
+  nothing about where they were produced; ingestion trust is carried by AnalysisResult.origin.
+$defs:
+  schemaVersion:
+    description: Portable record format version. Version 1 is the initial format.
+    type: integer
+    const: 1
+  id:
+    description: Opaque identifier. Never an access credential and never a content hash.
+    type: string
+    minLength: 3
+    maxLength: 128
+    pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+  sha256:
+    description: Lowercase hex SHA-256 digest carrying its algorithm prefix.
+    type: string
+    pattern: ^sha256:[0-9a-f]{64}$
+  path:
+    description: POSIX relative path inside a snapshot. No leading slash, no backslash, no '.' or '..'
+      segment, no symlink.
+    type: string
+    minLength: 1
+    maxLength: 512
+    pattern: ^(?!/)(?!.*\.\.)(?!.*\\)[A-Za-z0-9._@+-]+(/[A-Za-z0-9._@+-]+)*$
+  propertyId:
+    description: Required property a scenario declares and an analysis decides. x- names are project-local
+      extensions.
+    anyOf:
+    - enum:
+      - memoryBounds
+      - outputCoverage
+      - initialization
+      - writeWriteConflict
+      - readWriteConflict
+      - raceFreedom
+      - synchronizationOrdering
+      - deadlockFreedom
+      - numericalAgreement
+      - performanceRegression
+    - type: string
+      pattern: ^x-[a-z0-9-]{2,64}$
+  method:
+    description: Execution mechanism that produced a result. Static and symbolic mechanisms are not execution.
+    enum:
+    - static
+    - symbolic
+    - instrumented
+    - benchmark
+    - artifact
+  supportLevel:
+    description: Empirical support a profile revision claims for a capability. Separate from current availability.
+    enum:
+    - validated
+    - limited
+    - untested
+  availability:
+    description: Deployment state of a capability right now, independent of its support level.
+    enum:
+    - immediate
+    - queued
+    - unavailable
+  intExpr:
+    description: Restricted integer-expression AST. Serializable data, never executable host code. Every
+      node preserves Triton width semantics.
+    type: object
+    required:
+    - op
+    properties:
+      op:
+        enum:
+        - literal
+        - parameter
+        - add
+        - subtract
+        - multiply
+        - floorDivide
+        - ceilDivide
+        - modulo
+      value:
+        type: integer
+      parameter:
+        $ref: '#/$defs/identifier'
+      operands:
+        $comment: Required by the six binary operators; the conditional below is what enforces that. Present
+          here so the property is typed and the emitted bindings can name it.
+        type: array
+        minItems: 2
+        maxItems: 2
+        items:
+          $ref: '#/$defs/intExpr'
+    allOf:
+    - if:
+        properties:
+          op:
+            const: literal
+        required:
+        - op
+      then:
+        required:
+        - value
+        not:
+          required:
+          - parameter
+          - operands
+    - if:
+        properties:
+          op:
+            const: parameter
+        required:
+        - op
+      then:
+        required:
+        - parameter
+        not:
+          required:
+          - value
+          - operands
+    - if:
+        properties:
+          op:
+            enum:
+            - add
+            - subtract
+            - multiply
+            - floorDivide
+            - ceilDivide
+            - modulo
+        required:
+        - op
+      then:
+        required:
+        - operands
+        not:
+          required:
+          - value
+          - parameter
+  identifier:
+    description: Domain variable or declared symbol name as written in the kernel.
+    type: string
+    pattern: ^[A-Za-z_][A-Za-z0-9_]{0,63}$
+  intConstraint:
+    description: Conjunction member of a domain constraint. The divisor of a division inside a launch
+      expression must be provably positive under these constraints.
+    type: object
+    required:
+    - constraintId
+    - lhs
+    - relation
+    - rhs
+    properties:
+      constraintId:
+        $ref: '#/$defs/id'
+      lhs:
+        $ref: '#/$defs/intExpr'
+      relation:
+        enum:
+        - lt
+        - le
+        - eq
+        - ne
+        - ge
+        - gt
+      rhs:
+        $ref: '#/$defs/intExpr'
+    additionalProperties: false
+  domainVariable:
+    description: One dimension of the workload domain theta = (shape, dtype, layout, launch, hardware).
+    type: object
+    required:
+    - name
+    - kind
+    - type
+    properties:
+      name:
+        $ref: '#/$defs/identifier'
+      kind:
+        enum:
+        - shape
+        - dtype
+        - layout
+        - stride
+        - launch
+        - blockSize
+        - warps
+        - stages
+        - hardware
+      type:
+        enum:
+        - int
+        - bool
+        - enum
+      width:
+        description: Declared integer width. Unsupported widths are rejected rather than widened silently.
+        enum:
+        - i32
+        - u32
+        - i64
+        - u64
+      values:
+        type: array
+        minItems: 1
+        items:
+          type:
+          - integer
+          - string
+          - boolean
+      min:
+        type: integer
+      max:
+        type: integer
+      step:
+        type: integer
+        minimum: 1
+    additionalProperties: false
+  allocation:
+    description: Declared tensor or buffer the scenario provides to the kernel.
+    type: object
+    required:
+    - allocationId
+    - name
+    - role
+    - dtype
+    - shape
+    properties:
+      allocationId:
+        $ref: '#/$defs/id'
+      name:
+        $ref: '#/$defs/identifier'
+      role:
+        enum:
+        - input
+        - output
+        - scratch
+      dtype:
+        enum:
+        - fp16
+        - bf16
+        - fp32
+        - fp64
+        - int8
+        - int16
+        - int32
+        - int64
+        - uint8
+        - uint32
+        - bool
+      shape:
+        type: array
+        minItems: 1
+        maxItems: 8
+        items:
+          $ref: '#/$defs/intExpr'
+      strides:
+        type: array
+        minItems: 1
+        maxItems: 8
+        items:
+          $ref: '#/$defs/intExpr'
+      aliasGroupId:
+        $ref: '#/$defs/id'
+      poisoned:
+        description: True when the output starts as a poison pattern so an unwritten element cannot inherit
+          a previous run.
+        type: boolean
+    additionalProperties: false
+  aliasGroup:
+    description: Declared aliasing. Two allocations in one group may overlap; no other pair may.
+    type: object
+    required:
+    - aliasGroupId
+    - allocationIds
+    properties:
+      aliasGroupId:
+        $ref: '#/$defs/id'
+      allocationIds:
+        type: array
+        minItems: 2
+        items:
+          $ref: '#/$defs/id'
+    additionalProperties: false
+  launchConfig:
+    description: Program-instance launch configuration as a restricted expression AST, not a host lambda.
+    type: object
+    required:
+    - grid
+    - block
+    properties:
+      grid:
+        type: array
+        minItems: 1
+        maxItems: 3
+        items:
+          $ref: '#/$defs/intExpr'
+      block:
+        type: array
+        minItems: 1
+        maxItems: 3
+        items:
+          $ref: '#/$defs/intExpr'
+      numWarps:
+        $ref: '#/$defs/intExpr'
+      numStages:
+        $ref: '#/$defs/intExpr'
+      displayHints:
+        description: Human-facing rendering only, e.g. triton.cdiv for ceilDivide. Never parsed back.
+        type: array
+        items:
+          type: string
+    additionalProperties: false
+  referenceComputation:
+    description: How the expected output is computed. Executing it requires local execution consent.
+    type: object
+    required:
+    - kind
+    - tolerances
+    properties:
+      kind:
+        enum:
+        - numpy
+        - torch
+        - host-python
+        - cuda-c
+        - none
+      path:
+        $ref: '#/$defs/path'
+      symbol:
+        $ref: '#/$defs/identifier'
+      tolerances:
+        type: object
+        required:
+        - atol
+        - rtol
+        - dtype
+        properties:
+          atol:
+            type: number
+            minimum: 0
+          rtol:
+            type: number
+            minimum: 0
+          dtype:
+            type: string
+          nanPolicy:
+            enum:
+            - equal-nan
+            - reject-nan
+          infPolicy:
+            enum:
+            - equal-inf
+            - reject-inf
+        additionalProperties: false
+    additionalProperties: false
+  scenario:
+    description: 'One declared experiment: what to run, over which domain, under which required properties.'
+    type: object
+    required:
+    - schemaVersion
+    - scenarioId
+    - snapshotId
+    - name
+    - entrypoint
+    - allocations
+    - launch
+    - domain
+    - requiredProperties
+    - createdAt
+    properties:
+      schemaVersion:
+        $ref: '#/$defs/schemaVersion'
+      scenarioId:
+        $ref: '#/$defs/id'
+      snapshotId:
+        $ref: '#/$defs/id'
+      name:
+        type: string
+        minLength: 1
+        maxLength: 120
+      entrypoint:
+        type: object
+        required:
+        - path
+        - symbol
+        properties:
+          path:
+            $ref: '#/$defs/path'
+          symbol:
+            $ref: '#/$defs/identifier'
+        additionalProperties: false
+      allocations:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/allocation'
+      aliasGroups:
+        type: array
+        items:
+          $ref: '#/$defs/aliasGroup'
+      launch:
+        $ref: '#/$defs/launchConfig'
+      domain:
+        $ref: '#/$defs/workloadDomain'
+      reference:
+        $ref: '#/$defs/referenceComputation'
+      requiredProperties:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/propertyId'
+      notes:
+        type: string
+        maxLength: 2000
+      createdAt:
+        type: string
+        format: date-time
+    additionalProperties: false
+  workloadDomain:
+    description: Finite or range-constrained set of configurations the user declares as supported. Must
+      be nonempty.
+    type: object
+    required:
+    - domainId
+    - variables
+    - enumerable
+    properties:
+      domainId:
+        $ref: '#/$defs/id'
+      variables:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/domainVariable'
+      constraints:
+        type: array
+        items:
+          $ref: '#/$defs/intConstraint'
+      enumerable:
+        description: True only when the domain enumerates a finite set of points whose size is reported.
+        type: boolean
+      hardwareCohortIds:
+        type: array
+        items:
+          $ref: '#/$defs/id'
+    additionalProperties: false
+  project:
+    description: Versioned container. Ownership is separate from content identity.
+    type: object
+    required:
+    - schemaVersion
+    - projectId
+    - ownerId
+    - title
+    - createdAt
+    - updatedAt
+    properties:
+      schemaVersion:
+        $ref: '#/$defs/schemaVersion'
+      projectId:
+        $ref: '#/$defs/id'
+      ownerId:
+        description: Server-owned opaque owner. Never caller-supplied identity.
+        $ref: '#/$defs/id'
+      title:
+        type: string
+        minLength: 1
+        maxLength: 200
+      description:
+        type: string
+        maxLength: 4000
+      createdAt:
+        type: string
+        format: date-time
+      updatedAt:
+        type: string
+        format: date-time
+    additionalProperties: false
+  snapshotFile:
+    type: object
+    required:
+    - path
+    - role
+    - sha256
+    - bytes
+    properties:
+      path:
+        $ref: '#/$defs/path'
+      role:
+        enum:
+        - source
+        - config
+        - reference
+        - fixture
+        - other
+      sha256:
+        $ref: '#/$defs/sha256'
+      bytes:
+        type: integer
+        minimum: 0
+    additionalProperties: false
+  snapshotManifest:
+    description: Immutable analysed state. manifestHash is SHA-256 over the RFC 8785 JCS serialization
+      of this object with manifestHash omitted.
+    type: object
+    required:
+    - schemaVersion
+    - snapshotId
+    - projectId
+    - createdAt
+    - files
+    - manifestHash
+    properties:
+      schemaVersion:
+        $ref: '#/$defs/schemaVersion'
+      snapshotId:
+        $ref: '#/$defs/id'
+      projectId:
+        $ref: '#/$defs/id'
+      parentSnapshotId:
+        $ref: '#/$defs/id'
+      createdAt:
+        type: string
+        format: date-time
+      files:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/snapshotFile'
+      manifestHash:
+        $ref: '#/$defs/sha256'
+    additionalProperties: false
+  profileRevision:
+    description: Immutable measured combination of engine, tools, versions and platform. A revision is
+      never rewritten in place.
+    type: object
+    required:
+    - schemaVersion
+    - profileRevisionId
+    - backend
+    - revisionHash
+    - createdAt
+    - components
+    - platform
+    - capabilityIds
+    properties:
+      schemaVersion:
+        $ref: '#/$defs/schemaVersion'
+      profileRevisionId:
+        $ref: '#/$defs/id'
+      backend:
+        enum:
+        - triton
+        - cuda
+        - openmp
+      revisionHash:
+        $ref: '#/$defs/sha256'
+      createdAt:
+        type: string
+        format: date-time
+      components:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          required:
+          - name
+          - version
+          properties:
+            name:
+              type: string
+            version:
+              type: string
+            digest:
+              $ref: '#/$defs/sha256'
+          additionalProperties: false
+      platform:
+        type: object
+        required:
+        - os
+        - arch
+        properties:
+          os:
+            type: string
+          arch:
+            type: string
+          device:
+            type: string
+          driver:
+            type: string
+        additionalProperties: false
+      imageDigest:
+        $ref: '#/$defs/sha256'
+      capabilityIds:
+        type: array
+        items:
+          $ref: '#/$defs/id'
+      notes:
+        type: string
+        maxLength: 2000
+    additionalProperties: false
+  capability:
+    description: One feature a profile may or may not support. Support is empirical and separate from
+      availability at runtime.
+    type: object
+    required:
+    - schemaVersion
+    - capabilityId
+    - profileRevisionId
+    - backend
+    - feature
+    - support
+    - availability
+    properties:
+      schemaVersion:
+        $ref: '#/$defs/schemaVersion'
+      capabilityId:
+        $ref: '#/$defs/id'
+      profileRevisionId:
+        $ref: '#/$defs/id'
+      backend:
+        enum:
+        - triton
+        - cuda
+        - openmp
+      feature:
+        enum:
+        - parse
+        - bounds
+        - outputCoverage
+        - writeWriteConflict
+        - readWriteConflict
+        - atomics
+        - dynamicIndexing
+        - reductions
+        - dot
+        - synchronizationDiagnostics
+        - initializationDiagnostics
+        - deadlockDiagnostics
+        - numericalReference
+        - interpreterReplay
+        - compilation
+        - sourceMaps
+        - ptxInspection
+        - instrumentedExecution
+        - benchmark
+        - hardwareMetrics
+        - traceExport
+      support:
+        $ref: '#/$defs/supportLevel'
+      availability:
+        $ref: '#/$defs/availability'
+      reason:
+        description: Required when support is limited/untested or availability is unavailable. Never replaced
+          by a nearby fallback.
+        type: string
+        maxLength: 2000
+      evidenceArtifactIds:
+        type: array
+        items:
+          $ref: '#/$defs/id'
+    allOf:
+    - description: An untested capability and an unavailable capability both state why. An unavailable
+        combination is explained, never hidden.
+      if:
+        anyOf:
+        - properties:
+            support:
+              enum:
+              - limited
+              - untested
+          required:
+          - support
+        - properties:
+            availability:
+              const: unavailable
+          required:
+          - availability
+      then:
+        required:
+        - reason
+    additionalProperties: false
+  eligibilityPolicy:
+    description: The single policy that decides whether a result's required properties are satisfied and
+      whether a measurement may be recommended or benchmarked.
+    type: object
+    required:
+    - schemaVersion
+    - policyId
+    - policyRevision
+    - requiredProperties
+    - benchmark
+    properties:
+      schemaVersion:
+        $ref: '#/$defs/schemaVersion'
+      policyId:
+        $ref: '#/$defs/id'
+      policyRevision:
+        type: integer
+        minimum: 1
+      requiredProperties:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          required:
+          - propertyId
+          - acceptedMethods
+          - acceptSampled
+          - acceptUnknown
+          properties:
+            propertyId:
+              $ref: '#/$defs/propertyId'
+            acceptedMethods:
+              type: array
+              minItems: 1
+              items:
+                $ref: '#/$defs/method'
+            acceptSampled:
+              description: A sampled pass may satisfy this property only as a declared benchmarking policy.
+              type: boolean
+            acceptUnknown:
+              description: True only when the user explicitly accepts that a required check is inconclusive.
+              type: boolean
+          additionalProperties: false
+      benchmark:
+        type: object
+        required:
+        - requireEligibleValidation
+        - requireMeasuredMetric
+        - cohortMatch
+        properties:
+          requireEligibleValidation:
+            type: boolean
+          requireMeasuredMetric:
+            description: Estimated metrics never gate a recommendation.
+            type: boolean
+          cohortMatch:
+            enum:
+            - exact-hardware
+            - same-arch
+            - any
+          minSamples:
+            type: integer
+            minimum: 1
+          requireWarmup:
+            type: boolean
+        additionalProperties: false
+      notes:
+        type: string
+        maxLength: 2000
+    additionalProperties: false
+
+  workingSource:
+    type: object
+    additionalProperties: false
+    required: [path, source]
+    properties:
+      path: {$ref: '#/$defs/path'}
+      source: {type: string, maxLength: 1048576}
+  analysisSubmission:
+    description: Source data for the static/symbolic analyzer. Carries no executable, environment, consent or command authority.
+    type: object
+    additionalProperties: false
+    required: [files, scenario, profileRevisionId, solverTimeMs]
+    properties:
+      files:
+        type: array
+        minItems: 1
+        maxItems: 100
+        items: {$ref: '#/$defs/workingSource'}
+      scenario: {$ref: '#/$defs/scenario'}
+      profileRevisionId: {$ref: '#/$defs/id'}
+      solverTimeMs: {type: integer, minimum: 1, maximum: 30000}
+      parentSnapshotId: {$ref: '#/$defs/id'}
