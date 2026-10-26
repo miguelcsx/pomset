@@ -3,10 +3,26 @@
 /** Monaco and its workers are bundled locally; no CDN or analysis service. */
 import { useEffect, useRef, type JSX } from "react";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+// Monaco decides whether Tab moves focus from a global service, not from the
+// editor's creation option — `editorConfiguration` reads `TabFocus` and ignores
+// what it is given. The toggle is imported so the standard shortcut stays
+// available, and `TabFocus` is set below.
+import "monaco-editor/esm/vs/editor/contrib/toggleTabFocusMode/browser/toggleTabFocusMode.js";
+import { TabFocus } from "monaco-editor/esm/vs/editor/browser/config/tabFocus.js";
 import "monaco-editor/esm/vs/basic-languages/python/python.contribution";
 import "monaco-editor/esm/vs/basic-languages/cpp/cpp.contribution";
 import "monaco-editor/esm/vs/language/json/monaco.contribution";
 import type { SourceSelection } from "@pomset/ui";
+
+/**
+ * Tab leaves the editor rather than inserting a character.
+ *
+ * Monaco traps Tab by default, which makes the source a keyboard dead end: a
+ * reader who tabs into it can never reach the evidence beside it, and the
+ * finding controls past it are built to be reachable. Ctrl+M, or Ctrl+Shift+M
+ * on macOS, switches back to indenting and announces the change.
+ */
+TabFocus.setTabFocusMode(true);
 
 /**
  * The workers are declared as `new Worker(new URL(…))` because that is the form
