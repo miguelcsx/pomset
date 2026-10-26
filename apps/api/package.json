@@ -1,0 +1,35 @@
+{
+  "name": "@pomset/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The hosted HTTP API and event stream: ownership, authorization, project, snapshot, scenario, job and publication routes over the canonical contracts.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pomset/contracts": "workspace:*",
+    "@pomset/domain": "workspace:*",
+    "@pomset/storage": "workspace:*",
+    "@pomset/worker": "workspace:*",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
