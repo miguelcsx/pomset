@@ -30,9 +30,14 @@ job event stream.
 
 | Area | Owns |
 |---|---|
-| `apps/web` | Routing, data access, state store, layout. |
+| `apps/web/app` | The document, the client boundary, and mounting the workstation. |
+| `apps/web/src/features` | Data access, state store, layout and the feature leaves. |
+| `apps/web/src/features/editor` | Monaco integration. Editing only; it is not the analysis surface. It is mounted client-only, so it never enters the server render. |
 | `packages/ui` | Tokens, primitives, lane and evidence components, shared with the read-only local viewer. |
-| Monaco integration | Editing only; it is not the analysis surface. |
+
+The client is built as a static export and served by the workbench from the
+API's own origin, so a browser reaches one host, one origin and one capability
+([ADR-0014](../adr/0014-web-client-and-api-layers.md)).
 
 The workbench renders. It never analyses, never measures and never decides
 eligibility — those come from `packages/domain` and the engines.

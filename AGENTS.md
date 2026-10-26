@@ -4,7 +4,13 @@
 
 `pomset` is a multi-language concurrency workbench for the web. You open a
 project, pick a scenario, run it under one or more profiles, and read the
-evidence each one produces. There is no backend yet.
+evidence each one produces.
+
+The workbench is a Next.js client over a layered Express API, both in this
+repository. `apps/api/src` is `domain`, `application`, `infrastructure` and
+`interface`; the shared layers those use live in `packages/*`, which the CLI,
+the worker and the Python engine reuse. The client is served from the API's own
+origin, so a browser reaches one host and one capability.
 
 ## Branches
 
@@ -15,7 +21,8 @@ evidence each one produces. There is no backend yet.
 
 The mock is never merged into `main`. It is a maquette for settling the visual
 language and the interaction states, and it gets thrown away once the real
-frontend exists. That one will be React with Monaco.
+frontend exists. That one is React with Monaco, built with Next.js
+([ADR-0014](docs/adr/0014-web-client-and-api-layers.md)).
 
 ## Conventions
 

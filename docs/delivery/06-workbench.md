@@ -5,7 +5,7 @@ memory, events, domain coverage, comparison lanes and publication preview. It
 renders real engine output from the hosted API and from the read-only local
 viewer; it never simulates progress and never invents an ordering.
 
-**Whole-epic prerequisites.** `TASK-FND-002` (React/Monaco/Vite shell and the
+**Whole-epic prerequisites.** `TASK-FND-002` (React/Monaco/Next.js shell and the
 shared token package), `TASK-LOC-009` (the read-only local transport) and
 `TASK-HST-008` (the durable job event stream). Each block lists its own
 prerequisites.
@@ -23,23 +23,23 @@ view responsibilities are specified in
 is a planned future target and the mock under `origin/web/mock` is a visual
 reference only, not scaffolding to import.
 
-### TASK-WEB-001  Build the React, Monaco and Vite shell with Explore, Validate and Optimize
+### TASK-WEB-001  Build the React, Monaco and Next.js shell with Explore, Validate and Optimize
 
 **Purpose.** Establish the application shell and the single primary navigation so later views attach to one vocabulary.
 
-**Owns.** `apps/web/src/app/`, `apps/web/src/navigation/`, `apps/web/vite.config.ts`, `packages/ui/src/tokens/`
+**Owns.** `apps/web/app/`, `apps/web/src/features/`, `apps/web/next.config.ts`, `packages/ui/src/tokens/`
 
 **Requirement links.** `REQ-UX-004`, `REQ-CLI-013`
 
 **Prerequisites.** `TASK-FND-002`
 
-**Implementation.** Create the Vite build, the React root and a CSS-grid layout whose primary navigation is exactly Explore, Validate and Optimize. There is no second mode hierarchy and no Observe/Explore/Verify vocabulary. Import the shared token package from `packages/ui` and build both the hosted client and the local reader from it: `pomset serve` mounts the same built route and components over the read-only transport, so no second renderer exists. Execution mechanisms appear as qualifiers on evidence, never as navigation entries.
+**Implementation.** Create the Next.js build, the React root and a CSS-grid layout whose primary navigation is exactly Explore, Validate and Optimize. There is no second mode hierarchy and no Observe/Explore/Verify vocabulary. Import the shared token package from `packages/ui` and build both the hosted client and the local reader from it: `pomset serve` mounts the same exported route and components over the read-only transport, so no second renderer exists. Execution mechanisms appear as qualifiers on evidence, never as navigation entries.
 
 **Acceptance.** The built app renders three primary navigation entries with those names, no fourth mode entry exists anywhere in the source, and the same bundle built from `packages/ui` is served at a loopback `pomset serve` URL showing identical navigation and tokens.
 
 **Verification.** Environment: Node toolchain with the workspace installed, plus `pomset serve` over an exported report. Command: `pnpm --filter @pomset/web build` and `pnpm --filter @pomset/web test -- shell`. Observe: navigation entries and identical component tree in both modes.
 
-**Artifacts.** The Vite/React shell, the navigation module, and the token package consumption path shared with the local viewer.
+**Artifacts.** The Next.js/React shell, the navigation module, and the token package consumption path shared with the local viewer.
 
 ### TASK-WEB-002  Present the project tree and source editor over a snapshot
 

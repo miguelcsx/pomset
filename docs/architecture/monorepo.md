@@ -9,8 +9,8 @@ no-go gate. Sources: `SRC-029`, `SRC-030`, `SRC-031`.
 ## Planned tree
 
 ```text
-apps/web/                       React + Monaco + Vite client
-apps/api/                       Node.js + Express HTTP API and event stream
+apps/web/                       React + Monaco + Next.js client, statically exported
+apps/api/                       Node.js + Express HTTP API and event stream, layered
 apps/cli/                       TypeScript local/CI CLI and loopback report server
 apps/worker/                    TypeScript engine supervisor / hosted job consumer
 packages/contracts/             generated TS bindings + canonical moved schemas
@@ -114,8 +114,9 @@ behind adapters, in line with
 
 ## Current browser feature boundaries
 
-`apps/web/src/app/Workbench.tsx` composes the local workstation. Feature leaves
-are organized by responsibility, with permitted imports checked by
+`apps/web/app/page.tsx` mounts the workstation and
+`apps/web/src/features/Workbench.tsx` composes it. Feature leaves are organized
+by responsibility, with permitted imports checked by
 `scripts/check-boundaries.mjs`:
 
 | Folder | Responsibility | Other feature dependencies |
@@ -133,3 +134,25 @@ every returned job and rejects identity changes. Aborting browser observation
 stops requests without cancelling the durable job. Closing a tab changes the
 editor view, never source membership in a snapshot. These boundaries do not
 constitute a completed hosted architecture or four-lane implementation.
+
+Monaco is mounted client-only through `next/dynamic` with `ssr: false`, so it
+never enters the server render; its workers are declared as
+`new Worker(new URL(…, import.meta.url))` and bundled locally. The exported
+client is served by the workbench from the API's own origin, which is what keeps
+the browser inside one host and one capability.
+
+## Current API layers
+
+`apps/api/src` repeats, one level down, the layering the packages already
+express. `scripts/check-boundaries.mjs` enforces the directions:
+
+| Layer | Holds | May import |
+|---|---|---|
+| `domain/` | The shared policy re-exported, and the error vocabulary | — |
+| `application/` | One use case per operation, and the ports they need | `domain` |
+| `infrastructure/` | The ports implemented over SQLite and the child-process supervisor | `domain`, `application` |
+| `interface/` | Controllers, routers and middlewares | `domain`, `application` |
+
+Nothing imports `interface`. Only the composition root — `app.ts`, `main.ts`,
+`bin/` — names a concrete adapter, which is what makes the SQLite backend and
+the child-process supervisor replaceable without touching a use case.

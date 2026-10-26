@@ -24,7 +24,7 @@ requirement and an ADR conflict, the requirement wins.
 |---|---|---|
 | [0001](0001-product-and-evidence.md) | Kernel-only behaviour-envelope product with Explore/Validate/Optimize and six evidence classes. | accepted |
 | [0002](0002-monorepo-and-language-boundary.md) | pnpm/uv tree; TypeScript product and CLI; isolated Python/native engines behind a subprocess protocol. | accepted |
-| [0003](0003-workbench-composition.md) | React, Monaco and Vite with bounded CSS-grid panels; shared semantic tokens; no GoldenLayout/jQuery/EventHub. | accepted |
+| [0003](0003-workbench-composition.md) | React, Monaco and Vite with bounded CSS-grid panels; shared semantic tokens; no GoldenLayout/jQuery/EventHub. Amended by [0014](0014-web-client-and-api-layers.md). | accepted |
 | [0004](0004-contract-authority.md) | JSON Schema 2020-12 is the portable authority; OpenAPI 3.1 references it; generated consumers. | accepted |
 | [0005](0005-snapshots-and-artifacts.md) | Immutable, content-addressed snapshot and artifact manifests; ownership separate from content identity. | accepted |
 | [0006](0006-jobs-and-persistence.md) | SQLite/CAS locally, PostgreSQL and leased jobs plus object storage hosted; no proprietary queue requirement. | accepted |
@@ -34,6 +34,8 @@ requirement and an ADR conflict, the requirement wins.
 | [0010](0010-performance-and-eligibility.md) | Required-property policy gates recommendations and benchmark execution; imports stay labelled; measurements are not proofs. | accepted |
 | [0011](0011-private-local-and-publication.md) | Offline operation, no implicit upload, explicit publication with a disclosure preview. | accepted |
 | [0012](0012-research-gates-and-compatibility.md) | Feasibility before the full web product; feature-by-feature tool probes; later-phase documentation stays specified even if a gate fails. | accepted |
+| [0013](0013-local-symbolic-workstation.md) | A separately launched single-owner loopback workbench that takes source as data and executes nothing. | accepted |
+| [0014](0014-web-client-and-api-layers.md) | Next.js static export served from the workbench's own origin; a layered Express API; the shared packages kept as the shared layers. | accepted |
 
 ## Template
 

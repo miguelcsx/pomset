@@ -73,3 +73,13 @@ Design references: [Apple layout guidance](https://developer.apple.com/design/hu
 [OpenAI canvas](https://openai.com/index/introducing-canvas/),
 [Anthropic artifacts](https://support.anthropic.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them).
 These guide hierarchy and content-focused interaction, not copied assets or a chat interface.
+
+## Amendment
+
+[ADR-0014](0014-web-client-and-api-layers.md) replaces the bundler and the
+origin. The client is built with Next.js and shipped as a static export that the
+workbench serves from its own origin, so a browser still reaches one host and
+one capability. React, Monaco, the bounded CSS-grid panels, the four-lane cap,
+the spacing scale, the five semantic roles and the rule against staged progress
+are unchanged; "React, Monaco and Vite" above now reads "React, Monaco and
+Next.js".

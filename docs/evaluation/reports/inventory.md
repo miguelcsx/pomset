@@ -65,7 +65,7 @@ Existing targets are candidates for review, not acceptance evidence. No requirem
 | TASK-HST-015 | missing | 0 / 4 |
 | TASK-HST-016 | missing | 0 / 3 |
 | TASK-HST-017 | missing | 0 / 3 |
-| TASK-WEB-001 | partial/unverified | 2 / 4 |
+| TASK-WEB-001 | partial/unverified | 3 / 4 |
 | TASK-WEB-002 | missing | 0 / 3 |
 | TASK-WEB-003 | missing | 0 / 3 |
 | TASK-WEB-004 | missing | 0 / 3 |
