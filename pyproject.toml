@@ -6,7 +6,7 @@
 # The TypeScript side is a pnpm workspace; the two are coordinated here, and no
 # Python or native build is ever routed through a JavaScript bundler.
 [tool.uv.workspace]
-members = ["engines/triton", "packages/contracts/python"]
+members = ["engines/triton", "engines/openmp", "packages/contracts/python"]
 
 [tool.uv]
 package = false
