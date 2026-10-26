@@ -8,6 +8,9 @@ dist/
 .vite/
 .next/
 out/
+# Next.js rewrites this on every dev run and every build, pointing at whichever
+# of the two it produced last. Both targets are inside `.next/` and ignored.
+next-env.d.ts
 
 # Rust
 target/

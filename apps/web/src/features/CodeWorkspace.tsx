@@ -1,6 +1,6 @@
 /** Editor-first working files; no result is inferred from an edit or a compiler artifact. */
 import { Icon, type SourceSelection } from "@pomset/ui";
-import { Suspense, lazy, useState } from "react";
+import { Suspense, lazy, useState, type JSX } from "react";
 import { downloadText, editWorkingFile, MAX_SOURCE_BYTES, type WorkingCopy } from "./workspace/working-copy";
 
 const SourceEditor = lazy(() => import("./editor/SourceEditor").then((module) => ({ default: module.SourceEditor })));

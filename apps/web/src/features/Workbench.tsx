@@ -1,7 +1,7 @@
 "use client";
 
 /** Editor, scenario and immutable evidence remain visible in one compact workspace. */
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type JSX } from "react";
 import dynamic from "next/dynamic";
 import { EvidencePanel, Icon, type IconName, type InspectionDocument, type SourceSelection, type StatusRole } from "@pomset/ui";
 import type { Finding, Job, Scenario } from "@pomset/contracts";

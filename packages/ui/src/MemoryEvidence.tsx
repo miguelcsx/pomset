@@ -1,4 +1,5 @@
 /** Access connections are not temporal order. Only recorded actors and events are drawn. */
+import type { JSX } from "react";
 import type { Finding } from "@pomset/contracts";
 import type { InspectionDocument, SourceSelection } from "./inspection.js";
 import { Icon } from "./Icon.js";

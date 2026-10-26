@@ -45,9 +45,12 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: nix develop -c pnpm install --frozen-lockfile
-      - run: nix develop -c pnpm --filter "${{ matrix.package }}" run typecheck
-      - run: nix develop -c pnpm --filter "${{ matrix.package }}" run build
-      - run: nix develop -c pnpm --filter "${{ matrix.package }}" run test
+      # `pkg...` selects the package and its workspace dependencies. A member
+      # consumes the others through their built `dist`, so a leg that installed
+      # only would otherwise fail on a clean checkout.
+      - run: nix develop -c pnpm --filter "${{ matrix.package }}..." run typecheck
+      - run: nix develop -c pnpm --filter "${{ matrix.package }}..." run build
+      - run: nix develop -c pnpm --filter "${{ matrix.package }}..." run test
 
   lint:
     name: lint

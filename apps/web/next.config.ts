@@ -23,6 +23,9 @@ const workbench = process.env["POMSET_WORKBENCH_URL"] ?? "http://127.0.0.1:8811"
 
 const config: NextConfig = {
   env: { NEXT_PUBLIC_POMSET_WEB_VERSION: version },
+  // This repository keeps one set of agent instructions, at the root. Next.js
+  // would otherwise write its own inside `apps/web` on every dev run.
+  agentRules: false,
   ...(exporting
     ? { output: "export" as const }
     : {

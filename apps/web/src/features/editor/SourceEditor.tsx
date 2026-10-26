@@ -1,7 +1,7 @@
 "use client";
 
 /** Monaco and its workers are bundled locally; no CDN or analysis service. */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type JSX } from "react";
 import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import "monaco-editor/esm/vs/basic-languages/python/python.contribution";
 import "monaco-editor/esm/vs/basic-languages/cpp/cpp.contribution";

@@ -8,9 +8,18 @@ allowBuilds:
 
 # One version per shared development dependency, declared here rather than
 # repeated in nine manifests. A member references these with `catalog:`.
+#
+# React and its types are pinned here for a sharper reason: two copies of
+# `@types/react` in one workspace make a package fail to compile with
+# "cannot be named without a reference to ...@types/react", which is what
+# happened when the client moved to React 19 and the shared UI package did not.
 catalog:
   "@types/node": ^22.10.2
+  "@types/react": ^19.3.0
+  "@types/react-dom": ^19.3.0
   ajv: ^8.17.1
+  react: ^19.3.1
+  react-dom: ^19.3.1
   typescript: ~5.7.2
   vitest: ^3.0.5
 

@@ -1,5 +1,5 @@
 /** A local disclosure preview and file download; hosted publication is a separate act. */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type JSX } from "react";
 import { Icon, type InspectionDocument } from "@pomset/ui";
 import { downloadText } from "../workspace/working-copy";
 

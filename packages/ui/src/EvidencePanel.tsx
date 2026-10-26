@@ -1,5 +1,5 @@
 /** Visual inspection first. Exact evidence remains available without expanding the workspace chrome. */
-import { useEffect, useState } from "react";
+import { useEffect, useState, type JSX } from "react";
 import type { Finding } from "@pomset/contracts";
 import type { InspectionDocument, SourceSelection } from "./inspection.js";
 import { AccessDiagram } from "./AccessDiagram.js";

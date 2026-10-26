@@ -1,5 +1,5 @@
 /** Snapshot, source, profile and evidence share one linked selection. */
-import { useState, type ReactNode } from "react";
+import { useState, type JSX, type ReactNode } from "react";
 import type { Finding } from "@pomset/contracts";
 import type { InspectionDocument, SourceSelection } from "./inspection.js";
 import { EvidencePanel } from "./EvidencePanel.js";
