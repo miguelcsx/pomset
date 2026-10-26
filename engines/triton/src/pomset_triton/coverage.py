@@ -32,6 +32,26 @@ def is_numeric(variable: dict) -> bool:
     )
 
 
+def _witness_metadata(solution, metadata):
+    """The metadata of the clause this witness satisfies.
+
+    A coverage hole is universally quantified whenever the store address is not
+    provably the identity mapping, and Z3 will not reduce a quantified formula in
+    a model — it stays a formula rather than becoming a Boolean, so evaluating it
+    decides nothing. The quantifier-free guard identifies the clause instead, and
+    the quantified part is already known to hold: the solver returned this very
+    clause as satisfiable. Without this, any store whose address is merely
+    equivalent to the identity, rather than syntactically it, crashed the query.
+    """
+    for condition, item in metadata:
+        if z3.is_true(solution.eval(condition, model_completion=True)):
+            return item
+    for _, item in metadata:
+        if z3.is_true(solution.eval(item["guard"], model_completion=True)):
+            return item
+    return None
+
+
 def query(
     scenario: dict, extraction: Extraction, timeout_ms: int, property_id: str
 ) -> CoverageAnswer:
@@ -54,11 +74,11 @@ def query(
                 "unsat", z3.get_version_string(), property_id=property_id
             )
         solution = solver.model()
-        selected = next(
-            item
-            for condition, item in metadata
-            if z3.is_true(solution.eval(condition, model_completion=True))
-        )
+        selected = _witness_metadata(solution, metadata)
+        if selected is None:
+            raise SolverInconclusive(
+                "the witness could not be attributed to a declared allocation"
+            )
         objective = selected.get("index", selected.get("address"))
         minimization = {
             "attempted": False,
@@ -72,11 +92,7 @@ def query(
                 reduced = smaller.check()
                 if reduced == z3.sat:
                     solution = smaller.model()
-                    selected = next(
-                        item
-                        for condition, item in metadata
-                        if z3.is_true(solution.eval(condition, model_completion=True))
-                    )
+                    selected = _witness_metadata(solution, metadata) or selected
                     minimization["note"] = (
                         "A smaller witness was found; global minimality is not claimed. All assumptions retained."
                     )
@@ -178,6 +194,7 @@ def coverage_query(model: Model):
             (
                 hole,
                 {
+                    "guard": z3.And(index >= 0, index < extent.value),
                     "index": index,
                     "allocationId": allocation["allocationId"],
                     "accessIndices": [i for i, _ in stores],
@@ -207,6 +224,7 @@ def bounds_query(model: Model):
             (
                 invalid,
                 {
+                    "guard": z3.And(active, mask),
                     "address": offset.value,
                     "program": pid.value,
                     "lane": lane.value,
@@ -243,6 +261,7 @@ def conflict_query(model: Model):
                 (
                     conflict,
                     {
+                        "guard": z3.And(active1, active2, distinct),
                         "address": a.value,
                         "programA": p1.value,
                         "laneA": l1.value,

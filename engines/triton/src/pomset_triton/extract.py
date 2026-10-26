@@ -71,6 +71,23 @@ class Extraction:
         return tuple(access for access in self.accesses if access.kind == "store")
 
 
+def _split_pointer(node: ast.expr) -> tuple[ast.expr, list[ast.expr]]:
+    """Splits an address into the base and the terms added to it.
+
+    An address is written as the allocation plus an offset, but an offset that
+    is itself a sum parses as ``((Y + offsets) + 1)``: the addition is
+    left-associative, so the base is buried under the terms. Walking the spine
+    is what lets a shifted store be modelled instead of refused, and
+    ``Y + 1 + offsets`` and ``Y + offsets + 1`` mean the same address.
+    """
+    terms: list[ast.expr] = []
+    current = node
+    while isinstance(current, ast.BinOp) and isinstance(current.op, ast.Add):
+        terms.append(current.right)
+        current = current.left
+    return current, terms
+
+
 def _access(kind: str, call: ast.Call, bindings: dict, entry: Entrypoint) -> Access:
     if len(call.args) != (1 if kind == "load" else 2):
         raise unsupported(call, f"tl.{kind} argument count")
@@ -78,22 +95,27 @@ def _access(kind: str, call: ast.Call, bindings: dict, entry: Entrypoint) -> Acc
     names = [keyword.arg for keyword in call.keywords]
     if len(set(names)) != len(names) or any(name not in allowed for name in names):
         raise unsupported(call, f"tl.{kind} keyword arguments")
-    pointer_expr = resolve(call.args[0], bindings)
-    if not isinstance(pointer_expr, ast.BinOp) or not isinstance(
-        pointer_expr.op, ast.Add
-    ):
+    base, terms = _split_pointer(resolve(call.args[0], bindings))
+    if not terms:
         raise unsupported(call, "pointer expression must be named allocation + offset")
-    pointer = pointer_expr.left
-    if not isinstance(pointer, ast.Name) or pointer.id not in entry.parameters:
+    if not isinstance(base, ast.Name) or base.id not in entry.parameters:
         raise unsupported(call, "pointer is not a declared argument")
+    offset = terms[-1]
+    for term in reversed(terms[:-1]):
+        offset = ast.BinOp(
+            left=offset,
+            op=ast.Add(),
+            right=term,
+            lineno=call.lineno,
+            col_offset=call.col_offset,
+        )
     mask_node = next(
         (kw.value for kw in call.keywords if kw.arg == "mask"), ast.Constant(True)
     )
     mask = resolve(mask_node, bindings)
-    offset = pointer_expr.right
     return Access(
         kind,
-        pointer.id,
+        base.id,
         ast.unparse(offset),
         ast.unparse(mask),
         call.lineno,

@@ -94,6 +94,52 @@ def test_the_ceiling_divided_control_is_silent() -> None:
     assert answer.status == "unsat"
 
 
+SHIFTED = """
+import triton
+import triton.language as tl
+
+@triton.jit
+def transform(X, Y, N, BLOCK: tl.constexpr):
+    pid = tl.program_id(0)
+    offsets = pid * BLOCK + tl.arange(0, BLOCK)
+    mask = offsets < N
+    x = tl.load(X + offsets, mask=mask)
+    tl.store(Y + offsets + 1, x * 2.0, mask=mask)
+"""
+
+
+def test_a_shifted_store_address_is_modelled_rather_than_refused() -> None:
+    """A halo or a shifted write is ordinary kernel code, so it is modelled.
+
+    ``Y + offsets + 1`` parses as ``(Y + offsets) + 1``: addition is
+    left-associative, so the allocation is not the left operand of the outermost
+    sum. Reading the left operand alone refused every such address.
+    """
+    store = extract(select_entrypoint(SHIFTED, "k.py", "transform")).stores[0]
+    assert store.pointer == "Y"
+    assert store.lane_expression == (
+        "tl.program_id(0) * BLOCK + tl.arange(0, BLOCK) + 1"
+    )
+
+
+def test_the_constant_offset_may_sit_on_either_side_of_the_sum() -> None:
+    same = SHIFTED.replace("Y + offsets + 1", "Y + 1 + offsets")
+    assert (
+        extract(select_entrypoint(same, "k.py", "transform")).stores[0].pointer == "Y"
+    )
+    # Both are analysed, not merely parsed. Under the ceiling-divided control the
+    # only unwritten element is index 0, which the shift leaves behind.
+    for source in (SHIFTED, same):
+        answer = output_coverage(
+            load(CONTROL),
+            extract(select_entrypoint(source, "k.py", "transform")),
+            30_000,
+        )
+        assert answer.status == "sat"
+        assert answer.witness is not None
+        assert answer.witness["index"] == 0
+
+
 def test_the_result_obeys_the_closed_outcome_table() -> None:
     scenario = load(DEFECT)
     extraction = extract(entrypoint())
