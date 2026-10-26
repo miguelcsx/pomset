@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "artifactId": "art_rep_1",
+  "kind": "report-json",
+  "contentHash": "sha256:f65fdb506bcae90353f4a4e1c68a80964ae26a26169e09318d17f8ad1bd4f294",
+  "bytes": 18422,
+  "mediaType": "application/json",
+  "producedBy": "src_z3",
+  "profileRevisionId": "prf_triton_cpu_z3_1",
+  "createdAt": "2026-10-12T09:22:10Z",
+  "retention": "publication",
+  "notes": "Machine-readable report for result res_1."
+}

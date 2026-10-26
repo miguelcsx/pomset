@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "capabilityId": "cap_coverage",
+  "profileRevisionId": "prf_triton_cpu_z3_1",
+  "backend": "triton",
+  "feature": "outputCoverage",
+  "support": "validated",
+  "availability": "immediate",
+  "evidenceArtifactIds": [
+    "art_rep_1"
+  ]
+}
