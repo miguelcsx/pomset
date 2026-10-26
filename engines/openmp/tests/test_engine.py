@@ -9,11 +9,13 @@ easy to get wrong and hard to notice.
 from __future__ import annotations
 
 import json
+import shutil
 import struct
 import subprocess
 import sys
 from pathlib import Path
 
+import pytest
 
 from pomset_openmp.profiles.probe import capabilities, measure
 from pomset_openmp.run import compile as compilation
@@ -33,6 +35,29 @@ void transform(float *X, float *Y, int N, int T) {
   for (int i = 0; i < N; ++i) if (i % 2 == 0) Y[i] = X[i] * 2.0f;
 }
 """
+
+
+def openmp_compiler_available(directory: Path) -> bool:
+    """Whether `clang` on PATH builds and links `-fopenmp`, as the nix shell does.
+
+    Apple's system clang accepts the source but refuses the flag, so a test that
+    needs a working OpenMP run must skip there rather than report a false failure.
+    """
+    if shutil.which("clang") is None:
+        return False
+    source = directory / "probe.c"
+    source.write_text("int main(void) { return 0; }\n", encoding="utf-8")
+    built = subprocess.run(
+        ["clang", "-fopenmp", str(source), "-o", str(directory / "probe")],
+        capture_output=True,
+        check=False,
+    )
+    return built.returncode == 0
+
+
+def require_openmp(directory: Path) -> None:
+    if not openmp_compiler_available(directory):
+        pytest.skip("clang cannot build -fopenmp here; run the checks in `nix develop`")
 
 
 def scenario(name: str, size: int = 64) -> dict:
@@ -214,6 +239,7 @@ def test_refuses_to_run_without_consent(tmp_path: Path) -> None:
 
 def test_a_correct_kernel_is_never_established(tmp_path: Path) -> None:
     """`established` is reachable only through reasoning, never through a run."""
+    require_openmp(tmp_path)
     terminal, code = stage(
         tmp_path,
         "complete",
@@ -235,6 +261,7 @@ def test_a_correct_kernel_is_never_established(tmp_path: Path) -> None:
 def test_an_element_no_store_reached_is_an_initialization_violation(
     tmp_path: Path,
 ) -> None:
+    require_openmp(tmp_path)
     terminal, code = stage(
         tmp_path,
         "partial",
@@ -261,7 +288,7 @@ def test_a_kernel_the_compiler_refuses_decides_nothing(tmp_path: Path) -> None:
     assert code == 0, terminal
     for item in terminal["payload"]["propertyResults"]:
         assert item["outcome"] == "unsupported"
-        assert "expected ';'" in item["unsupportedReason"]
+        assert "the compiler refused this kernel" in item["unsupportedReason"]
 
 
 def test_the_probe_names_why_instrumentation_is_unavailable() -> None:
