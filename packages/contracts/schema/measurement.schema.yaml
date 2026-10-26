@@ -1,0 +1,347 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://pomset.dev/contracts/measurement.schema.yaml
+title: Pomset measurement contracts
+description: Authoritative portable definition of a performance measurement. A measurement carries measured
+  or estimated evidence, never a correctness outcome, and is inspectable without being recommendable.
+$defs:
+  id:
+    type: string
+    minLength: 3
+    maxLength: 128
+    pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+  sha256:
+    type: string
+    pattern: ^sha256:[0-9a-f]{64}$
+  measurement:
+    type: object
+    required:
+    - schemaVersion
+    - measurementId
+    - resultId
+    - evidenceClass
+    - metric
+    - cohortId
+    - instrumentation
+    - samples
+    - synchronization
+    - referenceOutcome
+    - eligibility
+    - createdAt
+    properties:
+      schemaVersion:
+        type: integer
+        const: 1
+      measurementId:
+        $ref: '#/$defs/id'
+      resultId:
+        $ref: '#/$defs/id'
+      snapshotId:
+        $ref: '#/$defs/id'
+      scenarioId:
+        $ref: '#/$defs/id'
+      profileRevisionId:
+        $ref: '#/$defs/id'
+      evidenceClass:
+        description: measured comes from a real timed execution; estimated comes from a model or simulator.
+        enum:
+        - measured
+        - estimated
+      origin:
+        enum:
+        - local
+        - hosted
+        - imported
+      metric:
+        type: object
+        required:
+        - name
+        - unit
+        - statistic
+        properties:
+          name:
+            enum:
+            - latency
+            - throughput
+            - duration
+            - bandwidth
+            - occupancy
+            - registerCount
+            - spillBytes
+            - bankConflicts
+            - warpDivergence
+            - memoryTransactions
+            - launchOverhead
+            - compileTime
+            - custom
+          customName:
+            type: string
+            maxLength: 120
+          unit:
+            enum:
+            - ns
+            - us
+            - ms
+            - s
+            - bytes
+            - bytes-per-second
+            - flops
+            - flops-per-second
+            - percent
+            - count
+          statistic:
+            enum:
+            - min
+            - median
+            - mean
+            - p90
+            - p99
+            - max
+            - stdev
+            - histogram
+        additionalProperties: false
+      value:
+        type: number
+      distribution:
+        description: Latency distribution actually observed. Present for measured metrics with more than
+          one sample.
+        type: object
+        required:
+        - bucketEdges
+        - counts
+        properties:
+          bucketEdges:
+            type: array
+            minItems: 2
+            items:
+              type: number
+          counts:
+            type: array
+            minItems: 1
+            items:
+              type: integer
+              minimum: 0
+        additionalProperties: false
+      cohortId:
+        description: Hardware cohort identity. Unlike devices are never pooled to rank a universally fastest
+          configuration.
+        $ref: '#/$defs/id'
+      hardware:
+        type: object
+        required:
+        - device
+        - arch
+        - driver
+        - runtime
+        properties:
+          device:
+            type: string
+            maxLength: 200
+          arch:
+            type: string
+            maxLength: 120
+          driver:
+            type: string
+            maxLength: 120
+          runtime:
+            type: string
+            maxLength: 120
+          clockMhz:
+            type: number
+            minimum: 0
+          clockMethod:
+            enum:
+            - reported-base
+            - reported-boost
+            - locked
+            - measured
+            - unknown
+        additionalProperties: false
+      tool:
+        type: object
+        required:
+        - name
+        - version
+        properties:
+          name:
+            type: string
+            maxLength: 200
+          version:
+            type: string
+            maxLength: 120
+          revisionId:
+            $ref: '#/$defs/sha256'
+        additionalProperties: false
+      instrumentation:
+        description: How the measurement was observed. A serialized or instrumented execution is never
+          presented as unmodified parallel hardware behaviour.
+        type: object
+        required:
+        - kind
+        - serializes
+        properties:
+          kind:
+            enum:
+            - none
+            - cuda-events
+            - host-timers
+            - profiler-counters
+            - nsys-trace
+            - hardware-counters
+            - model-estimate
+          serializes:
+            type: boolean
+          overheadNote:
+            type: string
+            maxLength: 2000
+          samplingRateHz:
+            type: number
+            minimum: 0
+        additionalProperties: false
+      samples:
+        type: object
+        required:
+        - warmupCount
+        - sampleCount
+        - statistics
+        properties:
+          warmupCount:
+            type: integer
+            minimum: 0
+          sampleCount:
+            type: integer
+            minimum: 1
+          statistics:
+            type: object
+            required:
+            - min
+            - median
+            - max
+            properties:
+              min:
+                type: number
+              median:
+                type: number
+              mean:
+                type: number
+              max:
+                type: number
+              stdev:
+                type: number
+                minimum: 0
+            additionalProperties: false
+          outlierCount:
+            type: integer
+            minimum: 0
+        additionalProperties: false
+      synchronization:
+        description: How execution boundaries were observed, and whether compile time was separated from
+          execution time.
+        type: object
+        required:
+        - method
+        - compileTimeSeparated
+        properties:
+          method:
+            enum:
+            - device-synchronize
+            - stream-synchronize
+            - event-elapsed
+            - wall-clock
+            - profiler-serialized
+          compileTimeSeparated:
+            type: boolean
+          compileTimeMs:
+            type: number
+            minimum: 0
+          jitCacheState:
+            enum:
+            - cold
+            - warm
+            - unknown
+        additionalProperties: false
+      referenceOutcome:
+        description: Numerical agreement of this measurement's run against the declared reference, or
+          its absence.
+        type: object
+        required:
+        - checked
+        - outcome
+        properties:
+          checked:
+            type: boolean
+          outcome:
+            enum:
+            - agreed
+            - disagreed
+            - not-applicable
+            - blocked
+          propertyResultId:
+            $ref: '#/$defs/id'
+          freshBufferUsed:
+            description: True when the output buffer was freshly poisoned rather than reused from a previous
+              run.
+            type: boolean
+          autotuneBufferReuse:
+            description: True when a reused autotune buffer was in play; such a comparison cannot hide
+              an unwritten element.
+            type: boolean
+        additionalProperties: false
+      eligibility:
+        description: Recommendation status under the single EligibilityPolicy. Well-formed but incomplete
+          imports stay ineligible with reasons.
+        type: object
+        required:
+        - state
+        - reasonCodes
+        properties:
+          state:
+            enum:
+            - eligible
+            - ineligible
+          reasonCodes:
+            type: array
+            items:
+              enum:
+              - MISSING_PROVENANCE
+              - INCOMPLETE_HARDWARE
+              - COHORT_MISMATCH
+              - POLICY_MISMATCH
+              - VALIDATION_UNSATISFIED
+              - ESTIMATED_NOT_MEASURED
+              - SNAPSHOT_MISMATCH
+              - SCENARIO_MISMATCH
+              - PROFILE_MISMATCH
+              - ORIGIN_IMPORTED
+              - INSUFFICIENT_SAMPLES
+              - NO_WARMUP
+          policyId:
+            $ref: '#/$defs/id'
+          policyRevision:
+            type: integer
+            minimum: 1
+        additionalProperties: false
+      notes:
+        type: string
+        maxLength: 4000
+      createdAt:
+        type: string
+        format: date-time
+    additionalProperties: false
+
+    allOf:
+    - if:
+        properties:
+          instrumentation:
+            properties:
+              kind:
+                const: cuda-events
+            required: [kind]
+        required: [instrumentation]
+      then:
+        properties:
+          metric:
+            properties:
+              name:
+                enum: [latency, duration, launchOverhead]
+              unit:
+                enum: [ns, us, ms, s]

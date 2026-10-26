@@ -1,0 +1,181 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://pomset.dev/contracts/bundle.schema.yaml
+title: Pomset experiment bundle contract
+description: 'Authoritative portable definition of the experiment bundle: the unit exchanged between machines.
+  Import never executes anything, never publishes anything, and never trusts a hash as an access credential.'
+$defs:
+  id:
+    type: string
+    minLength: 3
+    maxLength: 128
+    pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+  sha256:
+    type: string
+    pattern: ^sha256:[0-9a-f]{64}$
+  relativePath:
+    description: POSIX relative path. Absolute paths, parent traversal and symlinks are rejected at import.
+    type: string
+    minLength: 1
+    maxLength: 512
+    pattern: ^(?!/)(?!.*\.\.)(?!.*\\)[A-Za-z0-9._@+-]+(/[A-Za-z0-9._@+-]+)*$
+  bundleEntry:
+    type: object
+    required:
+    - path
+    - contentHash
+    - bytes
+    properties:
+      path:
+        $ref: '#/$defs/relativePath'
+      contentHash:
+        $ref: '#/$defs/sha256'
+      bytes:
+        type: integer
+        minimum: 0
+      kind:
+        enum:
+        - document
+        - artifact
+        - report
+        - measurement
+      symlink:
+        description: Always false. A symlink entry is rejected, never followed.
+        type: boolean
+        const: false
+    additionalProperties: false
+  experimentBundle:
+    description: Portable experiment carrying its own provenance. Replay requires compatible tools and
+      hardware; the bundle states the incompatibility instead of substituting something close.
+    type: object
+    required:
+    - schemaVersion
+    - bundleId
+    - createdAt
+    - sourceOrigin
+    - entries
+    - documents
+    - manifestHash
+    properties:
+      schemaVersion:
+        type: integer
+        const: 1
+      bundleId:
+        $ref: '#/$defs/id'
+      createdAt:
+        type: string
+        format: date-time
+      sourceOrigin:
+        description: Where the original work was produced. Importing never upgrades this to a provider-produced
+          validation.
+        enum:
+        - local
+        - hosted
+        - imported
+      snapshotId:
+        $ref: '#/$defs/id'
+      scenarioId:
+        $ref: '#/$defs/id'
+      profileRevisionIds:
+        type: array
+        items:
+          $ref: '#/$defs/id'
+      entries:
+        type: array
+        minItems: 1
+        items:
+          $ref: '#/$defs/bundleEntry'
+      documents:
+        description: Inline portable records referenced by path, so an offline reader needs no network.
+        type: object
+        required:
+        - scenarios
+        properties:
+          projectPath:
+            $ref: '#/$defs/relativePath'
+          scenarios:
+            type: array
+            minItems: 1
+            items:
+              $ref: '#/$defs/relativePath'
+          snapshotManifests:
+            type: array
+            items:
+              $ref: '#/$defs/relativePath'
+          results:
+            type: array
+            items:
+              $ref: '#/$defs/relativePath'
+          measurements:
+            type: array
+            items:
+              $ref: '#/$defs/relativePath'
+          profileRevisions:
+            type: array
+            items:
+              $ref: '#/$defs/relativePath'
+        additionalProperties: false
+      requiredTools:
+        description: Tools and revisions a faithful replay needs. Missing entries produce an explicit
+          blocked replay, never a silent substitution.
+        type: array
+        items:
+          type: object
+          required:
+          - name
+          - version
+          properties:
+            name:
+              type: string
+              maxLength: 200
+            version:
+              type: string
+              maxLength: 120
+            backend:
+              enum:
+              - triton
+              - cuda
+              - openmp
+              - host
+              - solver
+            optional:
+              type: boolean
+          additionalProperties: false
+      requiredHardware:
+        type: object
+        properties:
+          device:
+            type: string
+            maxLength: 200
+          arch:
+            type: string
+            maxLength: 120
+          cohortId:
+            $ref: '#/$defs/id'
+          note:
+            type: string
+            maxLength: 500
+        additionalProperties: false
+      producer:
+        description: Recorded for provenance only. Never authorization.
+        type: object
+        properties:
+          tool:
+            type: string
+            maxLength: 120
+          toolVersion:
+            type: string
+            maxLength: 120
+        additionalProperties: false
+      executable:
+        description: 'Always false: import never runs anything.'
+        type: boolean
+        const: false
+      published:
+        description: Always false at creation. Publication is a separate, authenticated act on the server
+          that received the import.
+        type: boolean
+        const: false
+      manifestHash:
+        description: SHA-256 over the RFC 8785 JCS serialization of this object with manifestHash omitted.
+        $ref: '#/$defs/sha256'
+    additionalProperties: false

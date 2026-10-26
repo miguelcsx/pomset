@@ -1,0 +1,470 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://pomset.dev/contracts/engine.schema.yaml
+title: Pomset engine and job contracts
+description: Authoritative portable definitions for the engine process protocol, the EngineRequest launch
+  contract, jobs, durable job events and the directional message envelopes. The supervisor owns lifecycle;
+  the engine owns analysis only.
+$defs:
+  id:
+    type: string
+    minLength: 3
+    maxLength: 128
+    pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]*$
+  sha256:
+    type: string
+    pattern: ^sha256:[0-9a-f]{64}$
+  path:
+    type: string
+    minLength: 1
+    maxLength: 512
+    pattern: ^(?!/)(?!.*\.\.)(?!.*\\|\\)[^\u0000-\u001f]{1,512}$
+  jobState:
+    description: Lifecycle state of one job. Terminal states are immutable and a succeeded job carries
+      no correctness assertion.
+    enum:
+    - queued
+    - running
+    - cancel-requested
+    - succeeded
+    - failed
+    - cancelled
+  errorCode:
+    enum:
+    - PROFILE_NOT_FOUND
+    - ENGINE_FAILED
+    - WORKER_LOST
+    - PROTOCOL_INVALID
+    - INPUT_INVALID
+    - BUNDLE_INVALID
+    - UNAUTHORIZED
+    - FORBIDDEN
+  errorRecord:
+    type: object
+    required:
+    - code
+    - message
+    properties:
+      code:
+        $ref: '#/$defs/errorCode'
+      message:
+        type: string
+        minLength: 1
+        maxLength: 2000
+      details:
+        type: object
+        additionalProperties: true
+    additionalProperties: false
+  operation:
+    description: What the engine was asked to do. Parse and replay adapters are distinct operations.
+    enum:
+    - parse
+    - bounds
+    - coverage
+    - conflicts
+    - explore
+    - replay
+    - validate
+    - benchmark
+    - compile
+    - full
+  engineRequest:
+    description: Immutable launcher-written request handed to the engine through a read-only file plus
+      --request <path>. Nothing inside it is executable authority.
+    type: object
+    required:
+    - schemaVersion
+    - protocolVersion
+    - jobId
+    - attemptId
+    - operation
+    - snapshotId
+    - scenarioId
+    - profileRevisionId
+    - domainRef
+    - budget
+    - inputs
+    - scratchDir
+    properties:
+      schemaVersion:
+        type: integer
+        const: 1
+      protocolVersion:
+        type: integer
+        const: 1
+      jobId:
+        $ref: '#/$defs/id'
+      attemptId:
+        $ref: '#/$defs/id'
+      operation:
+        $ref: '#/$defs/operation'
+      snapshotId:
+        $ref: '#/$defs/id'
+      scenarioId:
+        $ref: '#/$defs/id'
+      profileRevisionId:
+        $ref: '#/$defs/id'
+      policyId:
+        $ref: '#/$defs/id'
+      policyRevision:
+        type: integer
+        minimum: 1
+      domainRef:
+        $ref: '#/$defs/id'
+      budget:
+        type: object
+        required:
+        - solverTimeMs
+        - engineWallTimeMs
+        - memoryBytes
+        - maxMessageBytes
+        - maxOutputBytes
+        - maxArtifactBytes
+        properties:
+          solverTimeMs:
+            type: integer
+            minimum: 0
+          engineWallTimeMs:
+            type: integer
+            minimum: 0
+          memoryBytes:
+            type: integer
+            minimum: 0
+          maxMessageBytes:
+            type: integer
+            minimum: 0
+          maxOutputBytes:
+            type: integer
+            minimum: 0
+          maxArtifactBytes:
+            type: integer
+            minimum: 0
+        additionalProperties: false
+      inputs:
+        description: Read-only references the sandbox mapped in. Host paths supplied by an uploaded scenario
+          are never authority.
+        type: array
+        minItems: 1
+        items:
+          type: object
+          required:
+          - kind
+          - path
+          properties:
+            kind:
+              enum:
+              - files
+              - scenario
+              - domain
+              - policy
+              - profile
+              - fixture
+            path:
+              $ref: '#/$defs/path'
+            sha256:
+              $ref: '#/$defs/sha256'
+          additionalProperties: false
+      scratchDir:
+        $ref: '#/$defs/path'
+      artifactDir:
+        $ref: '#/$defs/path'
+      consent:
+        description: Explicit local execution consent. Present only when the user passed --trust-local-code
+          and the operation imports or executes user code.
+        type: object
+        required:
+        - granted
+        properties:
+          granted:
+            type: boolean
+          scope:
+            enum:
+            - analysis-only
+            - numerical-replay
+            - benchmark
+        additionalProperties: false
+    additionalProperties: false
+  jobEventType:
+    description: Durable event kinds. Progress and accepted evidence chunks are append-only; a reconnect
+      replays from a durable event id.
+    enum:
+    - job.created
+    - job.queued
+    - job.leased
+    - job.started
+    - job.progress
+    - job.cancel-requested
+    - job.cancelled
+    - job.succeeded
+    - job.failed
+    - result.committed
+    - artifact.committed
+  jobEvent:
+    type: object
+    required:
+    - schemaVersion
+    - eventId
+    - jobId
+    - sequence
+    - type
+    - createdAt
+    properties:
+      schemaVersion:
+        type: integer
+        const: 1
+      eventId:
+        $ref: '#/$defs/id'
+      jobId:
+        $ref: '#/$defs/id'
+      attemptId:
+        $ref: '#/$defs/id'
+      sequence:
+        description: Monotonic per job, starting at 1, in commit order.
+        type: integer
+        minimum: 1
+      type:
+        $ref: '#/$defs/jobEventType'
+      resultId:
+        $ref: '#/$defs/id'
+      artifactId:
+        $ref: '#/$defs/id'
+      progress:
+        type: object
+        properties:
+          phase:
+            enum:
+            - extract
+            - solve
+            - replay
+            - compile
+            - instrument
+            - benchmark
+            - finalize
+          completed:
+            type: integer
+            minimum: 0
+          total:
+            type: integer
+            minimum: 0
+          note:
+            type: string
+            maxLength: 500
+        additionalProperties: false
+      error:
+        $ref: '#/$defs/errorRecord'
+      createdAt:
+        type: string
+        format: date-time
+    additionalProperties: false
+  job:
+    description: Durable unit of requested work. State carries no correctness assertion and is not an
+      evidence class.
+    type: object
+    required:
+    - schemaVersion
+    - jobId
+    - projectId
+    - snapshotId
+    - scenarioId
+    - profileRevisionId
+    - state
+    - createdAt
+    properties:
+      schemaVersion:
+        type: integer
+        const: 1
+      jobId:
+        $ref: '#/$defs/id'
+      projectId:
+        $ref: '#/$defs/id'
+      ownerId:
+        $ref: '#/$defs/id'
+      snapshotId:
+        $ref: '#/$defs/id'
+      scenarioId:
+        $ref: '#/$defs/id'
+      profileRevisionId:
+        $ref: '#/$defs/id'
+      domainRef:
+        $ref: '#/$defs/id'
+      policyId:
+        $ref: '#/$defs/id'
+      policyRevision:
+        type: integer
+        minimum: 1
+      operation:
+        $ref: '#/$defs/operation'
+      state:
+        $ref: '#/$defs/jobState'
+      attemptId:
+        description: Execution identity once a worker leased and started the job.
+        $ref: '#/$defs/id'
+      leaseId:
+        $ref: '#/$defs/id'
+      leaseFencingToken:
+        type: integer
+        minimum: 0
+      leaseExpiresAt:
+        type: string
+        format: date-time
+      cancelRequestedAt:
+        type: string
+        format: date-time
+      resultIds:
+        type: array
+        items:
+          $ref: '#/$defs/id'
+      failure:
+        $ref: '#/$defs/errorRecord'
+      createdAt:
+        type: string
+        format: date-time
+      startedAt:
+        type: string
+        format: date-time
+      finishedAt:
+        type: string
+        format: date-time
+    additionalProperties: false
+  engineMessageType:
+    description: Engine to supervisor message kinds. supervisor to engine traffic is cancel only.
+    enum:
+    - hello
+    - progress
+    - finding
+    - artifact
+    - result
+    - error
+  engineEnvelope:
+    description: One JSON Lines message on the engine child process stdout. Sequence is per direction,
+      starts at 1 and increases by exactly 1.
+    type: object
+    required:
+    - protocolVersion
+    - jobId
+    - attemptId
+    - sequence
+    - type
+    - payload
+    properties:
+      protocolVersion:
+        type: integer
+        const: 1
+      jobId:
+        $ref: '#/$defs/id'
+      attemptId:
+        $ref: '#/$defs/id'
+      sequence:
+        type: integer
+        minimum: 1
+      type:
+        $ref: '#/$defs/engineMessageType'
+      payload:
+        type: object
+    additionalProperties: false
+  helloPayload:
+    description: Exactly one initial engine message. A repeated hello or a mismatched version is PROTOCOL_INVALID.
+    type: object
+    required:
+    - engineName
+    - engineVersion
+    - capabilities
+    properties:
+      engineName:
+        type: string
+        minLength: 1
+        maxLength: 120
+      engineVersion:
+        type: string
+        minLength: 1
+        maxLength: 120
+      capabilities:
+        type: array
+        items:
+          type: object
+          required:
+          - feature
+          - support
+          properties:
+            feature:
+              type: string
+              maxLength: 120
+            support:
+              enum:
+              - validated
+              - limited
+              - untested
+            reason:
+              type: string
+              maxLength: 1000
+          additionalProperties: false
+      limits:
+        type: object
+        properties:
+          maxMessageBytes:
+            type: integer
+            minimum: 0
+          maxOutputBytes:
+            type: integer
+            minimum: 0
+        additionalProperties: false
+    additionalProperties: false
+  progressPayload:
+    description: Bounded progress about a real phase; it is not a correctness outcome.
+    type: object
+    properties:
+      phase:
+        enum: [extract, solve, replay, compile, instrument, benchmark, finalize]
+      completed:
+        type: integer
+        minimum: 0
+      total:
+        type: integer
+        minimum: 0
+      note:
+        type: string
+        maxLength: 2000
+    additionalProperties: false
+  cancelEnvelope:
+    description: The single supervisor-to-engine message direction. Its sequence is independent of the
+      engine-to-supervisor sequence and starts at 1.
+    type: object
+    required:
+    - protocolVersion
+    - jobId
+    - attemptId
+    - sequence
+    - type
+    - payload
+    properties:
+      protocolVersion:
+        type: integer
+        const: 1
+      jobId:
+        $ref: '#/$defs/id'
+      attemptId:
+        $ref: '#/$defs/id'
+      sequence:
+        type: integer
+        minimum: 1
+      type:
+        const: cancel
+      payload:
+        $ref: '#/$defs/cancelPayload'
+    additionalProperties: false
+  cancelPayload:
+    description: supervisor to engine cooperative cancellation. The engine acknowledges through its terminal
+      result or error message.
+    type: object
+    required:
+    - reason
+    properties:
+      reason:
+        enum:
+        - user-requested
+        - lease-lost
+        - budget-exceeded
+        - shutdown
+      gracePeriodMs:
+        type: integer
+        minimum: 0
+    additionalProperties: false
