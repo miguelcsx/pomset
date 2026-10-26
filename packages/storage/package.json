@@ -1,0 +1,31 @@
+{
+  "name": "@pomset/storage",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The consumer-visible lifecycle over two backends: local SQLite plus a filesystem content-addressed store, and hosted PostgreSQL plus an S3-compatible object store. Both satisfy the same interface defined in docs/architecture/lifecycle.md.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pomset/contracts": "workspace:*",
+    "@pomset/domain": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
