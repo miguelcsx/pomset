@@ -9,7 +9,9 @@ import { timingSafeEqual } from "node:crypto";
 
 import type { NextFunction, Request, Response } from "express";
 
-export function capability(token: string) {
+import { type Exposure, isSameOrigin } from "./exposure.js";
+
+export function capability(token: string, exposure: () => Exposure) {
   const expected = Buffer.from(token);
   return (request: Request, response: Response, next: NextFunction): void => {
     const supplied = Buffer.from(
@@ -24,7 +26,7 @@ export function capability(token: string) {
     }
     if (
       !["GET", "HEAD"].includes(request.method) &&
-      request.headers.origin !== `http://${request.headers.host}`
+      !isSameOrigin(exposure(), request.headers.host, request.headers.origin)
     ) {
       response.status(403).json({ error: "Same-origin analysis requests are required" });
       return;
