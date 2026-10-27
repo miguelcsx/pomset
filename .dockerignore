@@ -1,0 +1,16 @@
+# Local state, caches and build output are rebuilt inside the image, never copied in.
+.git
+**/node_modules
+**/dist
+**/out
+**/.next
+**/.turbo
+**/*.tsbuildinfo
+.venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+.pomset-workbench
+.claude
+dont-track
+inspo

@@ -1,0 +1,14 @@
+# Render Blueprint. Render builds the Dockerfile and redeploys on every commit to
+# `main`. The token is set in the Render dashboard and never committed here.
+services:
+  - type: web
+    name: pomset
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /healthz
+    envVars:
+      - key: POMSET_WORKBENCH_TOKEN
+        sync: false
