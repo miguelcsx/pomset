@@ -1,5 +1,9 @@
 # ADR-0013 Local symbolic workstation
 
+> Amended by ADR-0017: the same workbench may run as a public deployment when
+> given a hostname. Its loopback-only binding and Host and Origin checks apply to
+> the local mode only.
+
 ## Context
 
 The user explicitly requested an editor → configure → analyze → inspect → share
