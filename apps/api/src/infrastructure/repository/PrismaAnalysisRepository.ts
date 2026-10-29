@@ -50,16 +50,6 @@ export class PrismaAnalysisRepository implements AnalysisRepository {
     });
   }
 
-  async history(): Promise<Job[]> {
-    // Newest first, by the declaration's own timestamp rather than by insertion
-    // order, which PostgreSQL does not promise.
-    const rows = await this.prisma.$queryRaw<Array<{ document: Job }>>`
-      SELECT document FROM jobs
-      ORDER BY document->>'createdAt' DESC, id DESC
-      LIMIT 100`;
-    return rows.map((row) => row.document);
-  }
-
   async job(id: string): Promise<Job> {
     const row = await this.prisma.job.findUnique({ where: { id } });
     if (!row) throw notFound(`No job ${id} in this store`);

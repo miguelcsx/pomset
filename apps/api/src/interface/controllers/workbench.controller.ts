@@ -8,7 +8,8 @@
 
 import type { NextFunction, Request, Response } from "express";
 
-import type { Workbench } from "../../application/Workbench.js";
+import type { Platform } from "../../application/Platform.js";
+import type { Account } from "../../domain/accounts/Account.js";
 
 const MAX_SOLVER_TIME_MS = 30_000;
 
@@ -25,16 +26,21 @@ const UNAVAILABLE = [
   },
 ] as const;
 
-export function workbenchController(workbench: Workbench) {
+/**
+ * `jobs` is the signed-in account's own history, and empty for anyone else.
+ * Nothing about another account's analyses is ever part of this description.
+ */
+export function workbenchController(platform: Platform) {
   return {
     async get(_request: Request, response: Response, next: NextFunction): Promise<void> {
       try {
+        const account = response.locals["account"] as Account | undefined;
         response.json({
           data: {
             mode: "local-symbolic",
-            profile: workbench.profile.execute(),
+            profile: platform.workbench.profile.execute(),
             maxSolverTimeMs: MAX_SOLVER_TIME_MS,
-            jobs: await workbench.history.execute(),
+            jobs: account ? await platform.analyses.history(account.id) : [],
             unavailable: UNAVAILABLE,
           },
         });

@@ -21,8 +21,6 @@ import type {
 } from "@pomset/contracts";
 
 export interface AnalysisRepository {
-  /** The most recent jobs this store holds, newest first. */
-  history(): Promise<Job[]>;
   job(id: string): Promise<Job>;
 
   snapshot(id: string): Promise<SnapshotManifest>;

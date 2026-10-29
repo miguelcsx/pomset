@@ -104,7 +104,6 @@ describe.skipIf(!connection)("hosted record store", () => {
 
     await repository.enqueue(job);
     expect(await repository.job(job.jobId)).toEqual(job);
-    expect((await repository.history())[0]?.jobId).toBe(job.jobId);
 
     // A queued attempt never started, so the policy cancels it outright.
     await repository.cancel(job.jobId);

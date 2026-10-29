@@ -39,13 +39,6 @@ export class LocalAnalysisStore
     private readonly directory: string,
   ) {}
 
-  async history(): Promise<Job[]> {
-    return this.store.db
-      .prepare("SELECT document FROM jobs ORDER BY rowid DESC LIMIT 100")
-      .all()
-      .map((row) => JSON.parse(String(row["document"])) as Job);
-  }
-
   async job(id: string): Promise<Job> {
     return translate(() => this.store.job(id));
   }
