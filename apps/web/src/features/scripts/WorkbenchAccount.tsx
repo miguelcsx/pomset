@@ -16,6 +16,7 @@ import { authHref, currentPath } from "../auth/navigation";
 import { useBrowserLocation } from "../auth/use-browser-location";
 import { useSession } from "../auth/use-session";
 import { asObject } from "../common/json";
+import { scriptTitle } from "../scenario/scenario-draft";
 import { SaveResultDialog } from "./SaveResultDialog";
 import { SaveScriptDialog } from "./SaveScriptDialog";
 import type { SavedScript } from "./scripts-api";
@@ -79,7 +80,7 @@ export function WorkbenchAccount(props: WorkbenchAccountProps) {
       )}
       <SaveScriptDialog
         open={dialog === "script"}
-        suggestedTitle={props.scenario.name}
+        suggestedTitle={scriptTitle(props.scenario)}
         note={otherFiles}
         source={props.source}
         scenario={asObject(props.scenario)}

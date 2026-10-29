@@ -12,7 +12,7 @@ import { FileTabs } from "./editor/FileTabs";
 import { closeTabs, openTab, type Tabs, type CloseMode } from "./editor/tab-state";
 import { RenameFile } from "./editor/RenameFile";
 import { ScenarioEditor } from "./scenario/ScenarioEditor";
-import { inferEntrypoint, newScenario, parseScenario } from "./scenario/scenario-draft";
+import { inferEntrypoint, newScenario, parseScenario, usableScenario } from "./scenario/scenario-draft";
 import { Splitter } from "./editor/Splitter";
 import { ReportExport } from "./evidence/ReportExport";
 import { connect, request, submit, terminal, unwrap, workbenchToken, type Connection } from "./analysis/workbench-client";
@@ -76,7 +76,7 @@ export function Workbench(_props: WorkbenchProps): JSX.Element {
   }
   useEffect(() => {
     let live = true;
-    void readWorkspace().then((value) => { if (live && !new URLSearchParams(location.hash.slice(1)).has("capability") && value?.copy?.files.length && value.scenario) { setCopy(value.copy); setScenario(value.scenario); setPath(value.copy.files[0]!.path); setSelection({ path: value.copy.files[0]!.path, line: 1 }); } }).catch(() => { if (live) setSaved("Browser storage unavailable"); }).finally(() => { if (live) setReady(true); });
+    void readWorkspace().then((value) => { if (live && !new URLSearchParams(location.hash.slice(1)).has("capability") && value?.copy?.files.length) { const first = value.copy.files[0]!.path; setCopy(value.copy); setScenario(usableScenario(value.scenario) ?? newScenario(first)); setPath(first); setSelection({ path: first, line: 1 }); } }).catch(() => { if (live) setSaved("Browser storage unavailable"); }).finally(() => { if (live) setReady(true); });
     void connect().then((value) => { if (live) { setConnection(value); setProfileId(value.profile.profileRevisionId); setJobs(value.jobs); } }).catch((failure: unknown) => { if (live) setError(String(failure)); });
     const capability = new URLSearchParams(location.hash.slice(1)).get("capability");
     if (capability) void fetch(`/api/report?capability=${encodeURIComponent(capability)}`).then(async (response) => { if (!response.ok) throw new Error(`Report transport returned ${response.status}`); const raw: unknown = await response.json(); if (raw) { const value = await inspectionDocument(unwrap(raw)); if (live) { acceptDocument(value); editDocument(value); } } }).catch((failure: unknown) => { if (live) setError(String(failure)); });
@@ -104,9 +104,13 @@ export function Workbench(_props: WorkbenchProps): JSX.Element {
     if (busy.current || !connection || configError) return;
     busy.current = true; setError(undefined); const inputKey = inputIdentity(copy, scenario, profileId, solverTimeMs); attempted.current = inputKey;
     try {
-      const symbol = scenario.entrypoint.symbol || inferEntrypoint(copy.files.find((file) => file.path === scenario.entrypoint.path)?.source);
+      // A one-file workspace has only one possible entry source, so a scenario that names another file (pasted or imported) is pointed at it.
+      const paths = copy.files.map((file) => file.path);
+      const entryPath = paths.includes(scenario.entrypoint.path) || paths.length !== 1 ? scenario.entrypoint.path : paths[0]!;
+      if (!paths.includes(entryPath)) throw new Error(`The entry source ${entryPath} is not in this workspace (${paths.join(", ")}). Pick it under Configure scenario → Entry source.`);
+      const symbol = scenario.entrypoint.symbol || inferEntrypoint(copy.files.find((file) => file.path === entryPath)?.source);
       if (!symbol) throw new Error("Name the entry point: the function to analyze, such as def transform(...)");
-      const valid = parseScenario(JSON.stringify({ ...scenario, entrypoint: { ...scenario.entrypoint, symbol } }));
+      const valid = parseScenario(JSON.stringify({ ...scenario, entrypoint: { ...scenario.entrypoint, path: entryPath, symbol } }));
       const parent = document && jobs.some((job) => job.snapshotId === document.snapshot.snapshotId) ? document.snapshot.snapshotId : undefined;
       const job = await submit({ files: copy.files, scenario: valid, profileRevisionId: profileId, solverTimeMs, ...(parent ? { parentSnapshotId: parent } : {}) });
       setActive(job); setJobs((previous) => [job, ...previous]);

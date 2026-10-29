@@ -13,6 +13,8 @@ import { failureMessage } from "../common/http";
 import { useBrowserLocation } from "../auth/use-browser-location";
 import { authHref, currentPath } from "../auth/navigation";
 import { useSession } from "../auth/use-session";
+import { usableScenario } from "../scenario/scenario-draft";
+import { stageDraft } from "../workspace/workspace-persistence";
 import { errorText, linkButton, panel, primaryButton } from "../ui/classes";
 import { getCatalogItem, kindLabel, type CatalogItem, saveCatalogItem } from "./catalog-api";
 
@@ -47,6 +49,20 @@ export function CatalogItemView({ id }: { readonly id: string }) {
     );
   }
   if (!item) return null;
+
+  async function openInWorkbench(example: CatalogItem) {
+    const scenario = usableScenario(example.scenario);
+    if (!scenario) {
+      setSaveError("This example does not carry a scenario the analysis can run.");
+      return;
+    }
+    try {
+      await stageDraft(scenario.entrypoint.path, example.source, scenario);
+      router.push(`/${here.fragment}`);
+    } catch (failure) {
+      setSaveError(failureMessage(failure));
+    }
+  }
 
   async function save() {
     setSaving(true);
@@ -95,6 +111,9 @@ export function CatalogItemView({ id }: { readonly id: string }) {
       </section>
 
       <div className="flex flex-wrap items-center gap-4">
+        <button type="button" className={primaryButton} onClick={() => void openInWorkbench(item)}>
+          Open in workbench
+        </button>
         {state.status === "signed-in" && (
           <button type="button" className={primaryButton} onClick={() => void save()} disabled={saving}>
             {saving ? "Saving…" : "Save as my script"}

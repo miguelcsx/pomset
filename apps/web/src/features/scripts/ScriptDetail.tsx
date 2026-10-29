@@ -10,6 +10,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 
+import { usableScenario } from "../scenario/scenario-draft";
+import { stageDraft } from "../workspace/workspace-persistence";
 import { downloadText } from "../workspace/working-copy";
 import { failureMessage } from "../common/http";
 import type { Page } from "../common/page";
@@ -53,6 +55,7 @@ export function ScriptDetail({ id }: { readonly id: string }) {
   const [removingScript, setRemovingScript] = useState(false);
   const [scriptBusy, setScriptBusy] = useState(false);
   const [scriptError, setScriptError] = useState<string>();
+  const [openError, setOpenError] = useState<string>();
   const [removingResult, setRemovingResult] = useState<SavedResultSummary>();
   const [resultBusy, setResultBusy] = useState(false);
   const [resultError, setResultError] = useState<string>();
@@ -108,6 +111,17 @@ export function ScriptDetail({ id }: { readonly id: string }) {
       setRenameError(failureMessage(failure));
     } finally {
       setRenaming(false);
+    }
+  }
+
+  async function openInWorkbench() {
+    const scenario = usableScenario(script?.scenario);
+    if (!script || !scenario) return;
+    try {
+      await stageDraft(scenario.entrypoint.path, script.source, scenario);
+      router.push(`/${window.location.hash}`);
+    } catch (failure) {
+      setOpenError(failureMessage(failure));
     }
   }
 
@@ -189,6 +203,14 @@ export function ScriptDetail({ id }: { readonly id: string }) {
               <button
                 type="button"
                 className={secondaryButton}
+                disabled={!usableScenario(script.scenario)}
+                onClick={() => void openInWorkbench()}
+              >
+                Open in workbench
+              </button>
+              <button
+                type="button"
+                className={secondaryButton}
                 onClick={() => downloadText(fileName(script.title), script.source, "text/plain;charset=utf-8")}
               >
                 Download source
@@ -198,6 +220,7 @@ export function ScriptDetail({ id }: { readonly id: string }) {
               </button>
             </div>
           </div>
+          {openError && <p role="alert" className="mt-3 text-sm text-danger">{openError}</p>}
           <pre className="mt-3 max-h-96 overflow-auto rounded-md bg-code p-3 font-mono text-xs text-ink">
             {script.source}
           </pre>
