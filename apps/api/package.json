@@ -15,23 +15,27 @@
     "dist"
   ],
   "scripts": {
-    "generate": "prisma generate",
-    "build": "prisma generate && tsc -b",
-    "typecheck": "prisma generate && tsc -b",
-    "test": "prisma generate && vitest run"
+    "generate": "prisma generate && prisma generate --schema prisma/accounts/schema.prisma",
+    "build": "pnpm run generate && tsc -b",
+    "typecheck": "pnpm run generate && tsc -b",
+    "test": "pnpm run generate && vitest run"
   },
   "dependencies": {
     "@pomset/contracts": "workspace:*",
     "@pomset/domain": "workspace:*",
     "@pomset/storage": "workspace:*",
     "@pomset/worker": "workspace:*",
+    "@prisma/adapter-libsql": "7.10.1",
     "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.1",
+    "bcryptjs": "3.0.3",
     "express": "^4.21.2",
+    "jsonwebtoken": "9.0.3",
     "pg": "8.13.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "catalog:",
     "@types/pg": "8.11.10",
     "prisma": "7.10.1",

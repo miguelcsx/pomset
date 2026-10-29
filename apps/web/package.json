@@ -19,9 +19,12 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "postcss": "^8.5.29",
+    "tailwindcss": "^4.3.3",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }
