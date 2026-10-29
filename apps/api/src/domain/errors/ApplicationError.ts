@@ -9,9 +9,12 @@
 
 export type ErrorKind =
   | "bad_request"
+  | "unauthenticated"
+  | "forbidden"
   | "not_found"
   | "conflict"
   | "too_large"
+  | "too_many_requests"
   | "unavailable";
 
 export class ApplicationError extends Error {
@@ -29,6 +32,15 @@ export const badRequest = (
   message: string,
   details?: Readonly<Record<string, unknown>>,
 ): ApplicationError => new ApplicationError("bad_request", message, details);
+
+export const unauthenticated = (message: string): ApplicationError =>
+  new ApplicationError("unauthenticated", message);
+
+export const forbidden = (message: string): ApplicationError =>
+  new ApplicationError("forbidden", message);
+
+export const tooManyRequests = (message: string): ApplicationError =>
+  new ApplicationError("too_many_requests", message);
 
 export const notFound = (
   message: string,
