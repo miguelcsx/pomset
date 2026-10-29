@@ -132,3 +132,11 @@ input[type=checkbox] { accent-color: var(--accent); }
 .editor-tab-menu button:hover, .editor-tab-menu button:focus-visible { background: var(--selected); outline: none; }
 .editor-tab-menu [role=separator] { height: 1px; background: var(--line); margin: 4px; }
 @media(hover:none) { .editor-tab .tab-close { opacity: 1; } }
+
+.ide-account { display: flex; align-items: center; gap: 4px; margin-left: 6px; font-size: 11px; color: var(--muted); white-space: nowrap; }
+.ide-account-user { margin-right: 4px; color: var(--text); }
+.ide-account-button { height: 25px; display: inline-flex; align-items: center; padding: 0 8px; border: 1px solid var(--line); border-radius: 5px; background: transparent; color: var(--text); font: inherit; text-decoration: none; cursor: pointer; }
+.ide-account-button:disabled { color: var(--muted); cursor: default; }
+.ide-account-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ide-account-notice { margin-left: 6px; color: var(--accent); }
+@media(max-width: 900px) { .ide-account-user, .ide-account-notice { display: none; } }

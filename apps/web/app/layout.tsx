@@ -8,8 +8,9 @@
 
 import type { Metadata, Viewport } from "next";
 
-import "../src/features/styles/workbench.css";
-import "../src/features/styles/ide.css";
+// One stylesheet entry: it places the workbench's CSS in the lowest cascade
+// layer and adds Tailwind for the site pages. See site.css for why.
+import "../src/features/styles/site.css";
 
 export const metadata: Metadata = {
   title: "pomset",

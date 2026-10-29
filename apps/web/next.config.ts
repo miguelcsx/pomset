@@ -26,8 +26,11 @@ const config: NextConfig = {
   // This repository keeps one set of agent instructions, at the root. Next.js
   // would otherwise write its own inside `apps/web` on every dev run.
   agentRules: false,
+  // The API serves the export with a plain static handler and no fallback to
+  // index.html. With a trailing slash every route is a directory index, which
+  // that handler serves, so a direct load of /login or /mis-scripts/ works.
   ...(exporting
-    ? { output: "export" as const }
+    ? { output: "export" as const, trailingSlash: true }
     : {
         async rewrites() {
           return [{ source: "/api/:path*", destination: `${workbench}/api/:path*` }];

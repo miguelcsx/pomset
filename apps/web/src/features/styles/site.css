@@ -1,0 +1,101 @@
+/*
+ * Styles for the account, script and admin pages.
+ *
+ * Preflight is deliberately not imported. It resets every element, and the
+ * workbench depends on element rules (body, button, a, h3, code, pre) that a
+ * reset would change. Instead the workbench's stylesheets move into the lowest
+ * cascade layer, so anything this file declares wins over them, and the
+ * workbench keeps its appearance: no Tailwind utility is applied inside the
+ * workbench markup, because the workbench sources are not scanned.
+ */
+
+@layer workbench, theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "./workbench.css" layer(workbench);
+@import "./ide.css" layer(workbench);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+
+@source "../../../app/login";
+@source "../../../app/register";
+@source "../../../app/mis-scripts";
+@source "../../../app/admin";
+@source "../../../app/not-found.tsx";
+@source "../auth";
+@source "../admin";
+@source "../scripts";
+@source "../site";
+@source "../ui";
+
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --color-canvas: #f7f7f5;
+  --color-surface: #ffffff;
+  --color-ink: #242523;
+  --color-muted: #5f6259;
+  --color-line: #d9dbd3;
+  --color-accent: #315f50;
+  --color-accent-hover: #264c3f;
+  --color-accent-soft: #e7eeea;
+  --color-code: #f2f3ef;
+  --color-danger: #a73933;
+  --color-danger-soft: #fbeceb;
+}
+
+@layer base {
+  /* Scoped to the site wrapper, so the workbench never sees these rules. */
+  .site {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-ink);
+    background: var(--color-canvas);
+    min-height: 100vh;
+  }
+  .site button,
+  .site input,
+  .site select,
+  .site textarea {
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+    letter-spacing: inherit;
+  }
+  .site a {
+    color: inherit;
+  }
+  .site h1,
+  .site h2,
+  .site h3,
+  .site p,
+  .site ul,
+  .site dl,
+  .site dd,
+  .site table,
+  .site pre {
+    margin: 0;
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  .site code,
+  .site pre {
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .site dialog {
+    margin: auto;
+    padding: 0;
+    border: 0;
+    color: inherit;
+    background: transparent;
+    max-width: calc(100vw - 32px);
+  }
+  .site dialog::backdrop {
+    background: rgb(20 22 20 / 0.45);
+  }
+}
