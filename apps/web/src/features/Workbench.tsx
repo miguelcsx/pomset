@@ -17,9 +17,10 @@ import { Splitter } from "./editor/Splitter";
 import { ReportExport } from "./evidence/ReportExport";
 import { connect, request, submit, terminal, unwrap, workbenchToken, type Connection } from "./analysis/workbench-client";
 import { observeJob } from "./analysis/poll-job";
-import { readWorkspace, saveWorkspace } from "./workspace/workspace-persistence";
+import { saveWorkspace, takeStagedWorkspace } from "./workspace/workspace-persistence";
 import { starterWorkspace } from "./catalog/starter-example";
 import { WorkbenchAccount } from "./scripts/WorkbenchAccount";
+import { useTheme } from "./theme/use-theme";
 // Monaco touches `self` as it loads, so it is kept out of the server render
 // entirely and mounted only once the browser has the editor.
 const SourceEditor = dynamic(() => import("./editor/SourceEditor").then((module) => module.SourceEditor), { ssr: false, loading: () => <div className="pane-empty">Opening editor…</div> });
@@ -34,7 +35,7 @@ export function Workbench(_props: WorkbenchProps): JSX.Element {
   const [tabs, setTabs] = useState<Tabs>({ closed: [], recent: [] });
   const [path, setPath] = useState("untitled.py");
   const [selection, setSelection] = useState<SourceSelection>({ path: "untitled.py", line: 1 });
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useTheme();
   const [mode, setMode] = useState<"Explore" | "Validate" | "Optimize">("Explore");
   const [configuration, setConfiguration] = useState(false);
   const [connection, setConnection] = useState<Connection>();
@@ -77,8 +78,8 @@ export function Workbench(_props: WorkbenchProps): JSX.Element {
   }
   useEffect(() => {
     let live = true;
-    // A browser with saved source reopens it; an empty one opens the catalog's starter example so the first analysis has something to run.
-    void readWorkspace().then((value) => { if (live && !new URLSearchParams(location.hash.slice(1)).has("capability")) { if (value?.copy?.files.some((file) => file.source.trim())) { const first = value.copy.files[0]!.path; setCopy(value.copy); setScenario(usableScenario(value.scenario) ?? newScenario(first)); setPath(first); setSelection({ path: first, line: 1 }); } else void starterWorkspace().then((starter) => { if (live && starter) { const first = starter.copy.files[0]!.path; setCopy(starter.copy); setScenario(starter.scenario); setPath(first); setSelection({ path: first, line: 1 }); } }).catch((failure: unknown) => { if (live) setError(String(failure)); }); } }).catch(() => { if (live) setSaved("Browser storage unavailable"); }).finally(() => { if (live) setReady(true); });
+    // A workspace staged from the catalog or My scripts opens once; every other load opens the catalog's starter example, so the first analysis has something to run.
+    void takeStagedWorkspace().then((value) => { if (live && !new URLSearchParams(location.hash.slice(1)).has("capability")) { if (value?.copy?.files.some((file) => file.source.trim())) { const first = value.copy.files[0]!.path; setCopy(value.copy); setScenario(usableScenario(value.scenario) ?? newScenario(first)); setPath(first); setSelection({ path: first, line: 1 }); } else void starterWorkspace().then((starter) => { if (live && starter) { const first = starter.copy.files[0]!.path; setCopy(starter.copy); setScenario(starter.scenario); setPath(first); setSelection({ path: first, line: 1 }); } }).catch((failure: unknown) => { if (live) setError(String(failure)); }); } }).catch(() => { if (live) setSaved("Browser storage unavailable"); }).finally(() => { if (live) setReady(true); });
     void connect().then((value) => { if (live) { setConnection(value); setProfileId(value.profile.profileRevisionId); setJobs(value.jobs); } }).catch((failure: unknown) => { if (live) setError(String(failure)); });
     const capability = new URLSearchParams(location.hash.slice(1)).get("capability");
     if (capability) void fetch(`/api/report?capability=${encodeURIComponent(capability)}`).then(async (response) => { if (!response.ok) throw new Error(`Report transport returned ${response.status}`); const raw: unknown = await response.json(); if (raw) { const value = await inspectionDocument(unwrap(raw)); if (live) { acceptDocument(value); editDocument(value); } } }).catch((failure: unknown) => { if (live) setError(String(failure)); });

@@ -9,6 +9,7 @@
  * opened with one, so moving between site pages never drops a local session.
  */
 
+import { Icon } from "@pomset/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -16,9 +17,16 @@ import { signOut } from "../auth/auth-api";
 import { authHref, currentPath } from "../auth/navigation";
 import { useBrowserLocation } from "../auth/use-browser-location";
 import { useSession } from "../auth/use-session";
-import { linkButton, secondaryButton } from "../ui/classes";
+import { badge, compactButton, iconButton, linkButton } from "../ui/classes";
+import type { Theme } from "../theme/use-theme";
 
-export function SiteHeader({ compact = false }: { readonly compact?: boolean }) {
+export interface SiteHeaderProps {
+  readonly compact?: boolean;
+  readonly theme: Theme;
+  readonly onThemeChange: (theme: Theme) => void;
+}
+
+export function SiteHeader({ compact = false, theme, onThemeChange }: SiteHeaderProps) {
   const state = useSession();
   const here = useBrowserLocation();
   const at = (path: string) => `${path}${here.fragment}`;
@@ -46,25 +54,33 @@ export function SiteHeader({ compact = false }: { readonly compact?: boolean }) 
             )}
           </nav>
         )}
-        {!compact && (
-          <div className="ml-auto flex items-center gap-3 text-sm">
-            {state.status === "signed-in" && (
-              <SignedIn name={state.session.user.displayName} role={state.session.user.role} home={at("/")} />
-            )}
-            {state.status === "signed-out" && (
-              <>
-                <Link className={linkButton} href={authHref("/login", currentPath(), here.fragment)}>
-                  Sign in
-                </Link>
-                <Link className={linkButton} href={authHref("/register", currentPath(), here.fragment)}>
-                  Create account
-                </Link>
-              </>
-            )}
-          </div>
-        )}
+        <div className="ml-auto flex items-center gap-3 text-sm">
+          {!compact && state.status === "signed-in" && (
+            <SignedIn name={state.session.user.displayName} role={state.session.user.role} home={at("/")} />
+          )}
+          {!compact && state.status === "signed-out" && (
+            <>
+              <Link className={linkButton} href={authHref("/login", currentPath(), here.fragment)}>
+                Sign in
+              </Link>
+              <Link className={linkButton} href={authHref("/register", currentPath(), here.fragment)}>
+                Create account
+              </Link>
+            </>
+          )}
+          <ThemeToggle theme={theme} onChange={onThemeChange} />
+        </div>
       </div>
     </header>
+  );
+}
+
+function ThemeToggle({ theme, onChange }: { readonly theme: Theme; readonly onChange: (theme: Theme) => void }) {
+  const label = theme === "dark" ? "Use light appearance" : "Use dark appearance";
+  return (
+    <button type="button" className={iconButton} title={label} aria-label={label} onClick={() => onChange(theme === "dark" ? "light" : "dark")}>
+      <Icon name={theme === "dark" ? "sun" : "moon"} size={17} />
+    </button>
   );
 }
 
@@ -74,11 +90,11 @@ function SignedIn({ name, role, home }: { readonly name: string; readonly role: 
     <>
       <span className="text-ink">
         {name}
-        <span className="ml-2 rounded-full bg-accent-soft px-2 py-0.5 text-xs text-accent">{role}</span>
+        <span className={`${badge} ml-2`}>{role}</span>
       </span>
       <button
         type="button"
-        className={secondaryButton}
+        className={compactButton}
         onClick={() => {
           signOut();
           router.replace(home);

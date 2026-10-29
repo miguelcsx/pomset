@@ -14,7 +14,7 @@ import { usePageParam } from "../common/use-page-param";
 import { useBrowserLocation } from "../auth/use-browser-location";
 import { formatDate } from "../scripts/ScriptsPanel";
 import { Pager } from "../ui/Pager";
-import { errorText, linkButton, panel, tableCell, tableHead } from "../ui/classes";
+import { badge, compactButton, emptyState, errorText, heading, lead, panel, tableCell, tableHead } from "../ui/classes";
 import { CATALOG_PAGE_SIZE, type CatalogSummary, kindLabel, listCatalog } from "./catalog-api";
 
 export function CatalogPanel() {
@@ -45,26 +45,26 @@ export function CatalogPanel() {
 
   return (
     <section aria-labelledby="catalog-title">
-      <h1 id="catalog-title" className="text-2xl font-semibold tracking-tight text-ink">
+      <h1 id="catalog-title" className={heading}>
         Catalog
       </h1>
-      <p className="mt-2 max-w-2xl text-sm text-muted">
-        Reviewed examples. Each defect is paired with a control, so a check is shown both to fire and to stay quiet.
-        Save an example to your scripts to edit and analyse it.
+      <p className={lead}>
+        Reviewed examples. Each defect is paired with a control, so a check is shown both to fire and to stay quiet. Save an example to your
+        scripts to edit and analyse it.
       </p>
       {error && (
-        <p role="alert" className={`${errorText} mt-4`}>
+        <p role="alert" className={`${errorText} mt-6`}>
           {error}
         </p>
       )}
-      {!error && data && data.items.length === 0 && <p className="mt-6 text-sm text-muted">The catalog is empty.</p>}
+      {!error && data && data.items.length === 0 && <p className={`${emptyState} mt-6`}>The catalog is empty.</p>}
       {data && data.items.length > 0 && (
         <div className={`${panel} mt-6 overflow-x-auto`}>
           <table className="w-full border-collapse">
             <thead>
               <tr>
                 <th scope="col" className={tableHead}>
-                  Title
+                  Example
                 </th>
                 <th scope="col" className={tableHead}>
                   Kind
@@ -79,15 +79,17 @@ export function CatalogPanel() {
             </thead>
             <tbody>
               {data.items.map((item) => (
-                <tr key={item.id}>
+                <tr key={item.id} className="hover:bg-code/60">
                   <td className={tableCell}>
                     <span className="font-medium text-ink">{item.title}</span>
-                    <span className="mt-1 block text-muted">{item.summary}</span>
+                    <span className="mt-0.5 block text-muted">{item.summary}</span>
                   </td>
-                  <td className={tableCell}>{kindLabel(item.kind)}</td>
-                  <td className={`${tableCell} text-muted`}>{formatDate(item.updatedAt)}</td>
+                  <td className={tableCell}>
+                    <span className={badge}>{kindLabel(item.kind)}</span>
+                  </td>
+                  <td className={`${tableCell} whitespace-nowrap text-muted`}>{formatDate(item.updatedAt)}</td>
                   <td className={`${tableCell} text-right`}>
-                    <Link className={linkButton} href={`/catalog/item/?id=${encodeURIComponent(item.id)}${here.fragment}`}>
+                    <Link className={compactButton} href={`/catalog/item/?id=${encodeURIComponent(item.id)}${here.fragment}`}>
                       Open<span className="sr-only"> {item.title}</span>
                     </Link>
                   </td>

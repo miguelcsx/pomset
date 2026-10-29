@@ -20,9 +20,11 @@
 @source "../../../app/register";
 @source "../../../app/mis-scripts";
 @source "../../../app/admin";
+@source "../../../app/catalog";
 @source "../../../app/not-found.tsx";
 @source "../auth";
 @source "../admin";
+@source "../catalog";
 @source "../scripts";
 @source "../site";
 @source "../ui";
@@ -30,21 +32,24 @@
 @theme {
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  --color-canvas: #f7f7f5;
+  /* Light values, the fallback outside the site wrapper. The palettes below are the live ones. */
+  --color-canvas: #f4f0ec;
   --color-surface: #ffffff;
-  --color-ink: #242523;
-  --color-muted: #5f6259;
-  --color-line: #d9dbd3;
-  --color-accent: #315f50;
-  --color-accent-hover: #264c3f;
-  --color-accent-soft: #e7eeea;
-  --color-code: #f2f3ef;
-  --color-danger: #a73933;
-  --color-danger-soft: #fbeceb;
+  --color-ink: #302934;
+  --color-muted: #786d79;
+  --color-line: #e3dcd7;
+  --color-accent: #765293;
+  --color-accent-hover: #5f3f7d;
+  --color-accent-soft: #ede3f4;
+  --color-code: #f1eaf3;
+  --color-on-solid: #ffffff;
+  --color-danger: #b72d42;
+  --color-danger-solid: #b72d42;
+  --color-danger-soft: #fbeef0;
 }
 
 @layer base {
-  /* Scoped to the site wrapper, so the workbench never sees these rules. */
+  /* Scoped to the site wrapper, so the workbench never sees these rules. The values match ide.css. */
   .site {
     font-family: var(--font-sans);
     font-size: 14px;
@@ -52,6 +57,38 @@
     color: var(--color-ink);
     background: var(--color-canvas);
     min-height: 100vh;
+  }
+  .site[data-theme=light] {
+    color-scheme: light;
+    --color-canvas: #f4f0ec;
+    --color-surface: #ffffff;
+    --color-ink: #302934;
+    --color-muted: #786d79;
+    --color-line: #e3dcd7;
+    --color-accent: #765293;
+    --color-accent-hover: #5f3f7d;
+    --color-accent-soft: #ede3f4;
+    --color-code: #f1eaf3;
+    --color-on-solid: #ffffff;
+    --color-danger: #b72d42;
+    --color-danger-solid: #b72d42;
+    --color-danger-soft: #fbeef0;
+  }
+  .site[data-theme=dark] {
+    color-scheme: dark;
+    --color-canvas: #19171c;
+    --color-surface: #201e24;
+    --color-ink: #e5e0e7;
+    --color-muted: #aaa1af;
+    --color-line: #39343e;
+    --color-accent: #c3a6e6;
+    --color-accent-hover: #d8c2f0;
+    --color-accent-soft: #463753;
+    --color-code: #302b35;
+    --color-on-solid: #19171c;
+    --color-danger: #ff9a9a;
+    --color-danger-solid: #e0566b;
+    --color-danger-soft: #3a2228;
   }
   .site button,
   .site input,

@@ -7,7 +7,7 @@ import type { Page } from "../common/page";
 import { usePageParam } from "../common/use-page-param";
 import { formatDate } from "../scripts/ScriptsPanel";
 import { Pager } from "../ui/Pager";
-import { errorText, panel, tableCell, tableHead } from "../ui/classes";
+import { badge, errorText, heading, lead, panel, tableCell, tableHead } from "../ui/classes";
 import type { Account } from "../auth/account";
 import { listUsers, USERS_PAGE_SIZE } from "./admin-api";
 
@@ -38,11 +38,12 @@ export function UsersTable() {
 
   return (
     <section aria-labelledby="users-title">
-      <h1 id="users-title" className="text-2xl font-semibold tracking-tight text-ink">
+      <h1 id="users-title" className={heading}>
         Users
       </h1>
+      <p className={lead}>Accounts registered on this server.</p>
       {error && (
-        <p role="alert" className={`${errorText} mt-4`}>
+        <p role="alert" className={`${errorText} mt-6`}>
           {error}
         </p>
       )}
@@ -67,11 +68,13 @@ export function UsersTable() {
             </thead>
             <tbody>
               {data.items.map((account) => (
-                <tr key={account.id}>
-                  <td className={tableCell}>{account.displayName}</td>
+                <tr key={account.id} className="hover:bg-code/60">
+                  <td className={`${tableCell} font-medium text-ink`}>{account.displayName}</td>
                   <td className={`${tableCell} text-muted`}>{account.email}</td>
-                  <td className={tableCell}>{account.role}</td>
-                  <td className={`${tableCell} text-muted`}>{formatDate(account.createdAt)}</td>
+                  <td className={tableCell}>
+                    {account.role === "admin" ? <span className={badge}>{account.role}</span> : <span className="text-muted">{account.role}</span>}
+                  </td>
+                  <td className={`${tableCell} whitespace-nowrap text-muted`}>{formatDate(account.createdAt)}</td>
                 </tr>
               ))}
             </tbody>

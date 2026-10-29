@@ -15,7 +15,7 @@ import { authHref, currentPath } from "../auth/navigation";
 import { useSession } from "../auth/use-session";
 import { usableScenario } from "../scenario/scenario-draft";
 import { stageDraft } from "../workspace/workspace-persistence";
-import { errorText, linkButton, panel, primaryButton } from "../ui/classes";
+import { badge, errorText, heading, lead, linkButton, panel, primaryButton, secondaryButton } from "../ui/classes";
 import { getCatalogItem, kindLabel, type CatalogItem, saveCatalogItem } from "./catalog-api";
 
 export function CatalogItemView({ id }: { readonly id: string }) {
@@ -80,11 +80,11 @@ export function CatalogItemView({ id }: { readonly id: string }) {
   return (
     <article aria-labelledby="item-title" className="space-y-6">
       <header>
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted">{kindLabel(item.kind)}</p>
-        <h1 id="item-title" className="mt-1 text-2xl font-semibold tracking-tight text-ink">
+        <span className={badge}>{kindLabel(item.kind)}</span>
+        <h1 id="item-title" className={`${heading} mt-3`}>
           {item.title}
         </h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted">{item.summary}</p>
+        <p className={lead}>{item.summary}</p>
       </header>
 
       <section className={`${panel} p-4`} aria-labelledby="outcome-title">
@@ -110,12 +110,12 @@ export function CatalogItemView({ id }: { readonly id: string }) {
         </pre>
       </section>
 
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-wrap items-center gap-3">
         <button type="button" className={primaryButton} onClick={() => void openInWorkbench(item)}>
           Open in workbench
         </button>
         {state.status === "signed-in" && (
-          <button type="button" className={primaryButton} onClick={() => void save()} disabled={saving}>
+          <button type="button" className={secondaryButton} onClick={() => void save()} disabled={saving}>
             {saving ? "Saving…" : "Save as my script"}
           </button>
         )}

@@ -14,7 +14,7 @@ import type { Page } from "../common/page";
 import { usePageParam } from "../common/use-page-param";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
 import { Pager } from "../ui/Pager";
-import { errorText, field, panel, primaryButton, tableCell, tableHead } from "../ui/classes";
+import { badge, emptyState, errorText, field, heading, lead, outlineDangerButton, panel, primaryButton, tableCell, tableHead } from "../ui/classes";
 import {
   CATALOG_KINDS,
   CATALOG_PAGE_SIZE,
@@ -73,23 +73,24 @@ export function AdminCatalogPanel() {
   }
 
   return (
-    <section aria-labelledby="admin-catalog-title" className="mt-10">
-      <h2 id="admin-catalog-title" className="text-xl font-semibold tracking-tight text-ink">
+    <section aria-labelledby="admin-catalog-title" className="mt-12">
+      <h2 id="admin-catalog-title" className={heading}>
         Catalog
       </h2>
+      <p className={lead}>Reviewed examples offered to every visitor. Removing one does not touch the scripts that were copied from it.</p>
       {error && (
-        <p role="alert" className={`${errorText} mt-4`}>
+        <p role="alert" className={`${errorText} mt-6`}>
           {error}
         </p>
       )}
-      {data && data.items.length === 0 && <p className="mt-4 text-sm text-muted">The catalog is empty.</p>}
+      {data && data.items.length === 0 && <p className={`${emptyState} mt-6`}>The catalog is empty.</p>}
       {data && data.items.length > 0 && (
-        <div className={`${panel} mt-4 overflow-x-auto`}>
+        <div className={`${panel} mt-6 overflow-x-auto`}>
           <table className="w-full border-collapse">
             <thead>
               <tr>
                 <th scope="col" className={tableHead}>
-                  Title
+                  Example
                 </th>
                 <th scope="col" className={tableHead}>
                   Kind
@@ -101,13 +102,15 @@ export function AdminCatalogPanel() {
             </thead>
             <tbody>
               {data.items.map((item) => (
-                <tr key={item.id}>
-                  <td className={tableCell}>{item.title}</td>
-                  <td className={tableCell}>{kindLabel(item.kind)}</td>
+                <tr key={item.id} className="hover:bg-code/60">
+                  <td className={`${tableCell} font-medium text-ink`}>{item.title}</td>
+                  <td className={tableCell}>
+                    <span className={badge}>{kindLabel(item.kind)}</span>
+                  </td>
                   <td className={`${tableCell} text-right`}>
                     <button
                       type="button"
-                      className="text-sm font-medium text-danger underline-offset-2 hover:underline"
+                      className={outlineDangerButton}
                       onClick={() => {
                         setRemoveError(undefined);
                         setRemoving(item);
@@ -192,17 +195,20 @@ function CreateForm({ onCreated }: { readonly onCreated: () => void }) {
   }
 
   return (
-    <form className={`${panel} mt-8 grid gap-4 p-4`} onSubmit={(event) => void submit(event)} aria-labelledby="new-example-title">
-      <h3 id="new-example-title" className="text-base font-semibold text-ink">
-        Add an example
-      </h3>
+    <form
+      className={`${panel} mt-10 grid gap-5 p-6 sm:grid-cols-2`}
+      onSubmit={(event) => void submit(event)}
+      aria-labelledby="new-example-title"
+    >
+      <div className="sm:col-span-2">
+        <h3 id="new-example-title" className="text-base font-semibold text-ink">
+          Add an example
+        </h3>
+        <p className="mt-1 text-sm text-muted">The kernel and the scenario are checked by the analysis before the example is offered.</p>
+      </div>
       <label className="block text-sm font-medium text-ink">
         Title
         <input className={field} value={title} onChange={(event) => setTitle(event.target.value)} required maxLength={120} />
-      </label>
-      <label className="block text-sm font-medium text-ink">
-        Summary
-        <input className={field} value={summary} onChange={(event) => setSummary(event.target.value)} required maxLength={500} />
       </label>
       <label className="block text-sm font-medium text-ink">
         Kind
@@ -214,7 +220,11 @@ function CreateForm({ onCreated }: { readonly onCreated: () => void }) {
           ))}
         </select>
       </label>
-      <label className="block text-sm font-medium text-ink">
+      <label className="block text-sm font-medium text-ink sm:col-span-2">
+        Summary
+        <input className={field} value={summary} onChange={(event) => setSummary(event.target.value)} required maxLength={500} />
+      </label>
+      <label className="block text-sm font-medium text-ink sm:col-span-2">
         Expected outcome
         <input
           className={field}
@@ -224,7 +234,7 @@ function CreateForm({ onCreated }: { readonly onCreated: () => void }) {
           maxLength={500}
         />
       </label>
-      <label className="block text-sm font-medium text-ink">
+      <label className="block text-sm font-medium text-ink sm:col-span-2">
         Kernel source
         <textarea
           className={`${field} font-mono text-xs`}
@@ -234,7 +244,7 @@ function CreateForm({ onCreated }: { readonly onCreated: () => void }) {
           required
         />
       </label>
-      <label className="block text-sm font-medium text-ink">
+      <label className="block text-sm font-medium text-ink sm:col-span-2">
         Scenario (JSON object)
         <textarea
           className={`${field} font-mono text-xs`}
@@ -245,11 +255,11 @@ function CreateForm({ onCreated }: { readonly onCreated: () => void }) {
         />
       </label>
       {error && (
-        <p role="alert" className={errorText}>
+        <p role="alert" className={`${errorText} sm:col-span-2`}>
           {error}
         </p>
       )}
-      <div>
+      <div className="sm:col-span-2">
         <button type="submit" className={primaryButton} disabled={busy}>
           {busy ? "Adding…" : "Add example"}
         </button>

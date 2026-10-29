@@ -7,7 +7,7 @@ import { failureMessage } from "../common/http";
 import type { Page } from "../common/page";
 import { usePageParam } from "../common/use-page-param";
 import { Pager } from "../ui/Pager";
-import { errorText, linkButton, panel, tableCell, tableHead } from "../ui/classes";
+import { compactButton, emptyState, errorText, heading, lead, linkButton, panel, tableCell, tableHead } from "../ui/classes";
 import { useBrowserLocation } from "../auth/use-browser-location";
 import { listScripts, SCRIPTS_PAGE_SIZE, type ScriptSummary } from "./scripts-api";
 
@@ -44,18 +44,28 @@ export function ScriptsPanel() {
 
   return (
     <section aria-labelledby="scripts-title">
-      <h1 id="scripts-title" className="text-2xl font-semibold tracking-tight text-ink">
+      <h1 id="scripts-title" className={heading}>
         My scripts
       </h1>
-      <p className="mt-2 text-sm text-muted">
-        Scripts are saved from the workbench with <em>Save as script</em>.
+      <p className={lead}>
+        Scripts are saved from the workbench with <em>Save as script</em>, or as a copy of a catalog example.
       </p>
       {error && (
-        <p role="alert" className={`${errorText} mt-4`}>
+        <p role="alert" className={`${errorText} mt-6`}>
           {error}
         </p>
       )}
-      {!error && data && data.items.length === 0 && <p className="mt-6 text-sm text-muted">You have no scripts yet.</p>}
+      {!error && data && data.items.length === 0 && (
+        <div className={`${emptyState} mt-6`}>
+          <p>You have no scripts yet.</p>
+          <p className="mt-2">
+            <Link className={linkButton} href={`/catalog/${here.fragment}`}>
+              Browse the catalog
+            </Link>{" "}
+            to start from a reviewed example.
+          </p>
+        </div>
+      )}
       {data && data.items.length > 0 && (
         <div className={`${panel} mt-6 overflow-x-auto`}>
           <table className="w-full border-collapse">
@@ -74,11 +84,11 @@ export function ScriptsPanel() {
             </thead>
             <tbody>
               {data.items.map((script) => (
-                <tr key={script.id}>
-                  <td className={tableCell}>{script.title}</td>
-                  <td className={`${tableCell} text-muted`}>{formatDate(script.updatedAt)}</td>
+                <tr key={script.id} className="hover:bg-code/60">
+                  <td className={`${tableCell} font-medium text-ink`}>{script.title}</td>
+                  <td className={`${tableCell} whitespace-nowrap text-muted`}>{formatDate(script.updatedAt)}</td>
                   <td className={`${tableCell} text-right`}>
-                    <Link className={linkButton} href={`/mis-scripts/script/?id=${encodeURIComponent(script.id)}${here.fragment}`}>
+                    <Link className={compactButton} href={`/mis-scripts/script/?id=${encodeURIComponent(script.id)}${here.fragment}`}>
                       Open<span className="sr-only"> {script.title}</span>
                     </Link>
                   </td>

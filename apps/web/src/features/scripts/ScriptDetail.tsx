@@ -19,9 +19,14 @@ import { ConfirmDialog } from "../ui/ConfirmDialog";
 import { Pager } from "../ui/Pager";
 import { TextField } from "../ui/TextField";
 import {
+  compactButton,
   dangerButton,
+  emptyState,
   errorText,
+  heading,
+  lead,
   linkButton,
+  outlineDangerButton,
   panel,
   primaryButton,
   secondaryButton,
@@ -175,12 +180,12 @@ export function ScriptDetail({ id }: { readonly id: string }) {
     <div className="grid gap-8">
       <section aria-labelledby="script-title" className="grid gap-4">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <h1 id="script-title" className="text-2xl font-semibold tracking-tight text-ink">
+          <h1 id="script-title" className={heading}>
             {script.title}
           </h1>
           <p className="text-sm text-muted">Updated {formatDate(script.updatedAt)}</p>
         </div>
-        <form onSubmit={rename} className="grid gap-3 sm:max-w-md" noValidate>
+        <form onSubmit={rename} className={`${panel} grid gap-3 p-4 sm:max-w-md`} noValidate>
           <TextField
             id="script-rename"
             label="Title"
@@ -220,27 +225,28 @@ export function ScriptDetail({ id }: { readonly id: string }) {
               </button>
             </div>
           </div>
-          {openError && <p role="alert" className="mt-3 text-sm text-danger">{openError}</p>}
-          <pre className="mt-3 max-h-96 overflow-auto rounded-md bg-code p-3 font-mono text-xs text-ink">
-            {script.source}
-          </pre>
+          {openError && (
+            <p role="alert" className={`${errorText} mt-3`}>
+              {openError}
+            </p>
+          )}
+          <pre className="mt-3 max-h-96 overflow-auto rounded-md bg-code p-3 font-mono text-xs text-ink">{script.source}</pre>
         </div>
       </section>
 
       <section aria-labelledby="results-title" className="grid gap-3">
-        <h2 id="results-title" className="text-lg font-semibold text-ink">
+        <h2 id="results-title" className="text-lg font-semibold tracking-tight text-ink">
           Saved results
         </h2>
-        <p className="text-sm text-muted">
-          A saved result is a copy of a finished analysis. Download it and open it in the workbench with{" "}
-          <em>Open captured report</em>.
+        <p className={lead}>
+          A saved result is a copy of a finished analysis. Download it and open it in the workbench with <em>Open captured report</em>.
         </p>
         {resultError && (
           <p role="alert" className={errorText}>
             {resultError}
           </p>
         )}
-        {results && results.items.length === 0 && <p className="text-sm text-muted">No results are saved yet.</p>}
+        {results && results.items.length === 0 && <p className={emptyState}>No results are saved yet.</p>}
         {results && results.items.length > 0 && (
           <div className={`${panel} overflow-x-auto`}>
             <table className="w-full border-collapse">
@@ -263,11 +269,11 @@ export function ScriptDetail({ id }: { readonly id: string }) {
                     <td className={`${tableCell} text-muted`}>{formatDate(result.createdAt)}</td>
                     <td className={`${tableCell} font-mono text-xs`}>{result.analysisId}</td>
                     <td className={`${tableCell} text-right`}>
-                      <span className="inline-flex gap-3">
-                        <button type="button" className={linkButton} onClick={() => void download(result)}>
+                      <span className="inline-flex gap-2">
+                        <button type="button" className={compactButton} onClick={() => void download(result)}>
                           Download
                         </button>
-                        <button type="button" className={linkButton} onClick={() => setRemovingResult(result)}>
+                        <button type="button" className={outlineDangerButton} onClick={() => setRemovingResult(result)}>
                           Remove
                         </button>
                       </span>
@@ -301,7 +307,6 @@ export function ScriptDetail({ id }: { readonly id: string }) {
         confirmLabel="Delete script"
         busy={scriptBusy}
         error={scriptError}
-
         onConfirm={() => void removeScript()}
         onCancel={() => setRemovingScript(false)}
       />

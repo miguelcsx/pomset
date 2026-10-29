@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
 import { ApiError, failureMessage } from "../common/http";
+import { PasswordField } from "../ui/PasswordField";
 import { TextField } from "../ui/TextField";
 import { linkButton, noticeBox, primaryButton } from "../ui/classes";
 import { register } from "./auth-api";
@@ -72,10 +73,9 @@ export function RegisterForm() {
         error={errors["email"]}
         disabled={busy}
       />
-      <TextField
+      <PasswordField
         id="register-password"
         label="Password"
-        type="password"
         name="password"
         autoComplete="new-password"
         value={password}
