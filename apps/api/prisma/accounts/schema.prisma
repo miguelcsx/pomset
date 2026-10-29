@@ -1,0 +1,77 @@
+// Accounts, saved scripts and results, and analysis ownership: the state that
+// belongs to a person rather than to a workbench run.
+//
+// SQLite, through Prisma and its libSQL driver adapter, so the same schema runs
+// locally and in the single-container deployment. The analysis evidence itself
+// stays in the workbench store (ADR-0013); only what a signed-in user chooses to
+// keep is copied here.
+//
+// SQLite has no enums and Prisma cannot express a CHECK constraint, so `role`
+// is a string here and the reviewed migration constrains it. The application
+// is the only writer, and it validates the value before it writes.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../../src/generated/accounts"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+/// A person who can sign in. `role` is `admin` or `user`; the API never creates
+/// an administrator, so one exists only where the operator seeds it.
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  displayName  String
+  passwordHash String
+  role         String        @default("user")
+  createdAt    DateTime      @default(now())
+  scripts      SavedScript[]
+
+  @@map("users")
+}
+
+/// A script a user keeps. `scenario` holds the canonical scenario as JSON text
+/// when one was set; the application validates it before it is stored.
+model SavedScript {
+  id        String        @id @default(uuid())
+  userId    String
+  title     String
+  source    String
+  scenario  String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  results   SavedResult[]
+
+  @@index([userId, updatedAt])
+  @@map("scripts")
+}
+
+/// A finished analysis a user chose to keep against a script. `job` is the
+/// finished job document as JSON text, copied rather than linked, so the saved
+/// evidence stays what it was even if the live analysis is later cancelled.
+model SavedResult {
+  id         String      @id @default(uuid())
+  scriptId   String
+  analysisId String
+  job        String
+  createdAt  DateTime    @default(now())
+  script     SavedScript @relation(fields: [scriptId], references: [id], onDelete: Cascade)
+
+  @@unique([scriptId, analysisId])
+  @@map("saved_results")
+}
+
+/// Which user submitted an analysis. Analysis reads check this, so one user
+/// cannot read or cancel another user's run by guessing its identifier.
+model AnalysisOwner {
+  analysisId String   @id
+  userId     String
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@map("analysis_owners")
+}
