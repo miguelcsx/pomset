@@ -15,5 +15,7 @@ export type { AnalysisRepository } from "./application/ports/AnalysisRepository.
 export type { BlobStore } from "./application/ports/BlobStore.js";
 export type { EngineRunner } from "./application/ports/EngineRunner.js";
 export type { CapturedFile, RunWorkspace } from "./application/ports/RunWorkspace.js";
+export { createPlatform, type Platform, type PlatformDependencies } from "./application/Platform.js";
 export { ApplicationError, type ErrorKind } from "./domain/errors/ApplicationError.js";
+export { type DemoPasswords } from "./application/accounts/SeedDemoAccounts.js";
 export { startWorkbench, type RunningWorkbench, type WorkbenchOptions } from "./main.js";
