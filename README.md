@@ -80,14 +80,16 @@ script to edit and analyse.
 
 Sign in with a demo account, or register your own:
 
-| Account | Email | Role |
-|---|---|---|
-| Demo administrator | `admin@pomset.example` | administrator: can list users |
-| Demo user | `user@pomset.example` | user |
+| Account | Email | Password | Role |
+|---|---|---|---|
+| Demo administrator | `admin@pomset.example` | `31573f5684d4ec65` | administrator: can list users and manage the catalog |
+| Demo user | `user@pomset.example` | `7757594bb02e2108` | user |
 
-The demo passwords are not in this repository. They are set in the Render
-dashboard as `POMSET_DEMO_ADMIN_PASSWORD` and `POMSET_DEMO_USER_PASSWORD`. Each
-account owns its saved scripts and results. Other accounts cannot see them.
+These are published test credentials for trying the roles. They open demo data
+only, so do not reuse them anywhere else. The deployment reads them from
+`POMSET_DEMO_ADMIN_PASSWORD` and `POMSET_DEMO_USER_PASSWORD` in the Render
+dashboard; the repository never stores them. Each account owns its saved
+scripts and results. Other accounts cannot see them.
 
 Decisions:
 
