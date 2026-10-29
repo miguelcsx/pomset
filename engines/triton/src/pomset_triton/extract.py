@@ -163,11 +163,15 @@ def extract(entrypoint: Entrypoint) -> Extraction:
             if name in {"load", "store"}:
                 accesses.append(_access(name, node, bindings, entrypoint))
             if name == "program_id":
+                # tl.program_id(0) and the common tl.program_id(axis=0) name the same axis.
+                axis = node.args[0] if len(node.args) == 1 else next(
+                    (kw.value for kw in node.keywords if kw.arg == "axis"), None
+                )
                 if (
-                    len(node.args) != 1
-                    or not isinstance(node.args[0], ast.Constant)
-                    or node.args[0].value != 0
-                    or node.keywords
+                    axis is None
+                    or not isinstance(axis, ast.Constant)
+                    or axis.value != 0
+                    or len(node.args) + len(node.keywords) != 1
                 ):
                     raise unsupported(node, "only program_id(0) is modeled")
                 program_ids.append(ast.unparse(node))

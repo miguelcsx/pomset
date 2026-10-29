@@ -140,6 +140,22 @@ def test_the_constant_offset_may_sit_on_either_side_of_the_sum() -> None:
         assert answer.witness["index"] == 0
 
 
+def test_the_keyword_axis_zero_is_the_same_program_id() -> None:
+    """``tl.program_id(axis=0)`` is the idiomatic spelling of ``program_id(0)``."""
+    keyword = SHIFTED.replace("tl.program_id(0)", "tl.program_id(axis=0)")
+    store = extract(select_entrypoint(keyword, "k.py", "transform")).stores[0]
+    # The expression keeps the spelling written in the source.
+    assert store.lane_expression == (
+        "tl.program_id(axis=0) * BLOCK + tl.arange(0, BLOCK) + 1"
+    )
+
+
+def test_another_program_axis_is_still_refused() -> None:
+    other = SHIFTED.replace("tl.program_id(0)", "tl.program_id(axis=1)")
+    with pytest.raises(Unsupported, match="only program_id"):
+        extract(select_entrypoint(other, "k.py", "transform"))
+
+
 def test_the_result_obeys_the_closed_outcome_table() -> None:
     scenario = load(DEFECT)
     extraction = extract(entrypoint())
