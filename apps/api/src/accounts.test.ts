@@ -105,6 +105,14 @@ async function data<T>(response: Response): Promise<T> {
   return body.data;
 }
 
+/** A list carries its items under `data` and the page beside them under `pagination`. */
+async function list<T>(response: Response): Promise<{ items: T[]; pagination: { page: number; pageSize: number; total: number; totalPages: number } }> {
+  const body = (await response.json()) as { data: T[]; pagination: { page: number; pageSize: number; total: number; totalPages: number } };
+  expect(body).toHaveProperty("data");
+  expect(body).toHaveProperty("pagination");
+  return { items: body.data, pagination: body.pagination };
+}
+
 async function failure(response: Response): Promise<Failure> {
   return (await response.json()) as Failure;
 }
@@ -120,9 +128,7 @@ async function register(email: string, displayName: string): Promise<Session> {
 }
 
 async function listScripts(token: string, query = "") {
-  return data<{ items: { id: string; title: string }[]; pagination: { page: number; pageSize: number; total: number; totalPages: number } }>(
-    await call(`/api/scripts${query ? `?${query}` : ""}`, { token }),
-  );
+  return list<{ id: string; title: string }>(await call(`/api/scripts${query ? `?${query}` : ""}`, { token }));
 }
 
 async function createScript(token: string, title: string, extra: Record<string, unknown> = {}) {
@@ -260,8 +266,8 @@ it("lets only an administrator list accounts, and never shows a password hash", 
   expect(listed.status).toBe(200);
   const text = await listed.text();
   expect(text).not.toContain("passwordHash");
-  const page = JSON.parse(text).data as { items: { email: string }[] };
-  expect(page.items.map((item) => item.email)).toContain(DEMO_USER.email);
+  const users = (JSON.parse(text) as { data: { email: string }[] }).data;
+  expect(users.map((item) => item.email)).toContain(DEMO_USER.email);
   expect((await call("/api/admin/users?pageSize=500", { token: admin.token })).status).toBe(400);
 
   const user = await data<Session>(await signIn(DEMO_USER.email, USER_PASSWORD));
@@ -317,7 +323,7 @@ it("keeps scripts and their results private, and removes results with their scri
       job: JSON.stringify({ job: { jobId: "job_private_1" } }),
     },
   });
-  const listed = await data<{ pagination: { total: number } }>(await call(`${path}/results`, { token: ada.token }));
+  const listed = await list<unknown>(await call(`${path}/results`, { token: ada.token }));
   expect(listed.pagination.total).toBe(1);
   expect((await call(`${path}/results/${result.id}`, { token: neighbour.token })).status).toBe(404);
   expect((await call(`${path}/results/${result.id}`, { token: ada.token })).status).toBe(200);

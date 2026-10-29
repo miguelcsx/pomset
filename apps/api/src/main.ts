@@ -28,6 +28,7 @@ import { LocalEngineRunner } from "./infrastructure/engine/LocalEngineRunner.js"
 import { BcryptPasswordHasher } from "./infrastructure/accounts/BcryptPasswordHasher.js";
 import { JwtSessionTokens } from "./infrastructure/accounts/JwtSessionTokens.js";
 import { PrismaAnalysisOwners } from "./infrastructure/accounts/PrismaAnalysisOwners.js";
+import { PrismaCatalogRepository } from "./infrastructure/accounts/PrismaCatalogRepository.js";
 import { PrismaResultRepository } from "./infrastructure/accounts/PrismaResultRepository.js";
 import { PrismaScriptRepository } from "./infrastructure/accounts/PrismaScriptRepository.js";
 import { PrismaUserRepository } from "./infrastructure/accounts/PrismaUserRepository.js";
@@ -113,6 +114,7 @@ export async function startWorkbench(options: WorkbenchOptions): Promise<Running
     workbench,
     users: new PrismaUserRepository(accounts.prisma),
     scripts: new PrismaScriptRepository(accounts.prisma),
+    catalog: new PrismaCatalogRepository(accounts.prisma),
     results: new PrismaResultRepository(accounts.prisma),
     owners: new PrismaAnalysisOwners(accounts.prisma),
     hasher,

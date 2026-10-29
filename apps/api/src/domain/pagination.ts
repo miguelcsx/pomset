@@ -49,6 +49,15 @@ export function pageOf<T>(request: PageRequest, items: readonly T[], total: numb
   };
 }
 
+/**
+ * The wire shape of every list: the items under `data`, the page beside them.
+ * A single resource is `{ data }` and a list is `{ data, pagination }`, so a
+ * client reads `data` the same way in both cases.
+ */
+export function pageBody<T>(page: Page<T>): { data: readonly T[]; pagination: PageInfo } {
+  return { data: page.items, pagination: page.pagination };
+}
+
 /** The rows to skip and take for a page, for a store that paginates itself. */
 export function window(request: PageRequest): { skip: number; take: number } {
   return { skip: (request.page - 1) * request.pageSize, take: request.pageSize };

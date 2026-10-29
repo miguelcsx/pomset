@@ -11,6 +11,7 @@ import { Router } from "express";
 
 import type { Platform } from "../../application/Platform.js";
 import { adminRouter } from "./admin.router.js";
+import { catalogRouter } from "./catalog.router.js";
 import { analysesRouter } from "./analyses.router.js";
 import { type AuthLimits, authRouter } from "./auth.router.js";
 import { scriptsRouter } from "./scripts.router.js";
@@ -21,6 +22,7 @@ export function apiRouter(platform: Platform, limits: AuthLimits): Router {
 
   router.use("/workbench", workbenchRouter(platform));
   router.use("/auth", authRouter(platform, limits));
+  router.use("/catalog", catalogRouter(platform));
   router.use("/scripts", scriptsRouter(platform));
   router.use("/admin", adminRouter(platform));
   router.use("/analyses", analysesRouter(platform));

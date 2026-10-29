@@ -15,8 +15,14 @@ import { PrismaLibSql } from "@prisma/adapter-libsql";
 
 import { PrismaClient } from "../../generated/accounts/client.js";
 
-const MIGRATION = new URL("../../../prisma/accounts/migrations/0001_accounts.sql", import.meta.url);
-const SCHEMA_VERSION = 1;
+import { encodeScenario } from "../../domain/scripts/SavedScript.js";
+import { CATALOG_SEED } from "./catalogSeed.js";
+
+/** Applied in order; each one runs once, and its version is recorded when it has. */
+const MIGRATIONS = [
+  { version: 1, file: new URL("../../../prisma/accounts/migrations/0001_accounts.sql", import.meta.url) },
+  { version: 2, file: new URL("../../../prisma/accounts/migrations/0002_catalog.sql", import.meta.url) },
+] as const;
 
 export interface AccountsStore {
   readonly prisma: PrismaClient;
@@ -30,6 +36,7 @@ export async function openAccountsStore(file: string): Promise<AccountsStore> {
   try {
     await prisma.$executeRawUnsafe("PRAGMA foreign_keys = ON");
     await applyMigrations(prisma);
+    await seedCatalog(prisma);
   } catch (error) {
     await prisma.$disconnect();
     throw error;
@@ -41,11 +48,33 @@ async function applyMigrations(prisma: PrismaClient): Promise<void> {
   const [row] = await prisma.$queryRawUnsafe<{ user_version: number | bigint }[]>(
     "PRAGMA user_version",
   );
-  if (Number(row?.user_version ?? 0) >= SCHEMA_VERSION) return;
+  const recorded = Number(row?.user_version ?? 0);
 
-  for (const statement of statementsOf(readFileSync(MIGRATION, "utf8")))
-    await prisma.$executeRawUnsafe(statement);
-  await prisma.$executeRawUnsafe(`PRAGMA user_version = ${SCHEMA_VERSION}`);
+  for (const migration of MIGRATIONS) {
+    if (migration.version <= recorded) continue;
+    for (const statement of statementsOf(readFileSync(migration.file, "utf8")))
+      await prisma.$executeRawUnsafe(statement);
+    await prisma.$executeRawUnsafe(`PRAGMA user_version = ${migration.version}`);
+  }
+}
+
+/**
+ * Fills in the reviewed examples that are missing. An entry that already exists
+ * is left as it is, so an administrator's change survives a restart. SQLite
+ * offers no skip-duplicates insert, so each entry is an upsert with no update.
+ */
+async function seedCatalog(prisma: PrismaClient): Promise<void> {
+  for (const item of CATALOG_SEED) {
+    const fields = {
+      title: item.title,
+      summary: item.summary,
+      kind: item.kind,
+      source: item.source,
+      scenario: encodeScenario(item.scenario)!,
+      expectedOutcome: item.expectedOutcome,
+    };
+    await prisma.catalogItem.upsert({ where: { id: item.id }, update: {}, create: { id: item.id, ...fields } });
+  }
 }
 
 /** The migration holds plain statements and comments only, so splitting on `;` is exact. */

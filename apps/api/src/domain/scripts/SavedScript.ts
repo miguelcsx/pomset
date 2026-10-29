@@ -27,6 +27,8 @@ export type ScriptPatch = Partial<ScriptInput>;
 
 export interface SavedScript extends ScriptInput {
   readonly id: string;
+  /** The catalog item this script was copied from, when it was saved from the catalog. */
+  readonly catalogItemId: string | null;
   readonly createdAt: string;
   readonly updatedAt: string;
 }

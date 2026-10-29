@@ -9,13 +9,15 @@
  */
 
 import type { Platform } from "../../application/Platform.js";
+import { pageBody, parsePageRequest } from "../../domain/pagination.js";
 import { asyncRoute } from "../middlewares/async-route.js";
 import { currentAccount } from "../middlewares/authenticate.middleware.js";
 
 export function analysesController(platform: Platform) {
   return {
-    history: asyncRoute(async (_request, response) => {
-      response.json({ data: await platform.analyses.history(currentAccount(response).id) });
+    history: asyncRoute(async (request, response) => {
+      const page = parsePageRequest(request.query);
+      response.json(pageBody(await platform.analyses.history(currentAccount(response).id, page)));
     }),
 
     submit: asyncRoute(async (request, response) => {

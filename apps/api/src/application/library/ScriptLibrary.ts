@@ -4,6 +4,7 @@
  * a missing script gets.
  */
 
+import type { CatalogItem } from "../../domain/catalog/CatalogItem.js";
 import { notFound } from "../../domain/errors/ApplicationError.js";
 import { pageOf, type Page, type PageRequest, window } from "../../domain/pagination.js";
 import {
@@ -26,7 +27,13 @@ export class ScriptLibrary {
   }
 
   create(userId: string, input: unknown): Promise<SavedScript> {
-    return this.scripts.create(userId, parseScriptInput(input), this.now().toISOString());
+    return this.scripts.create(userId, parseScriptInput(input), this.now().toISOString(), null);
+  }
+
+  /** A copy of a catalog item the account keeps and may edit; the link back is kept for the list. */
+  createFromCatalog(userId: string, item: CatalogItem): Promise<SavedScript> {
+    const input = { title: item.title, source: item.source, scenario: item.scenario };
+    return this.scripts.create(userId, input, this.now().toISOString(), item.id);
   }
 
   async get(userId: string, id: string): Promise<SavedScript> {

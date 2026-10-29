@@ -70,10 +70,13 @@ states, it is never merged into `main`, and it is not a specification.
 
 ### Public workbench
 
-The same workbench runs as a public demo at `<public-url>` (set the URL once the
-Render service is live). It is deployed from `main` by `render.yaml` and the
-[Dockerfile](Dockerfile); the decision is in
-[ADR-0017](docs/adr/0017-public-workbench-hosting.md).
+The same workbench runs as a public demo at https://pomset.onrender.com. It is
+deployed from `main` by `render.yaml` and the [Dockerfile](Dockerfile); the
+decision is in [ADR-0017](docs/adr/0017-public-workbench-hosting.md).
+
+The catalog at `/catalog/` lists reviewed kernels, each defect paired with a
+control. Anyone can read it; a signed-in account saves an example as its own
+script to edit and analyse.
 
 Sign in with a demo account, or register your own:
 

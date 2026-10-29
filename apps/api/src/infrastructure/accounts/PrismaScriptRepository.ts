@@ -14,6 +14,7 @@ type ScriptRow = {
   title: string;
   source: string;
   scenario: string | null;
+  catalogItemId: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -42,7 +43,7 @@ export class PrismaScriptRepository implements ScriptRepository {
     return row ? scriptOf(row) : undefined;
   }
 
-  async create(userId: string, input: ScriptInput, now: string): Promise<SavedScript> {
+  async create(userId: string, input: ScriptInput, now: string, catalogItemId: string | null): Promise<SavedScript> {
     const at = new Date(now);
     const row = await this.prisma.savedScript.create({
       data: {
@@ -50,6 +51,7 @@ export class PrismaScriptRepository implements ScriptRepository {
         title: input.title,
         source: input.source,
         scenario: encodeScenario(input.scenario),
+        catalogItemId,
         createdAt: at,
         updatedAt: at,
       },
@@ -88,5 +90,6 @@ function scriptOf(row: ScriptRow): SavedScript {
     ...summaryOf(row),
     source: row.source,
     scenario: decodeScenario(row.scenario),
+    catalogItemId: row.catalogItemId,
   };
 }

@@ -96,7 +96,8 @@ it("saves a finished analysis against a script, and only once", async () => {
   expect(saved.status).toBe(201);
   const result = payload(await saved.json()) as { id: string };
 
-  const listed = payload(await (await call(`/api/scripts/${script.id}/results`)).json()) as { items: unknown[]; pagination: { total: number } };
+  const listed = (await (await call(`/api/scripts/${script.id}/results`)).json()) as { data: unknown[]; pagination: { total: number } };
+  expect(listed.data).toHaveLength(1);
   expect(listed.pagination.total).toBe(1);
   const detail = payload(await (await call(`/api/scripts/${script.id}/results/${result.id}`)).json()) as { document: unknown };
   expect(checkedReport(detail.document).job.jobId).toBe(report.job.jobId);

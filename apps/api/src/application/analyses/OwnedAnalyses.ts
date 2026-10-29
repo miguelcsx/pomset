@@ -9,11 +9,10 @@
 import type { Job } from "@pomset/contracts";
 
 import { notFound } from "../../domain/errors/ApplicationError.js";
+import { pageOf, type Page, type PageRequest, window } from "../../domain/pagination.js";
 import type { AnalysisOwners } from "../ports/AnalysisOwners.js";
 import type { Workbench } from "../Workbench.js";
 import type { AnalysisReport } from "./GetAnalysis.js";
-
-const HISTORY_LIMIT = 100;
 
 export interface OwnedAnalysesDependencies {
   readonly workbench: Workbench;
@@ -30,10 +29,17 @@ export class OwnedAnalyses {
     return job;
   }
 
-  /** The account's own analyses, newest first, capped at `HISTORY_LIMIT`. */
-  async history(userId: string): Promise<Job[]> {
-    const ids = await this.deps.owners.analysisIdsOf(userId, HISTORY_LIMIT);
-    return this.deps.workbench.history.forIds(ids);
+  /**
+   * One page of the account's own analyses, newest first. `total` counts what the
+   * account submitted; an analysis whose job has since been removed is left out
+   * of `items`, so a page can be shorter than `pageSize`.
+   */
+  async history(userId: string, request: PageRequest): Promise<Page<Job>> {
+    const [ids, total] = await Promise.all([
+      this.deps.owners.analysisIdsOf(userId, window(request)),
+      this.deps.owners.countOf(userId),
+    ]);
+    return pageOf(request, await this.deps.workbench.history.forIds(ids), total);
   }
 
   async report(userId: string, id: string): Promise<AnalysisReport> {

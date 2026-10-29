@@ -22,13 +22,17 @@ export class PrismaAnalysisOwners implements AnalysisOwners {
     return row?.userId;
   }
 
-  async analysisIdsOf(userId: string, limit: number): Promise<string[]> {
+  async analysisIdsOf(userId: string, window: { skip: number; take: number }): Promise<string[]> {
     const rows = await this.prisma.analysisOwner.findMany({
       where: { userId },
       orderBy: [{ createdAt: "desc" }, { analysisId: "desc" }],
-      take: limit,
+      ...window,
       select: { analysisId: true },
     });
     return rows.map((row) => row.analysisId);
+  }
+
+  countOf(userId: string): Promise<number> {
+    return this.prisma.analysisOwner.count({ where: { userId } });
   }
 }

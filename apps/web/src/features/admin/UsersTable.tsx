@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { failureMessage } from "../common/http";
 import type { Page } from "../common/page";
+import { usePageParam } from "../common/use-page-param";
 import { formatDate } from "../scripts/ScriptsPanel";
 import { Pager } from "../ui/Pager";
 import { errorText, panel, tableCell, tableHead } from "../ui/classes";
@@ -11,7 +12,7 @@ import type { Account } from "../auth/account";
 import { listUsers, USERS_PAGE_SIZE } from "./admin-api";
 
 export function UsersTable() {
-  const [page, setPage] = useState(1);
+  const [page, setPage] = usePageParam("usersPage");
   const [data, setData] = useState<Page<Account>>();
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(true);

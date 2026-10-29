@@ -9,6 +9,7 @@ import type { Workbench } from "./application/Workbench.js";
 import { notFound } from "./domain/index.js";
 
 const NOW = new Date("2026-01-01T00:00:00.000Z");
+const FIRST = { page: 1, pageSize: 10 } as const;
 
 function job(jobId: string): Job {
   return { jobId, state: "queued", createdAt: NOW.toISOString() } as unknown as Job;
@@ -16,15 +17,16 @@ function job(jobId: string): Job {
 
 /** Owners held in memory, newest first as `analysisIdsOf` promises. */
 function memoryOwners(entries: Array<[string, string]>): AnalysisOwners {
+  const ownedBy = (userId: string) =>
+    entries
+      .filter(([, owner]) => owner === userId)
+      .map(([id]) => id)
+      .reverse();
   return {
     record: async () => {},
     ownerOf: async (analysisId) => entries.find(([id]) => id === analysisId)?.[1],
-    analysisIdsOf: async (userId, limit) =>
-      entries
-        .filter(([, owner]) => owner === userId)
-        .map(([id]) => id)
-        .reverse()
-        .slice(0, limit),
+    analysisIdsOf: async (userId, window) => ownedBy(userId).slice(window.skip, window.skip + window.take),
+    countOf: async (userId) => ownedBy(userId).length,
   };
 }
 
@@ -44,7 +46,7 @@ function services(owners: AnalysisOwners, jobs: Job[]): OwnedAnalyses {
 }
 
 describe("OwnedAnalyses.history", () => {
-  it("lists only the caller's own analyses, in the owner index's order", async () => {
+  it("lists only the caller's own analyses, newest first, with the total", async () => {
     const owners = memoryOwners([
       ["job_a", "alice"],
       ["job_b", "bob"],
@@ -52,15 +54,20 @@ describe("OwnedAnalyses.history", () => {
     ]);
     const analyses = services(owners, [job("job_a"), job("job_b"), job("job_c")]);
 
-    expect((await analyses.history("alice")).map((entry) => entry.jobId)).toEqual(["job_c", "job_a"]);
-    expect((await analyses.history("bob")).map((entry) => entry.jobId)).toEqual(["job_b"]);
+    const alice = await analyses.history("alice", FIRST);
+    expect(alice.items.map((entry) => entry.jobId)).toEqual(["job_c", "job_a"]);
+    expect(alice.pagination).toEqual({ page: 1, pageSize: 10, total: 2, totalPages: 1 });
+
+    expect((await analyses.history("bob", FIRST)).items.map((entry) => entry.jobId)).toEqual(["job_b"]);
   });
 
   it("lists nothing to an account that owns no analysis, and never the unowned", async () => {
     const owners = memoryOwners([["job_a", "alice"]]);
     const analyses = services(owners, [job("job_a"), job("job_legacy")]);
 
-    expect(await analyses.history("mallory")).toEqual([]);
+    const mallory = await analyses.history("mallory", FIRST);
+    expect(mallory.items).toEqual([]);
+    expect(mallory.pagination.total).toBe(0);
   });
 
   it("skips an owned identifier whose job is gone instead of failing the list", async () => {
@@ -70,6 +77,25 @@ describe("OwnedAnalyses.history", () => {
     ]);
     const analyses = services(owners, [job("job_a")]);
 
-    expect((await analyses.history("alice")).map((entry) => entry.jobId)).toEqual(["job_a"]);
+    const page = await analyses.history("alice", FIRST);
+    expect(page.items.map((entry) => entry.jobId)).toEqual(["job_a"]);
+    expect(page.pagination.total).toBe(2);
+  });
+
+  it("pages through the account's analyses without repeating or dropping any", async () => {
+    const entries: Array<[string, string]> = ["job_1", "job_2", "job_3", "job_4", "job_5"].map((id) => [id, "alice"]);
+    const analyses = services(
+      memoryOwners(entries),
+      entries.map(([id]) => job(id)),
+    );
+
+    const first = await analyses.history("alice", { page: 1, pageSize: 2 });
+    const second = await analyses.history("alice", { page: 2, pageSize: 2 });
+    const third = await analyses.history("alice", { page: 3, pageSize: 2 });
+
+    expect(first.items.map((entry) => entry.jobId)).toEqual(["job_5", "job_4"]);
+    expect(second.items.map((entry) => entry.jobId)).toEqual(["job_3", "job_2"]);
+    expect(third.items.map((entry) => entry.jobId)).toEqual(["job_1"]);
+    expect(third.pagination).toEqual({ page: 3, pageSize: 2, total: 5, totalPages: 3 });
   });
 });

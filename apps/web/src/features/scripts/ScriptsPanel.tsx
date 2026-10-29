@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { failureMessage } from "../common/http";
 import type { Page } from "../common/page";
+import { usePageParam } from "../common/use-page-param";
 import { Pager } from "../ui/Pager";
 import { errorText, linkButton, panel, tableCell, tableHead } from "../ui/classes";
 import { useBrowserLocation } from "../auth/use-browser-location";
@@ -17,7 +18,7 @@ export function formatDate(iso: string): string {
 
 export function ScriptsPanel() {
   const here = useBrowserLocation();
-  const [page, setPage] = useState(1);
+  const [page, setPage] = usePageParam();
   const [data, setData] = useState<Page<ScriptSummary>>();
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(true);

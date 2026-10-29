@@ -29,12 +29,17 @@ export function SiteHeader({ compact = false }: { readonly compact?: boolean }) 
         <Link href={at("/")} className="text-base font-semibold text-ink no-underline">
           pomset
         </Link>
-        {!compact && state.status === "signed-in" && (
+        {!compact && (
           <nav aria-label="Site" className="flex flex-wrap gap-4 text-sm">
-            <Link className={linkButton} href={at("/mis-scripts/")}>
-              My scripts
+            <Link className={linkButton} href={at("/catalog/")}>
+              Catalog
             </Link>
-            {state.session.user.role === "admin" && (
+            {state.status === "signed-in" && (
+              <Link className={linkButton} href={at("/mis-scripts/")}>
+                My scripts
+              </Link>
+            )}
+            {state.status === "signed-in" && state.session.user.role === "admin" && (
               <Link className={linkButton} href={at("/admin/")}>
                 Users
               </Link>

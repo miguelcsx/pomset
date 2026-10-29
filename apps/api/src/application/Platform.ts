@@ -7,6 +7,7 @@
  */
 
 import type { AnalysisOwners } from "./ports/AnalysisOwners.js";
+import type { CatalogRepository } from "./ports/CatalogRepository.js";
 import type { PasswordHasher } from "./ports/PasswordHasher.js";
 import type { ResultRepository } from "./ports/ResultRepository.js";
 import type { ScriptRepository } from "./ports/ScriptRepository.js";
@@ -17,6 +18,7 @@ import { ResolveSession } from "./accounts/ResolveSession.js";
 import { SignIn } from "./accounts/SignIn.js";
 import { ListUsers } from "./accounts/ListUsers.js";
 import { OwnedAnalyses } from "./analyses/OwnedAnalyses.js";
+import { Catalog } from "./catalog/Catalog.js";
 import { ScriptLibrary } from "./library/ScriptLibrary.js";
 import { SavedResults } from "./library/SavedResults.js";
 import type { Workbench } from "./Workbench.js";
@@ -25,6 +27,7 @@ export interface PlatformDependencies {
   readonly workbench: Workbench;
   readonly users: UserRepository;
   readonly scripts: ScriptRepository;
+  readonly catalog: CatalogRepository;
   readonly results: ResultRepository;
   readonly owners: AnalysisOwners;
   readonly hasher: PasswordHasher;
@@ -39,6 +42,7 @@ export interface Platform {
   readonly resolveSession: ResolveSession;
   readonly users: ListUsers;
   readonly scripts: ScriptLibrary;
+  readonly catalog: Catalog;
   readonly results: SavedResults;
   readonly analyses: OwnedAnalyses;
 }
@@ -53,6 +57,7 @@ export function createPlatform(deps: PlatformDependencies): Platform {
     resolveSession: new ResolveSession({ users: deps.users, tokens: deps.tokens }),
     users: new ListUsers(deps.users),
     scripts,
+    catalog: new Catalog({ repository: deps.catalog, scripts, now }),
     results: new SavedResults({
       scripts,
       results: deps.results,

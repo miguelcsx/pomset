@@ -41,13 +41,33 @@ model SavedScript {
   title     String
   source    String
   scenario  String?
+  catalogItemId String?
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  catalog   CatalogItem?  @relation(fields: [catalogItemId], references: [id], onDelete: SetNull)
   results   SavedResult[]
 
   @@index([userId, updatedAt])
   @@map("scripts")
+}
+
+/// A curated example: a kernel, the scenario it runs under, and the outcome the
+/// analysis should show. `scenario` is the canonical scenario as JSON text. Both
+/// defects and their controls are kept, so a check is judged on both.
+model CatalogItem {
+  id              String        @id @default(uuid())
+  title           String
+  summary         String
+  kind            String
+  source          String
+  scenario        String
+  expectedOutcome String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  scripts         SavedScript[]
+
+  @@map("catalog_items")
 }
 
 /// A finished analysis a user chose to keep against a script. `job` is the

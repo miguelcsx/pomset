@@ -83,7 +83,7 @@ export function parseResult(value: unknown): SavedResult {
 
 export function listScripts(page: number, pageSize = SCRIPTS_PAGE_SIZE): Promise<Page<ScriptSummary>> {
   return apiRequest(`/api/scripts?${pageQuery(page, pageSize)}`, { auth: "required" }).then((response) =>
-    parsePage(unwrap(response), parseSummary),
+    parsePage(response, parseSummary),
   );
 }
 
@@ -110,7 +110,7 @@ export async function deleteScript(id: string): Promise<void> {
 export function listResults(scriptId: string, page: number, pageSize = SCRIPTS_PAGE_SIZE): Promise<Page<SavedResultSummary>> {
   return apiRequest(`/api/scripts/${encodeURIComponent(scriptId)}/results?${pageQuery(page, pageSize)}`, {
     auth: "required",
-  }).then((response) => parsePage(unwrap(response), parseResultSummary));
+  }).then((response) => parsePage(response, parseResultSummary));
 }
 
 export async function getResult(scriptId: string, id: string): Promise<SavedResult> {

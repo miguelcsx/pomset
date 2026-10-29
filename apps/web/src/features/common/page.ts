@@ -1,6 +1,7 @@
 /**
- * A list the API returns: `data` holds the items and the page they belong to.
- * The shape mirrors the API's `Page<T>`; anything else is refused at the boundary.
+ * A list the API returns: `data` holds the items and `pagination` the page they
+ * belong to. The client keeps the items as `items`, so callers read one name.
+ * Anything else is refused at the boundary.
  */
 
 import { arrayField, asObject, numberField, type JsonObject } from "./json";
@@ -21,7 +22,7 @@ export function parsePage<T>(value: unknown, parseItem: (item: unknown) => T): P
   const record: JsonObject = asObject(value);
   const pagination = asObject(record["pagination"]);
   return {
-    items: arrayField(record, "items").map(parseItem),
+    items: arrayField(record, "data").map(parseItem),
     pagination: {
       page: numberField(pagination, "page"),
       pageSize: numberField(pagination, "pageSize"),
@@ -29,6 +30,13 @@ export function parsePage<T>(value: unknown, parseItem: (item: unknown) => T): P
       totalPages: numberField(pagination, "totalPages"),
     },
   };
+}
+
+const PAGE_PATTERN = /^[1-9]\d{0,5}$/;
+
+/** A page number from a query string. Anything malformed reads as the first page. */
+export function pageFromQuery(value: string | null): number {
+  return value !== null && PAGE_PATTERN.test(value) ? Number(value) : 1;
 }
 
 export function pageQuery(page: number, pageSize: number): string {

@@ -12,7 +12,7 @@
 import type { Response } from "express";
 
 import type { Platform } from "../../application/Platform.js";
-import { parsePageRequest } from "../../domain/pagination.js";
+import { pageBody, parsePageRequest } from "../../domain/pagination.js";
 import { asyncRoute } from "../middlewares/async-route.js";
 import { currentAccount } from "../middlewares/authenticate.middleware.js";
 
@@ -22,7 +22,7 @@ export function scriptsController(platform: Platform) {
   return {
     list: asyncRoute(async (request, response) => {
       const page = parsePageRequest(request.query);
-      response.json({ data: await platform.scripts.list(accountId(response), page) });
+      response.json(pageBody(await platform.scripts.list(accountId(response), page)));
     }),
 
     create: asyncRoute(async (request, response) => {
@@ -46,7 +46,7 @@ export function scriptsController(platform: Platform) {
     listResults: asyncRoute(async (request, response) => {
       const page = parsePageRequest(request.query);
       const scriptId = request.params["id"]!;
-      response.json({ data: await platform.results.list(accountId(response), scriptId, page) });
+      response.json(pageBody(await platform.results.list(accountId(response), scriptId, page)));
     }),
 
     saveResult: asyncRoute(async (request, response) => {
