@@ -18,6 +18,7 @@ import { ReportExport } from "./evidence/ReportExport";
 import { connect, request, submit, terminal, unwrap, workbenchToken, type Connection } from "./analysis/workbench-client";
 import { observeJob } from "./analysis/poll-job";
 import { readWorkspace, saveWorkspace } from "./workspace/workspace-persistence";
+import { WorkbenchAccount } from "./scripts/WorkbenchAccount";
 // Monaco touches `self` as it loads, so it is kept out of the server render
 // entirely and mounted only once the browser has the editor.
 const SourceEditor = dynamic(() => import("./editor/SourceEditor").then((module) => module.SourceEditor), { ssr: false, loading: () => <div className="pane-empty">Opening editor…</div> });
@@ -54,6 +55,8 @@ export function Workbench(_props: WorkbenchProps): JSX.Element {
   const [lastInput, setLastInput] = useState("");
   const [ready, setReady] = useState(false);
   const [saved, setSaved] = useState("Restoring…");
+  /** The job behind the document on screen; undefined when the document came from a file. */
+  const [documentJob, setDocumentJob] = useState<string>();
   const sourceInput = useRef<HTMLInputElement>(null);
   const reportInput = useRef<HTMLInputElement>(null);
   const scenarioInput = useRef<HTMLInputElement>(null);
@@ -66,7 +69,7 @@ export function Workbench(_props: WorkbenchProps): JSX.Element {
   const sourceMatches = useMemo(() => !!document && copy.files.every((file) => document.sourceFiles[file.path] && decode(document, file.path) === file.source), [copy.files, document]);
   const stale = !!document && (lastInput ? lastInput !== currentInput : !sourceMatches);
   const finding = document?.analysis.findings?.find((item) => item.findingId === findingId);
-  function acceptDocument(value: InspectionDocument) { setLastInput(inputIdentity({ id: "captured", files: value.snapshot.files.filter((file) => file.role !== "config").map((file) => ({ path: file.path, source: decode(value, file.path) })) }, value.scenario, value.profile.profileRevisionId, value.analysis.budget.solverTimeMs ?? solverTimeMs)); setDocument(value); setDocuments((previous) => [...previous.filter((item) => item.analysis.resultId !== value.analysis.resultId), value].slice(-100)); setFindingId(value.analysis.findings?.[0]?.findingId); }
+  function acceptDocument(value: InspectionDocument, job?: string) { setDocumentJob(job); setLastInput(inputIdentity({ id: "captured", files: value.snapshot.files.filter((file) => file.role !== "config").map((file) => ({ path: file.path, source: decode(value, file.path) })) }, value.scenario, value.profile.profileRevisionId, value.analysis.budget.solverTimeMs ?? solverTimeMs)); setDocument(value); setDocuments((previous) => [...previous.filter((item) => item.analysis.resultId !== value.analysis.resultId), value].slice(-100)); setFindingId(value.analysis.findings?.[0]?.findingId); }
   function editDocument(value: InspectionDocument) {
     const next = forkReport(value); const configs = new Set(value.snapshot.files.filter((file) => file.role === "config").map((file) => file.path));
     setCopy({ ...next, files: next.files.filter((file) => !configs.has(file.path)) }); setScenario(value.scenario); setPath(value.scenario.entrypoint.path); setSelection({ path: value.scenario.entrypoint.path, line: 1 }); setCaptured(false); setLastInput(inputIdentity({ ...next, files: next.files.filter((file) => !configs.has(file.path)) }, value.scenario, value.profile.profileRevisionId, value.analysis.budget.solverTimeMs ?? solverTimeMs));
@@ -92,7 +95,7 @@ export function Workbench(_props: WorkbenchProps): JSX.Element {
           setJobs((previous) => previous.map((item) => item.jobId === job.jobId ? job : item));
           if (job.failure) setError(`${job.failure.code}: ${job.failure.message}`);
         }, controller.signal);
-        if (raw && typeof raw === "object" && "analysis" in raw) acceptDocument(await inspectionDocument(raw));
+        if (raw && typeof raw === "object" && "analysis" in raw) acceptDocument(await inspectionDocument(raw), latest.jobId);
       } catch (failure) { setError(String(failure)); }
       finally { busy.current = false; setActive(undefined); }
     })();
@@ -110,7 +113,7 @@ export function Workbench(_props: WorkbenchProps): JSX.Element {
         setActive(next); setJobs((previous) => previous.map((item) => item.jobId === next.jobId ? next : item));
         if (next.failure) setError(`${next.failure.code}: ${next.failure.message}`);
       }, controller.signal);
-      if (response && typeof response === "object" && "analysis" in response) { acceptDocument(await inspectionDocument(response)); setLastInput(inputKey); }
+      if (response && typeof response === "object" && "analysis" in response) { acceptDocument(await inspectionDocument(response), job.jobId); setLastInput(inputKey); }
     } catch (failure) { setError(failure instanceof Error ? failure.message : String(failure)); }
     finally { busy.current = false; setActive(undefined); }
   }, [connection, configError, copy, scenario, profileId, solverTimeMs, document, jobs]);
@@ -126,7 +129,7 @@ export function Workbench(_props: WorkbenchProps): JSX.Element {
     } catch (failure) { setError(String(failure)); }
   }
   async function openReport(file: File) { try { if (file.size > 16_777_216) throw new Error("Report exceeds 16 MiB"); const value = await inspectionDocument(JSON.parse(await file.text())); acceptDocument(value); setCaptured(true); setPath(value.scenario.entrypoint.path); setSelection({ path: value.scenario.entrypoint.path, line: 1 });  setError(undefined); } catch (failure) { setError(String(failure)); } }
-  async function selectJob(job: Job) { try { const value = await request(`/api/analyses/${encodeURIComponent(job.jobId)}`); if (job.resultIds?.length) { acceptDocument(await inspectionDocument(value));  } else setError(job.failure?.message ?? `${job.state}: no analysis result`); } catch (failure) { setError(String(failure)); } }
+  async function selectJob(job: Job) { try { const value = await request(`/api/analyses/${encodeURIComponent(job.jobId)}`); if (job.resultIds?.length) { acceptDocument(await inspectionDocument(value), job.jobId); } else setError(job.failure?.message ?? `${job.state}: no analysis result`); } catch (failure) { setError(String(failure)); } }
   function selectFinding(value: Finding) { setFindingId(value.findingId); const range = value.sourceRanges[0]; if (range) selectSource({ path: range.path, line: range.startLine, ranges: value.sourceRanges }); }
   function selectSource(value: SourceSelection) { setTabs((state) => openTab(state, value.path)); if (document && (!sourceMatches || !copy.files.some((file) => file.path === value.path))) setCaptured(true); setPath(value.path); setSelection(value); }
   function activateFile(path: string) { setTabs((state) => openTab(state, path)); setPath(path); setSelection({ path, line: 1 }); setCaptured(false); }
@@ -137,7 +140,7 @@ export function Workbench(_props: WorkbenchProps): JSX.Element {
   return <main className="ide" data-theme={theme}>
     <header className="ide-topbar"><span className="ide-logo" title="Pomset"><Icon name="layers" size={20} /></span><Tool icon="settings" label="Configure scenario" pressed={configuration} onClick={() => setConfiguration(!configuration)} /><Tool icon="folder" label="Open source files" onClick={() => sourceInput.current?.click()} /><Tool icon="plus" label="New file" onClick={() => { if (copy.files.length >= 100) { setError("The workspace supports up to 100 files"); return; } let index = 1; while (copy.files.some((file) => file.path === `untitled-${index}.py`)) index++; const name = `untitled-${index}.py`; setCopy({ ...copy, files: [...copy.files, { path: name, source: "" }] }); setPath(name); setSelection({ path: name, line: 1 }); setTabs((state) => openTab(state, name)); setCaptured(false); }} />
       <div className="experience-tools" role="group" aria-label="Experiences">{([{ name: "Explore", icon: "explore" }, { name: "Validate", icon: "validate" }, { name: "Optimize", icon: "chart" }] as const).map(({ name, icon }) => <Tool key={name} icon={icon} label={name} pressed={mode === name} onClick={() => setMode(name)} />)}</div>
-      <div className="ide-top-actions"><Tool icon="upload" label="Open captured report" onClick={() => reportInput.current?.click()} /><Tool icon="download" label="Download current source" disabled={!hasEditor} onClick={() => downloadText(editorPath.split("/").at(-1)!, editorSource, "text/plain;charset=utf-8")} /><Tool icon="external" label="Share captured result" disabled={!document} onClick={() => setExporting(true)} /><Tool icon="history" label="Analysis history" pressed={history} onClick={() => setHistory(!history)} /><Tool icon={theme === "dark" ? "sun" : "moon"} label={theme === "dark" ? "Use light appearance" : "Use dark appearance"} onClick={() => setTheme(theme === "dark" ? "light" : "dark")} /></div>
+      <div className="ide-top-actions"><Tool icon="upload" label="Open captured report" onClick={() => reportInput.current?.click()} /><Tool icon="download" label="Download current source" disabled={!hasEditor} onClick={() => downloadText(editorPath.split("/").at(-1)!, editorSource, "text/plain;charset=utf-8")} /><Tool icon="external" label="Share captured result" disabled={!document} onClick={() => setExporting(true)} /><Tool icon="history" label="Analysis history" pressed={history} onClick={() => setHistory(!history)} /><Tool icon={theme === "dark" ? "sun" : "moon"} label={theme === "dark" ? "Use light appearance" : "Use dark appearance"} onClick={() => setTheme(theme === "dark" ? "light" : "dark")} /><WorkbenchAccount source={copy.files.find((file) => file.path === scenario.entrypoint.path)?.source ?? ""} scenario={scenario} fileCount={copy.files.length} analysisId={documentJob} /></div>
     </header>
     <input hidden ref={sourceInput} type="file" multiple aria-label="Source files" onChange={(e) => { if (e.currentTarget.files) void openSource(e.currentTarget.files); e.currentTarget.value = ""; }} />
     <input hidden ref={reportInput} type="file" accept=".json" onChange={(e) => { if (e.currentTarget.files?.[0]) void openReport(e.currentTarget.files[0]); e.currentTarget.value = ""; }} />
