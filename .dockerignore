@@ -14,3 +14,7 @@
 .claude
 dont-track
 inspo
+
+# Local secrets never enter the image; deployment sets them in the platform.
+.env
+.env.*

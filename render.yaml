@@ -1,5 +1,11 @@
 # Render Blueprint. Render builds the Dockerfile and redeploys on every commit to
-# `main`. The token is set in the Render dashboard and never committed here.
+# `main`. Secrets are generated or entered in the Render dashboard and never
+# committed here. RENDER_EXTERNAL_HOSTNAME is set by Render itself, so the
+# workbench learns its public host without configuration.
+#
+# The free plan has no persistent disk: accounts, saved scripts and results are
+# lost on every redeploy or restart, and the demo accounts are created again
+# from the two passwords below. See docs/adr/0017-public-workbench-hosting.md.
 services:
   - type: web
     name: pomset
@@ -10,5 +16,11 @@ services:
     autoDeploy: true
     healthCheckPath: /healthz
     envVars:
-      - key: POMSET_WORKBENCH_TOKEN
+      - key: JWT_SECRET
+        generateValue: true
+      - key: POMSET_DEMO_ACCOUNTS
+        value: "1"
+      - key: POMSET_DEMO_ADMIN_PASSWORD
+        sync: false
+      - key: POMSET_DEMO_USER_PASSWORD
         sync: false

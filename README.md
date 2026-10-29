@@ -68,6 +68,47 @@ Branch `web/mock` holds a navigable interface mock in plain HTML, CSS and
 JavaScript. It is a maquette for settling visual language and interaction
 states, it is never merged into `main`, and it is not a specification.
 
+### Public workbench
+
+The same workbench runs as a public demo at `<public-url>` (set the URL once the
+Render service is live). It is deployed from `main` by `render.yaml` and the
+[Dockerfile](Dockerfile); the decision is in
+[ADR-0017](docs/adr/0017-public-workbench-hosting.md).
+
+Sign in with a demo account, or register your own:
+
+| Account | Email | Role |
+|---|---|---|
+| Demo administrator | `admin@pomset.example` | administrator: can list users |
+| Demo user | `user@pomset.example` | user |
+
+The demo passwords are not in this repository. They are set in the Render
+dashboard as `POMSET_DEMO_ADMIN_PASSWORD` and `POMSET_DEMO_USER_PASSWORD`. Each
+account owns its saved scripts and results. Other accounts cannot see them.
+
+Decisions:
+
+- Sessions are JWTs (HS256, two hours). The role is read from the database on
+  every request, so a change of role or a deletion takes effect at once.
+- Passwords are hashed with bcrypt at cost 12. They are limited to 72 bytes.
+- Accounts live in SQLite through Prisma and the libSQL adapter. The schema is
+  `apps/api/prisma/accounts/schema.prisma`, and the migration is reviewed SQL.
+- Sign-in and registration are rate limited per address, and sign-in is also
+  limited per email.
+- The free Render plan has no persistent disk. Accounts, saved scripts and
+  results are lost on every redeploy or restart. Demo accounts are created again
+  at start-up.
+
+Token storage risk: the browser keeps the session token in `sessionStorage`,
+which is cleared when the tab closes. Script running in the page can read it, so
+the page must not render untrusted HTML. The token lasts at most two hours.
+
+Local configuration is listed in [`.env.example`](.env.example).
+
+AI use: parts of this codebase were written with AI assistance (Claude Code).
+The API behaviour is pinned by the tests under `apps/api`. Check any change
+against those tests and the ADRs before relying on it.
+
 ## Invariants
 
 Running leaves the project unpublished. Compiling for a target leaves it unexecuted. A finished job proves nothing about correctness. Reopening evidence returns the old sample. Editing source leaves historical results untouched.
