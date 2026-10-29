@@ -12,7 +12,7 @@ import { FileTabs } from "./editor/FileTabs";
 import { closeTabs, openTab, type Tabs, type CloseMode } from "./editor/tab-state";
 import { RenameFile } from "./editor/RenameFile";
 import { ScenarioEditor } from "./scenario/ScenarioEditor";
-import { newScenario, parseScenario } from "./scenario/scenario-draft";
+import { inferEntrypoint, newScenario, parseScenario } from "./scenario/scenario-draft";
 import { Splitter } from "./editor/Splitter";
 import { ReportExport } from "./evidence/ReportExport";
 import { connect, request, submit, terminal, unwrap, workbenchToken, type Connection } from "./analysis/workbench-client";
@@ -104,7 +104,9 @@ export function Workbench(_props: WorkbenchProps): JSX.Element {
     if (busy.current || !connection || configError) return;
     busy.current = true; setError(undefined); const inputKey = inputIdentity(copy, scenario, profileId, solverTimeMs); attempted.current = inputKey;
     try {
-      const valid = parseScenario(JSON.stringify(scenario));
+      const symbol = scenario.entrypoint.symbol || inferEntrypoint(copy.files.find((file) => file.path === scenario.entrypoint.path)?.source);
+      if (!symbol) throw new Error("Name the entry point: the function to analyze, such as def transform(...)");
+      const valid = parseScenario(JSON.stringify({ ...scenario, entrypoint: { ...scenario.entrypoint, symbol } }));
       const parent = document && jobs.some((job) => job.snapshotId === document.snapshot.snapshotId) ? document.snapshot.snapshotId : undefined;
       const job = await submit({ files: copy.files, scenario: valid, profileRevisionId: profileId, solverTimeMs, ...(parent ? { parentSnapshotId: parent } : {}) });
       setActive(job); setJobs((previous) => [job, ...previous]);

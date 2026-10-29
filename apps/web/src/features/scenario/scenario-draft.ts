@@ -7,6 +7,10 @@ export function newScenario(path: string): Scenario {
     domain: { domainId: `dom_${crypto.randomUUID()}`, enumerable: true, variables: [], constraints: [] },
     requiredProperties: ["memoryBounds", "outputCoverage", "writeWriteConflict"], createdAt: new Date().toISOString() };
 }
+/** The first top-level `def` name in a Python source, the function an analysis runs by default. */
+export function inferEntrypoint(source: string | undefined): string | undefined {
+  return source?.match(/^def ([A-Za-z_][A-Za-z0-9_]{0,63})\(/m)?.[1];
+}
 export function parseScenario(text: string): Scenario {
   const value: unknown = JSON.parse(text);
   const validate = schemaSet().validatorFor("domain.schema.yaml#/$defs/scenario");
